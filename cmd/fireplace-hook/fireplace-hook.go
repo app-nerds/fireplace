@@ -24,7 +24,7 @@ type FireplaceHook struct {
 
 func NewFireplaceHook(config *FireplaceHookConfig) *FireplaceHook {
 	return &FireplaceHook{
-		client: &http.Client{},
+		client: &http.Client{Timeout: time.Second * 2},
 		config: config,
 	}
 }
@@ -32,9 +32,7 @@ func NewFireplaceHook(config *FireplaceHookConfig) *FireplaceHook {
 func (h *FireplaceHook) Fire(entry *logrus.Entry) error {
 	var err error
 
-	fmt.Printf("We are here\n")
-
-	data := &logentry.LogEntry{
+	data := &logentry.CreateLogEntryRequest{
 		Application: h.config.Application,
 		Level:       entry.Level.String(),
 		Time:        entry.Time.UTC().Format(time.RFC3339),
@@ -75,9 +73,10 @@ func (h *FireplaceHook) Levels() []logrus.Level {
 	}
 }
 
-func (h *FireplaceHook) send(entry *logentry.LogEntry) error {
+func (h *FireplaceHook) send(entry *logentry.CreateLogEntryRequest) error {
 	var err error
 	var entryJSON []byte
+	var response *http.Response
 
 	if entryJSON, err = json.Marshal(entry); err != nil {
 		return errors.Wrapf(err, "Error converting log entry to JSON")
@@ -85,9 +84,10 @@ func (h *FireplaceHook) send(entry *logentry.LogEntry) error {
 
 	reader := bytes.NewReader(entryJSON)
 
-	if _, err = h.client.Post(h.config.FireplaceURL+"/logentry", "application/json", reader); err != nil {
+	if response, err = h.client.Post(h.config.FireplaceURL+"/logentry", "application/json", reader); err != nil {
 		return errors.Wrapf(err, "Error sending log entry to Fireplace Server")
 	}
 
+	defer response.Body.Close()
 	return nil
 }

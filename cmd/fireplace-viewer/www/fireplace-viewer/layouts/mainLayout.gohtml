@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Fireplace Viewer // {{.Title}}</title>
+
+	<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400italic,400,700" rel="stylesheet" type="text/css" />
+	<link href="/www/grommet/css/grommet.min.css" rel="stylesheet" type="text/css" />
+
+	<script src="/www/moment/min/moment-with-locales.min.js"></script>
+	<script src="/www/react/react-with-addons.js"></script>
+	<script src="/www/react/react-dom.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+	<script src="/www/grommet/grommet.min.js"></script>
+	<script src="/www/fireplace-viewer/components/FormatDateTime.js" type="text/babel"></script>
+	<script src="/www/fireplace-viewer/components/Header.js" type="text/babel"></script>
+	<script src="/www/fireplace-viewer/components/Footer.js" type="text/babel"></script>
+</head>
+<body>
+	{{template "body" .}}
+
+	{{template "scripts" .}}
+</body>
+</html>

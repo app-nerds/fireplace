@@ -1,121 +1,98 @@
 package logentry
 
 import (
-	"bytes"
-	"encoding/gob"
-	"sort"
 	"time"
 
-	"github.com/dgraph-io/badger"
-	uuid "github.com/nu7hatch/gouuid"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+
+	"github.com/adampresley/fireplace/pkg/filters"
 	"github.com/pkg/errors"
 )
 
 type LogEntryService struct {
-	DB *badger.DB
+	DB       *mgo.Database
+	PageSize int
 }
 
-func (s *LogEntryService) generateGUID() string {
-	uuid, _ := uuid.NewV4()
-	return uuid.String()
-}
-
-func (s *LogEntryService) decode(value []byte) (*LogEntry, error) {
+func (s *LogEntryService) CreateLogEntry(entryRequest *CreateLogEntryRequest) (string, error) {
 	var err error
-	var result *LogEntry
+	var t time.Time
 
-	decoder := gob.NewDecoder(bytes.NewReader(value))
+	id := bson.NewObjectId()
 
-	if err = decoder.Decode(&result); err != nil {
-		return nil, errors.Wrapf(err, "Unable to decode value")
+	if t, err = time.Parse(time.RFC3339, entryRequest.Time); err != nil {
+		return "", errors.Wrapf(err, "Error parsing time in create log entry request")
+	}
+
+	entry := &LogEntry{
+		Application: entryRequest.Application,
+		Details:     entryRequest.Details,
+		ID:          id,
+		Level:       entryRequest.Level,
+		Message:     entryRequest.Message,
+		Time:        t,
+	}
+
+	if err = s.DB.C("logentries").Insert(entry); err != nil {
+		return "", errors.Wrapf(err, "Error writing log entry to database")
+	}
+
+	return id.Hex(), nil
+}
+
+func (s *LogEntryService) GetLogEntries(filter *filters.LogEntryFilter) (LogEntryCollection, int, error) {
+	var err error
+	var totalCount int
+	result := make(LogEntryCollection, 0, 500)
+
+	query := s.buildQueryFromFilters(filter)
+	recordSet := s.DB.C("logentries").Find(query).Sort("-time")
+
+	if totalCount, err = recordSet.Count(); err != nil {
+		return result, 0, errors.Wrapf(err, "Error getting total count of records in GetLogEntries")
+	}
+
+	if filter.Page > 0 {
+		skip := (filter.Page - 1) * s.PageSize
+		recordSet.Skip(skip).Limit(s.PageSize)
+	}
+
+	if err = recordSet.All(&result); err != nil {
+		return result, 0, errors.Wrapf(err, "Error getting log entries in LogEntryService")
+	}
+
+	return result, totalCount, nil
+}
+
+func (s *LogEntryService) GetLogEntry(id string) (*LogEntry, error) {
+	var err error
+	result := &LogEntry{}
+
+	if err = s.DB.C("logentries").FindId(bson.ObjectIdHex(id)).One(&result); err != nil {
+		return result, errors.Wrapf(err, "Error getting log entry in LogEntryService for ID %s", id)
 	}
 
 	return result, nil
 }
 
-func (s *LogEntryService) encode(value interface{}) ([]byte, error) {
-	var err error
-	var result bytes.Buffer
+func (s *LogEntryService) buildQueryFromFilters(filter *filters.LogEntryFilter) bson.M {
+	query := bson.M{}
 
-	encoder := gob.NewEncoder(&result)
-
-	if err = encoder.Encode(value); err != nil {
-		return nil, errors.Wrapf(err, "Unable to encode value")
+	if filter.Application != "" {
+		query["application"] = filter.Application
 	}
 
-	return result.Bytes(), nil
-}
-
-func (s *LogEntryService) CreateLogEntry(entry *LogEntry) (string, error) {
-	var err error
-	var encoded []byte
-
-	id := []byte(s.generateGUID())
-
-	if encoded, err = s.encode(entry); err != nil {
-		return "", errors.Wrapf(err, "Error encoding log entry in LogEntryService")
+	if filter.Level != "" {
+		query["level"] = filter.Level
 	}
 
-	err = s.DB.Update(func(transaction *badger.Txn) error {
-		return transaction.Set(id, encoded)
-	})
-
-	if err != nil {
-		return "", errors.Wrapf(err, "Error writing log entry to database")
-	}
-
-	return string(id), nil
-}
-
-func (s *LogEntryService) GetLogEntries() (LogEntryCollection, int, error) {
-	var err error
-	totalRecords := 0
-	result := make(LogEntryCollection, 0, 500)
-
-	err = s.DB.View(func(transaction *badger.Txn) error {
-		var err error
-		var value []byte
-
-		options := badger.DefaultIteratorOptions
-		options.PrefetchSize = 10
-
-		iterator := transaction.NewIterator(options)
-		defer iterator.Close()
-
-		for iterator.Rewind(); iterator.Valid(); iterator.Next() {
-			var newLogEntry *LogEntry
-			item := iterator.Item()
-
-			key := string(item.Key())
-			if value, err = item.Value(); err != nil {
-				return errors.Wrapf(err, "Error getting value for key %s", key)
-			}
-
-			if newLogEntry, err = s.decode(value); err != nil {
-				return errors.Wrapf(err, "Unable to decode value for key %s", key)
-			}
-
-			totalRecords++
-			result = append(result, newLogEntry)
+	if filter.Search != "" {
+		query["$or"] = bson.D{
+			bson.DocElem{Name: "message", Value: bson.M{"$regex": "/" + filter.Search + "/i"}},
+			bson.DocElem{Name: "details", Value: filter.Search},
 		}
-
-		return nil
-	})
-
-	if err != nil {
-		return result, 0, errors.Wrapf(err, "Error getting log entries in LogEntryService")
 	}
 
-	// TODO: Fix sorting. Still not working
-	s.sortLogEntries(result)
-	return result, totalRecords, nil
-}
-
-func (s *LogEntryService) sortLogEntries(entries LogEntryCollection) {
-	sort.Slice(entries, func(i, j int) bool {
-		entryTime1, _ := time.Parse(entries[i].Time, time.RFC3339)
-		entryTime2, _ := time.Parse(entries[j].Time, time.RFC3339)
-
-		return entryTime1.Before(entryTime2)
-	})
+	return query
 }
