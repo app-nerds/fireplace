@@ -129,6 +129,7 @@ func getLogEntries(ctx echo.Context) error {
 	}
 
 	if page, err = strconv.Atoi(ctx.QueryParam("page")); err != nil {
+		logger.WithError(err).WithField("requestedPage", ctx.QueryParam("page")).Errorf("Unable to get page info")
 		page = 1
 	}
 
@@ -138,11 +139,16 @@ func getLogEntries(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "Error getting log enries: "+err.Error())
 	}
 
-	logger.WithField("totalRecords", totalRecords).Infof("Log entries retrieved")
+	logger.WithFields(logrus.Fields{"totalRecords": totalRecords, "count": len(result), "page": page}).Infof("Log entries retrieved")
 
-	ctx.Response().Header().Set("X-Total-Count", strconv.Itoa(totalRecords))
-	ctx.Response().Header().Set("X-Count", strconv.Itoa(len(result)))
-	return ctx.JSON(http.StatusOK, result)
+	response := &logentry.GetLogEntriesResponse{
+		LogEntries: result,
+		TotalCount: totalRecords,
+		Count:      len(result),
+		PageSize:   PAGE_SIZE,
+	}
+
+	return ctx.JSON(http.StatusOK, response)
 }
 
 func getLogEntry(ctx echo.Context) error {
