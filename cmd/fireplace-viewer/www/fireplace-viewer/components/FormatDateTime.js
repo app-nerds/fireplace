@@ -4,7 +4,7 @@ class FormatDateTime extends React.Component {
 	}
 
 	render() {
-		return <span>{moment(this.props.date).format("ddd MMM Do, YYYY hh:mm:ss A")}</span>;
+		return <span>{moment(this.props.date).format("YYYY-MM-DD hh:mm:ss A")}</span>;
 	}
 }
 
