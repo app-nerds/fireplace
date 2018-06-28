@@ -2,15 +2,16 @@ class ViewerPage extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.page = 1;
+		this.recordCount = 0;
+		this.totalRecordCount = 0;
+		this.pageSize = 0;
+
 		this.state = {
 			entries: [],
 			selectedEntry: undefined,
 			error: undefined,
-			detailsActive: false,
-			recordCount: 0,
-			totalRecordCount: 0,
-			page: 1,
-			pageSize: 0
+			detailsActive: false
 		};
 
 		this.onRefresh = this.onRefresh.bind(this);
@@ -29,14 +30,15 @@ class ViewerPage extends React.Component {
 			cache: "no-store"
 		};
 
-		fetch("/logentry?page=" + this.state.page, options)
+		fetch("/logentry?page=" + this.page, options)
 			.then(response => response.json())
 			.then((result) => {
+				this.recordCount = result.count;
+				this.totalRecordCount = result.totalCount;
+				this.pageSize = result.pageSize;
+
 				return this.setState({
 					entries: result.logEntries,
-					recordCount: result.count,
-					totalRecordCount: result.totalCount,
-					pageSize: result.pageSize,
 					error: undefined
 				});
 			})
@@ -69,12 +71,12 @@ class ViewerPage extends React.Component {
 	}
 
 	hasNextPage() {
-		let lastPage = Math.floor(this.state.totalRecordCount / this.state.pageSize);
-		return this.state.page < lastPage;
+		let lastPage = Math.floor(this.totalRecordCount / this.pageSize);
+		return this.page < lastPage;
 	}
 
 	hasPreviousPage() {
-		return this.state.page > 0;
+		return this.page > 1;
 	}
 
 	handleDetailsOnClose() {
@@ -102,10 +104,7 @@ class ViewerPage extends React.Component {
 		let hasNextPage = this.hasNextPage();
 
 		if (hasNextPage) {
-			this.setState((prevState) => {
-				return { page: prevState.page + 1 };
-			});
-
+			this.page = this.page + 1;
 			this.getLogEntries();
 		}
 	}
@@ -116,10 +115,7 @@ class ViewerPage extends React.Component {
 		let hasPreviousPage = this.hasPreviousPage();
 
 		if (hasPreviousPage) {
-			this.setState((prevState) => {
-				return { page: prevState.page - 1 };
-			});
-
+			this.page = this.page - 1;
 			this.getLogEntries();
 		}
 	}
