@@ -48,6 +48,7 @@ func main() {
 	httpServer := echo.New()
 	httpServer.HideBanner = true
 	httpServer.Use(middleware.CORS())
+
 	httpServer.Renderer = renderer
 
 	httpServer.GET("/www/*", echo.WrapHandler(assetHandler))
@@ -96,10 +97,9 @@ func getLogEntries(ctx echo.Context) error {
 	var err error
 	var response *http.Response
 	var rawResult []byte
+	var serverResponse *logentry.GetLogEntriesResponse
 
-	entries := make(logentry.LogEntryCollection, 0, 100)
-
-	if response, err = fireplaceServerClient.Get(*serverURL + "/logentry"); err != nil {
+	if response, err = fireplaceServerClient.Get(*serverURL + "/logentry?page=" + ctx.QueryParam("page")); err != nil {
 		logger.WithError(err).Errorf("Error getting log entries")
 		return ctx.String(http.StatusInternalServerError, "Error getting log entries")
 	}
@@ -109,12 +109,12 @@ func getLogEntries(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "Error getting log entries")
 	}
 
-	if err = json.Unmarshal(rawResult, &entries); err != nil {
+	if err = json.Unmarshal(rawResult, &serverResponse); err != nil {
 		logger.WithError(err).Errorf("Error unmarshalling log entries")
 		return ctx.String(http.StatusInternalServerError, "Error unmarshalling log entries")
 	}
 
-	return ctx.JSON(http.StatusOK, entries)
+	return ctx.JSON(http.StatusOK, serverResponse)
 }
 
 func getLogEntry(ctx echo.Context) error {

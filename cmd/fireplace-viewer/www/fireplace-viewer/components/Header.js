@@ -10,6 +10,8 @@ class Header extends React.Component {
 				<Grommet.Box flex={true} justify="end" direction="row" responsive={true}>
 					<Grommet.Search inline={true} fill={true} size="medium" placeHolder="Search" dropAlign={{ "right": "right" }} />
 					<Grommet.Button icon={<Grommet.RefreshIcon onClick={this.props.onRefresh} />} />
+					<Grommet.Button icon={<Grommet.CaretPreviousIcon onClick={this.props.onPreviousPage} />} />
+					<Grommet.Button icon={<Grommet.CaretNextIcon onClick={this.props.onNextPage} />} />
 				</Grommet.Box>
 			</Grommet.Header>
 		);

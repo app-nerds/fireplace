@@ -8,7 +8,9 @@ class ViewerPage extends React.Component {
 			error: undefined,
 			detailsActive: false,
 			recordCount: 0,
-			page: 1
+			totalRecordCount: 0,
+			page: 1,
+			pageSize: 0
 		};
 
 		this.onRefresh = this.onRefresh.bind(this);
@@ -18,18 +20,25 @@ class ViewerPage extends React.Component {
 		this.onPreviousPage = this.onPreviousPage.bind(this);
 	}
 
-	getLogEntries(search) {
+	getLogEntries(page, search) {
 		let options = {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json"
-			}
+			},
+			cache: "no-store"
 		};
 
-		fetch("/logentry", options)
+		fetch("/logentry?page=" + this.state.page, options)
 			.then(response => response.json())
 			.then((result) => {
-				this.setState({ entries: result, error: undefined })
+				return this.setState({
+					entries: result.logEntries,
+					recordCount: result.count,
+					totalRecordCount: result.totalCount,
+					pageSize: result.pageSize,
+					error: undefined
+				});
 			})
 			.catch((err) => {
 				console.log(err);
@@ -59,6 +68,15 @@ class ViewerPage extends React.Component {
 		})
 	}
 
+	hasNextPage() {
+		let lastPage = Math.floor(this.state.totalRecordCount / this.state.pageSize);
+		return this.state.page < lastPage;
+	}
+
+	hasPreviousPage() {
+		return this.state.page > 0;
+	}
+
 	handleDetailsOnClose() {
 		this.setState({ detailsActive: false });
 	}
@@ -80,10 +98,30 @@ class ViewerPage extends React.Component {
 
 	onNextPage(e) {
 		e.preventDefault();
+
+		let hasNextPage = this.hasNextPage();
+
+		if (hasNextPage) {
+			this.setState((prevState) => {
+				return { page: prevState.page + 1 };
+			});
+
+			this.getLogEntries();
+		}
 	}
 
 	onPreviousPage(e) {
 		e.preventDefault();
+
+		let hasPreviousPage = this.hasPreviousPage();
+
+		if (hasPreviousPage) {
+			this.setState((prevState) => {
+				return { page: prevState.page - 1 };
+			});
+
+			this.getLogEntries();
+		}
 	}
 
 	componentDidMount() {
