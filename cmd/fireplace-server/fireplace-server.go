@@ -67,6 +67,8 @@ func main() {
 	httpServer.POST("/logentry", createLogEntry)
 	httpServer.GET("/logentry", getLogEntries)
 	httpServer.GET("/logentry/:id", getLogEntry)
+	httpServer.DELETE("/logentry", deleteLogEntries)
+	httpServer.GET("/applicationname", getApplicationNames)
 
 	go func() {
 		var err error
@@ -116,6 +118,38 @@ func createLogEntry(ctx echo.Context) error {
 	return ctx.String(http.StatusOK, newID)
 }
 
+func deleteLogEntries(ctx echo.Context) error {
+	var err error
+	var initialFromDate time.Time
+	var fromDate time.Time
+	var numRecordsDeleted int
+
+	if initialFromDate, err = time.Parse("1/2/2006", ctx.QueryParam("fromDate")); err != nil {
+		return ctx.String(http.StatusBadRequest, "Invalid fromDate value")
+	}
+
+	fromDate = initialFromDate.Add(24 * time.Hour)
+
+	if numRecordsDeleted, err = logEntryService.Delete(fromDate); err != nil {
+		return ctx.String(http.StatusInternalServerError, "Error deleting log entries: "+err.Error())
+	}
+
+	logger.WithFields(logrus.Fields{"fromDate": ctx.QueryParam("fromDate"), "numRecords": numRecordsDeleted}).Infof("Deleted log entries")
+	return ctx.String(http.StatusOK, strconv.Itoa(numRecordsDeleted)+" entries deleted")
+}
+
+func getApplicationNames(ctx echo.Context) error {
+	var err error
+	var applicationNames []string
+
+	if applicationNames, err = logEntryService.GetApplicationNames(); err != nil {
+		logger.WithError(err).Errorf("Error getting application names")
+		return ctx.String(http.StatusInternalServerError, "Error getting application names")
+	}
+
+	return ctx.JSON(http.StatusOK, applicationNames)
+}
+
 func getLogEntries(ctx echo.Context) error {
 	var err error
 	totalRecords := 0
@@ -136,6 +170,7 @@ func getLogEntries(ctx echo.Context) error {
 	filter.Page = page
 
 	if result, totalRecords, err = logEntryService.GetLogEntries(filter); err != nil {
+		logger.WithError(err).WithField("filter", filter).Errorf("Error getting log entries")
 		return ctx.String(http.StatusInternalServerError, "Error getting log enries: "+err.Error())
 	}
 

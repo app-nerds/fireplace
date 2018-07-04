@@ -14,6 +14,7 @@ import (
 var templates map[string]*template.Template
 var pageList = []string{
 	"main-page.gohtml",
+	"delete-old-entries.gohtml",
 }
 
 /*

@@ -2,16 +2,16 @@ class ViewerPage extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.page = 1;
-		this.recordCount = 0;
-		this.totalRecordCount = 0;
-		this.pageSize = 0;
+		this.logEntryService = new LogEntryService();
 
 		this.state = {
 			entries: [],
 			selectedEntry: undefined,
-			error: undefined,
-			detailsActive: false
+			detailsActive: false,
+			page: 1,
+			application: "All",
+			level: "",
+			searchTerm: ""
 		};
 
 		this.onRefresh = this.onRefresh.bind(this);
@@ -19,171 +19,125 @@ class ViewerPage extends React.Component {
 		this.handleDetailsOnClose = this.handleDetailsOnClose.bind(this);
 		this.onNextPage = this.onNextPage.bind(this);
 		this.onPreviousPage = this.onPreviousPage.bind(this);
+		this.onSearch = this.onSearch.bind(this);
+		this.onApplicationSelect = this.onApplicationSelect.bind(this);
+		this.onLevelSelect = this.onLevelSelect.bind(this);
+		this.updateEntryState = this.updateEntryState.bind(this);
 	}
 
-	getLogEntries(page, search) {
-		let options = {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			cache: "no-store"
-		};
-
-		fetch("/logentry?page=" + this.page, options)
-			.then(response => response.json())
-			.then((result) => {
-				this.recordCount = result.count;
-				this.totalRecordCount = result.totalCount;
-				this.pageSize = result.pageSize;
-
-				return this.setState({
-					entries: result.logEntries,
-					error: undefined
-				});
-			})
-			.catch((err) => {
-				console.log(err);
-				this.setState({ entries: [], error: err });
+	updateEntryState(entries) {
+		return new Promise((resolve) => {
+			this.setState({
+				entries: entries,
+				page: this.logEntryService.getPage()
+			}, () => {
+				return resolve();
 			});
-	}
-
-	getLogEntry(id) {
-		let options = {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		return new Promise((resolve, reject) => {
-			fetch("/logentry/" + id, options)
-				.then(response => response.json())
-				.then(entry => this.setState({ selectedEntry: entry, error: undefined }))
-				.then(() => {
-					return resolve();
-				})
-				.catch((err) => {
-					this.setState({ error: err });
-					return reject(err);
-				});
-		})
-	}
-
-	hasNextPage() {
-		let lastPage = Math.floor(this.totalRecordCount / this.pageSize);
-		return this.page < lastPage;
-	}
-
-	hasPreviousPage() {
-		return this.page > 1;
+		});
 	}
 
 	handleDetailsOnClose() {
 		this.setState({ detailsActive: false });
 	}
 
-	onRefresh(e) {
-		e.preventDefault();
-		this.getLogEntries();
-	}
-
-	onShowDetails(e) {
-		e.preventDefault();
-
-		var id = e.currentTarget.dataset.id;
-		this.getLogEntry(id)
-			.then(() => {
-				this.setState({ detailsActive: true });
+	onRefresh() {
+		this.logEntryService.refresh()
+			.then(this.updateEntryState)
+			.catch((err) => {
+				console.log(err);
+				alert(err);
 			});
 	}
 
-	onNextPage(e) {
-		e.preventDefault();
+	onShowDetails(entry) {
+		this.setState({
+			detailsActive: true,
+			selectedEntry: entry
+		});
+	}
 
-		let hasNextPage = this.hasNextPage();
-
-		if (hasNextPage) {
-			this.page = this.page + 1;
-			this.getLogEntries();
+	onNextPage() {
+		if (this.logEntryService.hasNextPage()) {
+			this.logEntryService.nextPage()
+				.then(this.updateEntryState)
+				.catch((err) => {
+					console.log(err);
+					alert(err);
+				});
 		}
 	}
 
-	onPreviousPage(e) {
+	onPreviousPage() {
+		if (this.logEntryService.hasPreviousPage()) {
+			this.logEntryService.previousPage()
+				.then(this.updateEntryState)
+				.catch((err) => {
+					console.log(err);
+					alert(err);
+				});
+		}
+	}
+
+	onSearch(e) {
 		e.preventDefault();
 
-		let hasPreviousPage = this.hasPreviousPage();
+		this.logEntryService.filterBySearch(e.target.value)
+			.then(this.updateEntryState)
+			.then(() => { this.setState({ searchTerm: e.target.value }) })
+			.catch((err) => {
+				console.log(err);
+				alert(err);
+			});
+	}
 
-		if (hasPreviousPage) {
-			this.page = this.page - 1;
-			this.getLogEntries();
-		}
+	onApplicationSelect(applicationName) {
+		this.logEntryService.filterByApplication(applicationName)
+			.then(this.updateEntryState)
+			.then(() => { this.setState({ application: applicationName }); })
+			.catch((err) => {
+				console.log(err);
+				alert(err);
+			});
+	}
+
+	onLevelSelect(level) {
+		this.logEntryService.filterByLevel(level)
+			.then(this.updateEntryState)
+			.then(() => { this.setState({ level: level }); })
+			.catch((err) => {
+				console.log(err);
+				alert(err);
+			});
 	}
 
 	componentDidMount() {
-		this.getLogEntries();
+		this.logEntryService.getLogEntries()
+			.then((entries) => {
+				this.setState({ entries: entries });
+			})
+			.catch((err) => {
+				alert(err);
+				console.log(err);
+			});
 	}
 
 	render() {
 		return (
 			<Grommet.App centered={false}>
-				<Header onRefresh={this.onRefresh} onNextPage={this.onNextPage} onPreviousPage={this.onPreviousPage} />
+				<Header
+					showEntryManagement={true}
+					onRefresh={this.onRefresh}
+					onNextPage={this.onNextPage}
+					onPreviousPage={this.onPreviousPage}
+					onSearch={this.onSearch}
+					onApplicationSelect={this.onApplicationSelect}
+					onLevelSelect={this.onLevelSelect}
+					application={this.state.application}
+					level={this.state.level}
+					page={this.state.page} />
 				<Grommet.Box flex={true}>
-					{this.state.detailsActive &&
-						<Grommet.Layer closer={true} overlayClose={true} onClose={this.handleDetailsOnClose}>
-							<Grommet.Article full={true}>
-								<Grommet.Header>Details</Grommet.Header>
-
-								<Grommet.Section>
-									<Grommet.Table>
-										<thead>
-											<Grommet.TableRow>
-												<th>Key</th>
-												<th>Value</th>
-											</Grommet.TableRow>
-										</thead>
-										<tbody>
-											{this.state.selectedEntry.details.map((detail, index) => {
-												return (
-													<Grommet.TableRow key={index}>
-														<td>{detail.key}</td>
-														<td>{detail.value}</td>
-													</Grommet.TableRow>
-												);
-											})}
-										</tbody>
-									</Grommet.Table>
-								</Grommet.Section>
-							</Grommet.Article>
-						</Grommet.Layer>
-					}
-
-					<Grommet.Table>
-						<tbody>
-							{this.state.entries.map((entry) => {
-								let backgroundColor = "neutral-1";
-								let details = entry.details;
-
-								if (entry.level === "error") {
-									backgroundColor = "critical";
-								}
-
-								if (entry.level === "debug") {
-									backgroundColor = "accent-2-t";
-								}
-
-								return (
-									<Grommet.TableRow key={entry.id}>
-										{details ? <td style={{ "width": "2%" }}><Grommet.Button icon={<Grommet.FormNextLinkIcon />} onClick={this.onShowDetails} data-id={entry.id} /></td> : <td>&nbsp;</td>}
-										<td style={{ "width": "15%" }}>{entry.application}</td>
-										<td style={{ "width": "5%" }}><Grommet.Box colorIndex={backgroundColor}>{entry.level}</Grommet.Box></td>
-										<td style={{ "width": "58%" }}>{entry.message}</td>
-										<td style={{ "width": "25%" }}><FormatDateTime date={entry.time} /></td>
-									</Grommet.TableRow>
-								);
-							})}
-						</tbody>
-					</Grommet.Table>
+					<LogEntryDetails active={this.state.detailsActive} selectedEntry={this.state.selectedEntry} onClose={this.handleDetailsOnClose} />
+					<EntriesList entries={this.state.entries} onShowDetails={this.onShowDetails} />
 				</Grommet.Box>
 			</Grommet.App>
 		);

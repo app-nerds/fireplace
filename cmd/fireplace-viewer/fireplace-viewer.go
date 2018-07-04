@@ -7,6 +7,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -53,8 +54,11 @@ func main() {
 
 	httpServer.GET("/www/*", echo.WrapHandler(assetHandler))
 	httpServer.GET("/", handleMainPage)
+	httpServer.GET("/deleteoldentries", handleDeleteOldEntriesPage)
 	httpServer.GET("/logentry", getLogEntries)
 	httpServer.GET("/logentry/:id", getLogEntry)
+	httpServer.DELETE("/logentry", delete)
+	httpServer.GET("/applicationname", getApplicationNames)
 
 	go func() {
 		var err error
@@ -93,13 +97,55 @@ func handleMainPage(ctx echo.Context) error {
 	return ctx.Render(http.StatusOK, "mainLayout:main-page", viewState)
 }
 
+func handleDeleteOldEntriesPage(ctx echo.Context) error {
+	var viewState = map[string]interface{}{
+		"Title": "Delete Old Entries",
+	}
+
+	return ctx.Render(http.StatusOK, "mainLayout:delete-old-entries", viewState)
+}
+
+func getApplicationNames(ctx echo.Context) error {
+	var err error
+	var response *http.Response
+	var rawResult []byte
+	var applicationNames []string
+
+	if response, err = fireplaceServerClient.Get(*serverURL + "/applicationname"); err != nil {
+		logger.WithError(err).Errorf("Error getting application names")
+		return ctx.String(http.StatusInternalServerError, "Error getting application names")
+	}
+
+	if rawResult, err = ioutil.ReadAll(response.Body); err != nil {
+		logger.WithError(err).Errorf("Error reading response body when getting application names")
+		return ctx.String(http.StatusInternalServerError, "Error getting application names")
+	}
+
+	if response.StatusCode != 200 {
+		logger.WithField("result", string(rawResult)).Errorf("Error getting application names from Fireplace server")
+		return ctx.String(http.StatusInternalServerError, "Error getting application names")
+	}
+
+	if err = json.Unmarshal(rawResult, &applicationNames); err != nil {
+		logger.WithError(err).WithField("result", string(rawResult)).Errorf("Error unmarshalling application names")
+		return ctx.String(http.StatusInternalServerError, "Error unmarshalling application names")
+	}
+
+	return ctx.JSON(http.StatusOK, applicationNames)
+}
+
 func getLogEntries(ctx echo.Context) error {
 	var err error
 	var response *http.Response
 	var rawResult []byte
 	var serverResponse *logentry.GetLogEntriesResponse
 
-	if response, err = fireplaceServerClient.Get(*serverURL + "/logentry?page=" + ctx.QueryParam("page")); err != nil {
+	endpoint := *serverURL + "/logentry?page=" + ctx.QueryParam("page") +
+		"&search=" + url.QueryEscape(ctx.QueryParam("search")) +
+		"&application=" + url.QueryEscape(ctx.QueryParam("application")) +
+		"&level=" + url.QueryEscape(ctx.QueryParam("level"))
+
+	if response, err = fireplaceServerClient.Get(endpoint); err != nil {
 		logger.WithError(err).Errorf("Error getting log entries")
 		return ctx.String(http.StatusInternalServerError, "Error getting log entries")
 	}
@@ -109,8 +155,13 @@ func getLogEntries(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "Error getting log entries")
 	}
 
+	if response.StatusCode != 200 {
+		logger.WithField("result", string(rawResult)).Errorf("Error getting log entries from Fireplace server")
+		return ctx.String(http.StatusInternalServerError, "Error getting log entries")
+	}
+
 	if err = json.Unmarshal(rawResult, &serverResponse); err != nil {
-		logger.WithError(err).Errorf("Error unmarshalling log entries")
+		logger.WithError(err).WithField("result", string(rawResult)).Errorf("Error unmarshalling log entries")
 		return ctx.String(http.StatusInternalServerError, "Error unmarshalling log entries")
 	}
 
@@ -135,10 +186,44 @@ func getLogEntry(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "Error getting log entry")
 	}
 
+	if response.StatusCode != http.StatusOK {
+		return ctx.String(http.StatusInternalServerError, string(rawResult))
+	}
+
 	if err = json.Unmarshal(rawResult, &entry); err != nil {
 		logger.WithError(err).Errorf("Error unmarshalling log entry %s", id)
 		return ctx.String(http.StatusInternalServerError, "Error unmarshalling log entry")
 	}
 
 	return ctx.JSON(http.StatusOK, entry)
+}
+
+func delete(ctx echo.Context) error {
+	var err error
+	var request *http.Request
+	var response *http.Response
+	var rawResult []byte
+
+	fromDate := ctx.QueryParam("fromDate")
+
+	if request, err = http.NewRequest("DELETE", *serverURL+"/logentry?fromDate="+fromDate, nil); err != nil {
+		logger.WithError(err).Errorf("Error creating DELETE request")
+		return ctx.String(http.StatusInternalServerError, "Error creating delete request")
+	}
+
+	if response, err = fireplaceServerClient.Do(request); err != nil {
+		logger.WithError(err).Errorf("Error asking Fireplace server to delete log entries")
+		return ctx.String(http.StatusInternalServerError, "Error asking Fireplace server to delete log entries")
+	}
+
+	if rawResult, err = ioutil.ReadAll(response.Body); err != nil {
+		logger.WithError(err).WithField("result", string(rawResult)).Errorf("Error reading response body")
+		return ctx.String(http.StatusInternalServerError, "Error reading response body")
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return ctx.String(http.StatusInternalServerError, string(rawResult))
+	}
+
+	return ctx.String(http.StatusOK, string(rawResult))
 }

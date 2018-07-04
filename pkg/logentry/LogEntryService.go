@@ -41,6 +41,30 @@ func (s *LogEntryService) CreateLogEntry(entryRequest *CreateLogEntryRequest) (s
 	return id.Hex(), nil
 }
 
+func (s *LogEntryService) GetApplicationNames() ([]string, error) {
+	var err error
+	var ok bool
+	var values []struct {
+		Application string `json:"application" bson:"application"`
+	}
+
+	result := make([]string, 0, 20)
+	seen := make(map[string]bool)
+
+	if s.DB.C("logentries").Find(nil).Select(bson.M{"application": 1}).Sort("application").All(&values); err != nil {
+		return result, errors.Wrapf(err, "Error querying for application names")
+	}
+
+	for _, value := range values {
+		if _, ok = seen[value.Application]; !ok {
+			result = append(result, value.Application)
+			seen[value.Application] = true
+		}
+	}
+
+	return result, nil
+}
+
 func (s *LogEntryService) GetLogEntries(filter *filters.LogEntryFilter) (LogEntryCollection, int, error) {
 	var err error
 	var totalCount int
@@ -88,11 +112,23 @@ func (s *LogEntryService) buildQueryFromFilters(filter *filters.LogEntryFilter) 
 	}
 
 	if filter.Search != "" {
-		query["$or"] = bson.D{
-			bson.DocElem{Name: "message", Value: bson.M{"$regex": "/" + filter.Search + "/i"}},
-			bson.DocElem{Name: "details", Value: filter.Search},
+		query["$or"] = []bson.M{
+			bson.M{"message": bson.RegEx{filter.Search, "i"}},
+			bson.M{"details": filter.Search},
 		}
 	}
 
 	return query
+}
+
+func (s *LogEntryService) Delete(fromDate time.Time) (int, error) {
+	var err error
+	var changeInfo *mgo.ChangeInfo
+
+	query := bson.M{
+		"time": bson.M{"$lt": fromDate},
+	}
+
+	changeInfo, err = s.DB.C("logentries").RemoveAll(query)
+	return changeInfo.Removed, err
 }
