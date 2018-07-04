@@ -58,6 +58,64 @@ to provide arbitrary key/value pairs of additional data.
 Upon successful capture a *200* status code and the new log entry
 **ID** will be returned.
 
+### Getting Captured Log Entries
+
+#### GET: /logentry
+
+#### Query Parameters
+* **page** - Page number of records to retrieve. 1-based. *Required*
+* **application** - Filter results by application name. *Optional*
+* **level** - Filter results by level of severity. Must be one of the following: *debug*, *warning*, *info*, *error*, *fatal*, *panic*. *Optional*
+* **search** - Filter results by a search term. This will apply against the log message. *Optional*
+
+#### Response
+Upon return the payload will return a structure which contains the total count of records, the number of records in this
+response, the size of a page, and the collection of matching log entries. Here is a sample.
+
+```json
+{
+   "count": 10,
+   "logEntries": [
+      {
+         "application": "Create Test Entries 1",
+         "details": [
+            {
+               "key": "additional",
+               "value": "Additional 1"
+            },
+            {
+               "key": "who",
+               "value": "Main Process"
+            }
+         ],
+         "id": "5b3cde7a85db9e2b16aa4aae",
+         "level": "info",
+         "message": "This is test message 1",
+         "time": "2018-07-04T09:49:30-05:00"
+      },
+      {
+         "application": "Create Test Entries 1",
+         "details": [
+            {
+               "key": "additional",
+               "value": "Additional 3"
+            },
+            {
+               "key": "who",
+               "value": "Main Process"
+            }
+         ],
+         "id": "5b3cde7a85db9e2b16aa4ab2",
+         "level": "error",
+         "message": "This is error 1",
+         "time": "2018-07-04T09:49:30-05:00"
+      }
+  ],
+   "pageSize": 100,
+   "totalCount": 10
+}
+```
+
 ## License
 MIT License
 
