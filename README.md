@@ -14,6 +14,14 @@ This project is hardly ready for prime-time, and I only really put it together
 for my own personal use. But it is MIT licensed so if you want to use it,
 go for it!
 
+### Screenshots
+
+![Main Screen](assets/screenshot-1.png)
+
+![Filtering](assets/screenshot-2.png)
+
+![Details](assets/screenshot-3.png)
+
 ## Fireplace Server
 Fireplace Server is a Go application that runs an HTTP server for capturing
 and serving up structured log entries.
