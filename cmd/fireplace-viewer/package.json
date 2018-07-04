@@ -1,0 +1,17 @@
+{
+	"name": "FireplaceViewer",
+	"version": "0.1.0",
+	"description": "Viewer UI for logs captured by Fireplace Server",
+	"scripts": {
+		"build": "webpack --mode production"
+	},
+	"keywords": [],
+	"author": "Adam Presley",
+	"license": "MIT",
+	"devDependencies": {
+		"babel-core": "^6.26.3",
+		"babel-loader": "^7.1.4",
+		"webpack": "^4.14.0",
+		"webpack-cli": "^3.0.8"
+	}
+}
