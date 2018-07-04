@@ -14,6 +14,50 @@ This project is hardly ready for prime-time, and I only really put it together
 for my own personal use. But it is MIT licensed so if you want to use it,
 go for it!
 
+## Fireplace Server
+Fireplace Server is a Go application that runs an HTTP server for capturing
+and serving up structured log entries.
+
+### Capturing A Log Entry
+
+#### POST: /logentry
+
+#### Payload
+A log entry consists of a body in JSON format, with a content type of **application/json**.
+The body must look something like this.
+
+```json
+{
+	"application": "My Application",
+	"details": [
+		{
+			"key": "useful",
+			"value": "value"
+		}
+	],
+	"level": "info",
+	"message": "My log message!",
+	"time": "2018-07-04T09:39:05Z07:00"
+}
+```
+
+The payload must be configured in this way. The *details* key can be an
+empty array, and not required to contain any values. This key is used
+to provide arbitrary key/value pairs of additional data.
+
+*level* must be one of the following:
+
+* debug
+* warning
+* info
+* error
+* fatal
+* panic
+
+#### Response
+Upon successful capture a *200* status code and the new log entry
+**ID** will be returned.
+
 ## License
 MIT License
 
