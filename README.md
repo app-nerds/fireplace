@@ -1,6 +1,6 @@
 # Fireplace
 
-![assets/fire-pit.jpg](Fire Pit)
+![Fire Pit](assets/fire-pit.jpg)
 
 Fireplace is a set of tools for capturing and viewing structured log entries
 from your applications. Currently it is specifically tailored to log entries
