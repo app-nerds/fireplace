@@ -28,16 +28,16 @@ The body must look something like this.
 
 ```json
 {
-	"application": "My Application",
-	"details": [
-		{
-			"key": "useful",
-			"value": "value"
-		}
-	],
-	"level": "info",
-	"message": "My log message!",
-	"time": "2018-07-04T09:39:05Z07:00"
+   "application": "My Application",
+   "details": [
+      {
+         "key": "useful",
+         "value": "value"
+      }
+   ],
+   "level": "info",
+   "message": "My log message!",
+   "time": "2018-07-04T09:39:05Z07:00"
 }
 ```
 
