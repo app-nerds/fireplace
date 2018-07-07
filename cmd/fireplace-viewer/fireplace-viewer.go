@@ -23,7 +23,7 @@ import (
 
 const (
 	SERVER_VERSION string = "0.1.0"
-	DEBUG_ASSETS   bool   = true
+	DEBUG_ASSETS   bool   = false
 )
 
 var logLevel = flag.String("loglevel", "info", "Level of logs to write. Valid values are 'debug', 'info', or 'error'. Default is 'info'")
