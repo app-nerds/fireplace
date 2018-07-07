@@ -1,4 +1,7 @@
-class Header extends React.Component {
+import { Paging } from "./Paging";
+import { Filter } from "./Filter";
+
+export class Header extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -97,5 +100,3 @@ class Header extends React.Component {
 		);
 	}
 }
-
-window.Header = Header;

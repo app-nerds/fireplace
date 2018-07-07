@@ -1,4 +1,4 @@
-class Paging extends React.Component {
+export class Paging extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -37,4 +37,4 @@ class Paging extends React.Component {
 	}
 }
 
-window.Paging = Paging;
+//window.Paging = Paging;

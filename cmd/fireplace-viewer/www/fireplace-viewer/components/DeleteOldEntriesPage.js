@@ -1,4 +1,6 @@
-class DeleteOldEntriesPage extends React.Component {
+import { Header } from "./Header";
+
+export class DeleteOldEntriesPage extends React.Component {
 	constructor(props) {
 		super(props);
 

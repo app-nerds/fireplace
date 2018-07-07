@@ -1,4 +1,9 @@
-class ViewerPage extends React.Component {
+import { Header } from "./Header";
+import { LogEntryDetails } from "./LogEntryDetails";
+import { EntriesList } from "./EntriesList";
+import { LogEntryService } from "../services/LogEntryService";
+
+export class ViewerPage extends React.Component {
 	constructor(props) {
 		super(props);
 

@@ -1,4 +1,4 @@
-class ApplicationSelector extends React.Component {
+export class ApplicationSelector extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -60,4 +60,4 @@ class ApplicationSelector extends React.Component {
 	}
 }
 
-window.ApplicationSelector = ApplicationSelector;
+//window.ApplicationSelector = ApplicationSelector;

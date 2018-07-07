@@ -1,4 +1,5 @@
-class EntryListItem extends React.Component {
+import { FormatDateTime } from "./FormatDateTime";
+export class EntryListItem extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -53,4 +54,4 @@ class EntryListItem extends React.Component {
 	}
 }
 
-window.EntryListItem = EntryListItem;
+//window.EntryListItem = EntryListItem;

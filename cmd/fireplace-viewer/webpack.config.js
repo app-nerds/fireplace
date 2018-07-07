@@ -12,7 +12,12 @@ module.exports = {
 			}
 		]
 	},
-	entry: [
-		path.resolve("./www/fireplace-viewer/components/ViewerPage")
-	]
+	entry: {
+		ViewerPage: "./www/fireplace-viewer/components/ViewerPage",
+		DeleteOldEntriesPage: "./www/fireplace-viewer/components/DeleteOldEntriesPage"
+	},
+	output: {
+		filename: "[name].bundle.js",
+		path: path.resolve(__dirname, "www/fireplace-viewer/dist")
+	}
 };

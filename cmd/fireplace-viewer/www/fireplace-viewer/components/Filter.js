@@ -1,4 +1,7 @@
-class Filter extends React.Component {
+import { ApplicationSelector } from "./ApplicationSelector";
+import { LevelSelector } from "./LevelSelector";
+
+export class Filter extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -71,4 +74,4 @@ class Filter extends React.Component {
 	}
 }
 
-window.Filter = Filter;
+//window.Filter = Filter;

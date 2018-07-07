@@ -1,4 +1,6 @@
-class EntriesList extends React.Component {
+import { EntryListItem } from "./EntryListItem";
+
+export class EntriesList extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -44,4 +46,4 @@ class EntriesList extends React.Component {
 	}
 }
 
-window.EntriesList = EntriesList;
+//window.EntriesList = EntriesList;

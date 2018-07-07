@@ -1,4 +1,4 @@
-class FormatDateTime extends React.Component {
+export class FormatDateTime extends React.Component {
 	constructor(props) {
 		super(props);
 	}
@@ -8,4 +8,4 @@ class FormatDateTime extends React.Component {
 	}
 }
 
-window.FormatDateTime = FormatDateTime;
+//window.FormatDateTime = FormatDateTime;

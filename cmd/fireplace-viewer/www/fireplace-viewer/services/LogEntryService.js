@@ -1,4 +1,4 @@
-class LogEntryService {
+export class LogEntryService {
 	constructor() {
 		this.page = 1;
 		this.pageSize = 0;
@@ -102,4 +102,4 @@ class LogEntryService {
 	}
 }
 
-window.LogEntryService = LogEntryService;
+//window.LogEntryService = LogEntryService;

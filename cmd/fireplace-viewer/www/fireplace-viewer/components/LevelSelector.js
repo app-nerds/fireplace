@@ -1,4 +1,4 @@
-class LevelSelector extends React.Component {
+export class LevelSelector extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -40,4 +40,4 @@ class LevelSelector extends React.Component {
 	}
 }
 
-window.LevelSelector = LevelSelector;
+//window.LevelSelector = LevelSelector;

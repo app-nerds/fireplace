@@ -1,4 +1,4 @@
-class LogEntryDetails extends React.Component {
+export class LogEntryDetails extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -57,4 +57,4 @@ class LogEntryDetails extends React.Component {
 	}
 }
 
-window.LogEntryDetails = LogEntryDetails;
+//window.LogEntryDetails = LogEntryDetails;
