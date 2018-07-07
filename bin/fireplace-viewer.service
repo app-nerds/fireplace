@@ -1,0 +1,12 @@
+[Unit]
+Description=Fireplace Viewer
+
+[Service]
+User=fireplace
+Group=fireplace
+WorkingDirectory=/opt/fireplace
+ExecStart=/opt/fireplace/fireplace-viewer -host=127.0.0.1:8082
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
