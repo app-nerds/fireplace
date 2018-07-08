@@ -1,4 +1,4 @@
-export class LogEntryService {
+export default class LogEntryService {
 	constructor() {
 		this.page = 1;
 		this.pageSize = 0;

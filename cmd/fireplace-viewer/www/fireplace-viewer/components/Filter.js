@@ -1,7 +1,15 @@
-import { ApplicationSelector } from "./ApplicationSelector";
-import { LevelSelector } from "./LevelSelector";
+import Button from "grommet/components/Button";
+import Footer from "grommet/components/Footer";
+import Form from "grommet/components/Form";
+import FormFields from "grommet/components/FormFields";
+import Header from "grommet/components/Header";
+import Heading from "grommet/components/Heading";
+import Layer from "grommet/components/Layer";
+import React, { Component } from "react";
+import ApplicationSelector from "./ApplicationSelector";
+import LevelSelector from "./LevelSelector";
 
-export class Filter extends React.Component {
+export default class Filter extends Component {
 	constructor(props) {
 		super(props);
 
@@ -51,23 +59,23 @@ export class Filter extends React.Component {
 		return (
 			<div>
 				{this.state.visible && (
-					<Grommet.Layer closer={true} align="right" overlayClose={true} onClose={this.onClose}>
-						<Grommet.Form pad="small">
-							<Grommet.Header>
-								<Grommet.Heading>Filter</Grommet.Heading>
-							</Grommet.Header>
+					<Layer closer={true} align="right" overlayClose={true} onClose={this.onClose}>
+						<Form pad="small">
+							<Header>
+								<Heading>Filter</Heading>
+							</Header>
 
-							<Grommet.FormFields>
+							<FormFields>
 								<ApplicationSelector onSelect={this.onApplicationSelect} value={this.state.application} />
 								<LevelSelector onSelect={this.onLevelSelect} value={this.state.level} />
-							</Grommet.FormFields>
+							</FormFields>
 
-							<Grommet.Footer pad={{ "vertical": "medium" }}>
-								<Grommet.Button label="Close" type="button" primary={true} onClick={this.onClose} />
-								<Grommet.Button label="Clear" type="button" onClick={this.onClear} />
-							</Grommet.Footer>
-						</Grommet.Form>
-					</Grommet.Layer>
+							<Footer pad={{ "vertical": "medium" }}>
+								<Button label="Close" type="button" primary={true} onClick={this.onClose} />
+								<Button label="Clear" type="button" onClick={this.onClear} />
+							</Footer>
+						</Form>
+					</Layer>
 				)}
 			</div>
 		);

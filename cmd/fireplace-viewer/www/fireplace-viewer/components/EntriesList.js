@@ -1,6 +1,8 @@
-import { EntryListItem } from "./EntryListItem";
+import List from "grommet/components/List";
+import React, { Component } from "react";
+import EntryListItem from "./EntryListItem";
 
-export class EntriesList extends React.Component {
+export default class EntriesList extends Component {
 	constructor(props) {
 		super(props);
 
@@ -32,13 +34,13 @@ export class EntriesList extends React.Component {
 			control = <p>No log entries to display</p>;
 		} else {
 			control = (
-				<Grommet.List selectable={true} onSelect={this.onShowDetails}>
+				<List selectable={true} onSelect={this.onShowDetails}>
 					{this.state.entries.map((entry) => {
 						return (
 							<EntryListItem entry={entry} key={entry.id} />
 						);
 					})}
-				</Grommet.List>
+				</List>
 			);
 		}
 

@@ -1,4 +1,12 @@
-export class LogEntryDetails extends React.Component {
+import Article from "grommet/components/Article";
+import Header from "grommet/components/Header";
+import Layer from "grommet/components/Layer";
+import Section from "grommet/components/Section";
+import Table from "grommet/components/Table";
+import TableRow from "grommet/components/TableRow";
+import React, { Component } from "react";
+
+export default class LogEntryDetails extends Component {
 	constructor(props) {
 		super(props);
 
@@ -25,32 +33,32 @@ export class LogEntryDetails extends React.Component {
 		return (
 			<div>
 				{this.state.active &&
-					<Grommet.Layer closer={true} overlayClose={true} onClose={this.onClose} align="right" flush={false}>
-						<Grommet.Article pad="none" margin="none">
-							<Grommet.Header>Details</Grommet.Header>
+					<Layer closer={true} overlayClose={true} onClose={this.onClose} align="right" flush={false}>
+						<Article pad="none" margin="none">
+							<Header>Details</Header>
 
-							<Grommet.Section>
-								<Grommet.Table>
+							<Section>
+								<Table>
 									<thead>
-										<Grommet.TableRow>
+										<TableRow>
 											<th>Key</th>
 											<th>Value</th>
-										</Grommet.TableRow>
+										</TableRow>
 									</thead>
 									<tbody>
 										{this.state.selectedEntry.details.map((detail, index) => {
 											return (
-												<Grommet.TableRow key={index}>
+												<TableRow key={index}>
 													<td>{detail.key}</td>
 													<td>{detail.value}</td>
-												</Grommet.TableRow>
+												</TableRow>
 											);
 										})}
 									</tbody>
-								</Grommet.Table>
-							</Grommet.Section>
-						</Grommet.Article>
-					</Grommet.Layer>
+								</Table>
+							</Section>
+						</Article>
+					</Layer>
 				}
 			</div>
 		);

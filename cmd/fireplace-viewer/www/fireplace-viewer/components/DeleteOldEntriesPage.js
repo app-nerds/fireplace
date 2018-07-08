@@ -1,6 +1,13 @@
-import { Header } from "./Header";
+import Box from "grommet/components/Box";
+import Button from "grommet/components/Button";
+import DateTime from "grommet/components/DateTime";
+import Footer from "grommet/components/Footer";
+import Form from "grommet/components/Form";
+import FormFields from "grommet/components/FormFields";
+import Notification from "grommet/components/Notification";
+import React, { Component } from "react";
 
-export class DeleteOldEntriesPage extends React.Component {
+export default class DeleteOldEntriesPage extends Component {
 	constructor(props) {
 		super(props);
 
@@ -44,25 +51,22 @@ export class DeleteOldEntriesPage extends React.Component {
 
 	render() {
 		return (
-			<Grommet.App centered={false}>
-				<Header showEntryManagement={false} />
-				<Grommet.Box flex={true}>
-					<Grommet.Notification message="Select a date to delete entries from. Fireplace will delete all entries older than this date." status="ok" />
+			<div>
+				<Notification message="Select a date to delete entries from. Fireplace will delete all entries older than this date." status="ok" />
 
-					<Grommet.Box pad="small">
-						<Grommet.Form>
-							<Grommet.FormFields>
-								<Grommet.DateTime id="fromDate" name="fromDate" format="M/D/YYYY" onChange={this.onFromDateChange} value={this.state.fromDate} />
-							</Grommet.FormFields>
-							<Grommet.Footer pad={{ "vertical": "medium" }}>
-								<Grommet.Button label="Delete" type="button" primary={true} onClick={this.onDelete} />
-							</Grommet.Footer>
-						</Grommet.Form>
-					</Grommet.Box>
-				</Grommet.Box>
-			</Grommet.App>
+				<Box pad="small">
+					<Form>
+						<FormFields>
+							<DateTime id="fromDate" name="fromDate" format="M/D/YYYY" onChange={this.onFromDateChange} value={this.state.fromDate} />
+						</FormFields>
+						<Footer pad={{ "vertical": "medium" }}>
+							<Button label="Delete" type="button" primary={true} onClick={this.onDelete} />
+						</Footer>
+					</Form>
+				</Box>
+			</div>
 		);
 	}
 }
 
-ReactDOM.render(<DeleteOldEntriesPage />, document.getElementById("content"));
+//ReactDOM.render(<DeleteOldEntriesPage />, document.getElementById("content"));

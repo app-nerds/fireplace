@@ -7,15 +7,17 @@ module.exports = {
 				test: /\.js$/,
 				exclude: /node_modules/,
 				use: {
-					loader: "babel-loader"
+					loader: "babel-loader",
+					options: {
+						presets: ["es2015", "react"]
+					}
 				}
 			}
 		]
 	},
-	entry: {
-		ViewerPage: "./www/fireplace-viewer/components/ViewerPage",
-		DeleteOldEntriesPage: "./www/fireplace-viewer/components/DeleteOldEntriesPage"
-	},
+	entry: [
+		"./www/fireplace-viewer/components/Index",
+	],
 	output: {
 		filename: "[name].bundle.js",
 		path: path.resolve(__dirname, "www/fireplace-viewer/dist")

@@ -1,4 +1,6 @@
-export class LevelSelector extends React.Component {
+import React, { Component } from "react";
+
+export default class LevelSelector extends Component {
 	constructor(props) {
 		super(props);
 

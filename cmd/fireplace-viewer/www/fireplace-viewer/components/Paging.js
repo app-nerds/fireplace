@@ -1,4 +1,10 @@
-export class Paging extends React.Component {
+import Button from "grommet/components/Button";
+import CaretNextIcon from "grommet/components/icons/base/CaretNext";
+import CaretPreviousIcon from "grommet/components/icons/base/CaretPrevious";
+import Label from "grommet/components/Label";
+import React, { Component } from "react";
+
+export default class Paging extends Component {
 	constructor(props) {
 		super(props);
 
@@ -29,9 +35,9 @@ export class Paging extends React.Component {
 	render() {
 		return (
 			<span>
-				<Grommet.Button icon={<Grommet.CaretPreviousIcon onClick={this.onPreviousPage} />} />
-				<Grommet.Label>{this.state.page}</Grommet.Label>
-				<Grommet.Button icon={<Grommet.CaretNextIcon onClick={this.onNextPage} />} />
+				<Button icon={<CaretPreviousIcon onClick={this.onPreviousPage} />} />
+				<Label>{this.state.page}</Label>
+				<Button icon={<CaretNextIcon onClick={this.onNextPage} />} />
 			</span>
 		);
 	}

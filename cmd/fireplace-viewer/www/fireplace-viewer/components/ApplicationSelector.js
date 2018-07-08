@@ -1,4 +1,6 @@
-export class ApplicationSelector extends React.Component {
+import React, { Component } from "react";
+
+export default class ApplicationSelector extends Component {
 	constructor(props) {
 		super(props);
 
