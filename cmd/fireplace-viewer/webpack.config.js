@@ -16,7 +16,7 @@ module.exports = {
 		]
 	},
 	entry: [
-		"./www/fireplace-viewer/components/Index",
+		"./www/fireplace-viewer/index.js",
 	],
 	output: {
 		filename: "[name].bundle.js",
