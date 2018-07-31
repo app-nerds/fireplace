@@ -1,4 +1,4 @@
-//go:generate esc -o ./www/www.go -pkg www -ignore DS_Store|README\.md|LICENSE|www\.go -prefix /www/ ./www
+//go:generate esc -o ./www/www.go -pkg www -ignore DS_Store|LICENSE|www\.go|(.*?)\.md|(.*?)\.svg -prefix /www/ ./www
 package main
 
 import (
