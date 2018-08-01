@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import React, { Component } from "react";
 
 export default class Navigation extends Component {
@@ -6,10 +7,17 @@ export default class Navigation extends Component {
 		super(props);
 	}
 
+	// componentWillReceiveProps(nextProps) {
+	// 	this.setState({
+	// 		filter: nextProps.filter,
+	// 		page: nextProps.page
+	// 	});
+	// }
+
 	render() {
 		return (
 			<nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-				<NavLink to="/" exact={true} className="navbar-brand">Fireplace</NavLink>
+				<Link to="/" className="navbar-brand">Fireplace</Link>
 				<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false" aria-label="Toggle navigation">
 					<span className="navbar-toggler-icon"></span>
 				</button>
@@ -17,10 +25,10 @@ export default class Navigation extends Component {
 				<div className="collapse navbar-collapse" id="main-navbar">
 					<ul className="navbar-nav mr-auto">
 						<li className="nav-item">
-							<NavLink to="/" exact={true}>Logs</NavLink>
+							<Link to="/" className="navbar-brand">Logs</Link>
 						</li>
 						<li className="nav-item">
-							<NavLink to="/clean">Clean</NavLink>
+							<Link to="/clean" className="nav-link">Clean</Link>
 						</li>
 					</ul>
 
@@ -32,21 +40,26 @@ export default class Navigation extends Component {
 
 					<ul className="navbar-nav navbar-right">
 						<li className="nav-item">
-							<button
+							<a href="javascript:void" className="nav-link"><i className="fas fa-caret-left fa-lg"></i></a>
+						</li>
+						<li className="nav-item">
+							<a href="javascript:void" className="nav-link"><i className="fas fa-caret-right fa-lg"></i></a>
+						</li>
+						<li className="nav-item">
+							<a href="javascript:void" className="nav-link"><i className="fas fa-filter fa-lg"></i></a>
+						</li>
 					</ul>
 				</div>
-
-
-						<div className="container-fluid">
-							<div className="collapse navbar-collapse" id="main-navbar">
-								<ul className="nav navbar-nav navbar-right">
-									<li><button type="button" className="btn btn-default navbar-btn"><span className="glyphicon glyphicon-triangle-left" aria-label="Previous page"></span></button></li>
-									<li><button type="button" className="btn btn-default navbar-btn"><span className="glyphicon glyphicon-triangle-right" aria-label="Next page"></span></button></li>
-									<li><button type="button" className="btn btn-default navbar-btn"><span className="glyphicon glyphicon-filter" aria-label="Filter"></span></button></li>
-								</ul>
-							</div>
-						</div>
-			</nav>
-					);
-				}
+			</nav >
+		);
+	}
 }
+
+// Navigation.propTypes = {
+// 	filter: PropTypes.exact({
+// 		application: PropTypes.string.isRequired,
+// 		level: PropTypes.oneOf(["", "debug", "info", "warn", "error", "fatal", "panic"]),
+// 		searchTerm: PropTypes.string.isRequired
+// 	}),
+// 	page: PropTypes.number.isRequired
+// };
