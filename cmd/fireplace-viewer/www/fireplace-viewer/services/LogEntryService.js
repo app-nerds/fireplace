@@ -1,3 +1,4 @@
+import moment from "moment";
 export class LogEntryService {
 	constructor() {
 	}
@@ -38,6 +39,28 @@ export class LogEntryService {
 						pageSize: pageSize,
 						logs: logEntries
 					});
+				})
+				.catch((err) => {
+					console.log(err);
+					return reject(err);
+				});
+		});
+	}
+
+	delete(beforeDate) {
+		return new Promise((resolve, reject) => {
+			let options = {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				cache: "no-store"
+			};
+
+			fetch("/logentry?fromDate=" + moment(beforeDate).format("MM/DD/YYYY"), options)
+				.then(response => response.text())
+				.then((result) => {
+					return resolve(result);
 				})
 				.catch((err) => {
 					console.log(err);

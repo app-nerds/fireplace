@@ -7,7 +7,7 @@ import { FilterPropType } from "../../propTypes/FilterPropType";
 import { PagingPropType } from "../../propTypes/PagingPropType";
 import { DetailsPropType } from "../../propTypes/DetailsPropType";
 
-export class Main extends Component {
+export class MainPage extends Component {
 	constructor(props) {
 		super(props);
 	}
@@ -28,7 +28,7 @@ export class Main extends Component {
 	}
 }
 
-Main.propTypes = {
+MainPage.propTypes = {
 	details: DetailsPropType,
 	filter: FilterPropType,
 	paging: PagingPropType,

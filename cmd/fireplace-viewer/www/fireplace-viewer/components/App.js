@@ -1,5 +1,6 @@
-import { Main } from "./main/Main";
+import { MainPage } from "./mainPage/MainPage";
 import { Navigation } from "./navigation/Navigation";
+import { CleanPage } from "./cleanPage/CleanPage";
 import React, { Component } from "react";
 import { Switch, Route } from "react-router-dom";
 
@@ -55,7 +56,7 @@ export class App extends Component {
 				<Navigation filter={this.state.filter} paging={this.state.paging} updatePaging={this.updatePaging} updateFilter={this.updateFilter} />
 				<Switch>
 					<Route exact={true} path="/" render={() =>
-						<Main
+						<MainPage
 							details={this.state.detailsModal}
 							filter={this.state.filter}
 							paging={this.state.paging}
@@ -63,6 +64,9 @@ export class App extends Component {
 							updatePaging={this.updatePaging}
 							updateFilter={this.updateFilter}
 							updateDetailsModal={this.updateDetailsModal} />
+					} />
+					<Route path="/clean" render={() =>
+						<CleanPage paging={this.state.paging} updatePaging={this.updatePaging} />
 					} />
 				</Switch>
 			</div>

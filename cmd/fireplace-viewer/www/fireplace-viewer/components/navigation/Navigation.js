@@ -78,7 +78,7 @@ export class Navigation extends Component {
 				<div className="collapse navbar-collapse" id="main-navbar">
 					<ul className="navbar-nav mr-auto">
 						<li className="nav-item">
-							<Link to="/" className="navbar-brand">Logs</Link>
+							<Link to="/" className="nav-link">Logs</Link>
 						</li>
 						<li className="nav-item">
 							<Link to="/clean" className="nav-link">Clean</Link>

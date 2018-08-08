@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import moment from "moment";
 
 export class DateTimeSpan extends Component {
 	constructor(props) {
