@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	SERVER_VERSION string = "0.1.0"
+	SERVER_VERSION string = "0.2.0"
 	DEBUG_ASSETS   bool   = false
 )
 
@@ -54,7 +54,6 @@ func main() {
 
 	httpServer.GET("/www/*", echo.WrapHandler(assetHandler))
 	httpServer.GET("/", handleMainPage)
-	httpServer.GET("/deleteoldentries", handleDeleteOldEntriesPage)
 	httpServer.GET("/logentry", getLogEntries)
 	httpServer.GET("/logentry/:id", getLogEntry)
 	httpServer.DELETE("/logentry", delete)
@@ -95,14 +94,6 @@ func handleMainPage(ctx echo.Context) error {
 	}
 
 	return ctx.Render(http.StatusOK, "mainLayout:main-page", viewState)
-}
-
-func handleDeleteOldEntriesPage(ctx echo.Context) error {
-	var viewState = map[string]interface{}{
-		"Title": "Delete Old Entries",
-	}
-
-	return ctx.Render(http.StatusOK, "mainLayout:delete-old-entries", viewState)
 }
 
 func getApplicationNames(ctx echo.Context) error {

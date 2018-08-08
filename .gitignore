@@ -14,3 +14,4 @@
 cmd/fireplace-server/database
 cmd/fireplace-server/fireplace-server
 cmd/fireplace-viewer/node_modules
+cmd/fireplace-viewer/fireplace-viewer

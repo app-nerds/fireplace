@@ -20,10 +20,10 @@ module.exports = {
 		]
 	},
 	entry: [
-		"./www/fireplace-viewer/index.js",
+		"./www-src/index.js",
 	],
 	output: {
 		filename: "[name].bundle.js",
-		path: path.resolve(__dirname, "www/fireplace-viewer/dist")
+		path: path.resolve(__dirname, "www/fireplace-viewer/js")
 	}
 };

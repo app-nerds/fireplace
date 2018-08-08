@@ -4,13 +4,12 @@ prepare:
 	npm run-script build
 	go generate
 
-build:
-	go build
-
 run:
 	go run *.go
 
-dev:
-	npm run-script build
+dev: prepare run
+
+prod:
+	npm run-script build-prod
 	go generate
-	go run *.go
+	go build
