@@ -22,9 +22,29 @@ go for it!
 
 ![Details](assets/screenshot-3.png)
 
-## Fireplace Server
+## Getting Started
 Fireplace Server is a Go application that runs an HTTP server for capturing
-and serving up structured log entries.
+and serving up structured log entries. Fireplace Viewer is a web application
+used to view these captured logs.
+
+To begin, ensure you have [Go 1.10+](https://golang.org/dl/) installed. To compile
+the server application, perform the following on the terminal.
+
+```
+$ cd $GOPATH/src
+$ mkdir -p github.com/adampresley
+$ cd github.com/adampresley
+$ git clone git@github.com:adampresley/fireplace.git
+$ cd fireplace/cmd/fireplace-server
+$ go get
+$ go build
+$ cd $GOPATH/src/github.com/adampresley/fireplace/cmd/fireplace-viewer
+$ go get
+$ npm install
+$ make
+```
+
+## Fireplace Server API
 
 ### Capturing A Log Entry
 This is the main function of Fireplace Server. Application call this endpoint
