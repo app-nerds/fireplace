@@ -27,6 +27,8 @@ Fireplace Server is a Go application that runs an HTTP server for capturing
 and serving up structured log entries.
 
 ### Capturing A Log Entry
+This is the main function of Fireplace Server. Application call this endpoint
+to capture log entries into the database.
 
 #### POST: /logentry
 
@@ -122,6 +124,63 @@ response, the size of a page, and the collection of matching log entries. Here i
    "pageSize": 100,
    "totalCount": 10
 }
+```
+
+### Getting a Single Log Entry
+
+#### GET: /logentry/:id
+
+#### Path Parameters
+* **id** - ID of the log entry to retrieve
+
+#### Response
+Upon return the payload will return a structure which contains the specified log entry. Here is a sample:
+
+```json
+{
+    "application": "Create Test Entries 1",
+    "details": [
+    {
+        "key": "additional",
+        "value": "Additional 1"
+    },
+    {
+        "key": "who",
+        "value": "Main Process"
+    }
+    ],
+    "id": "5b3cde7a85db9e2b16aa4aae",
+    "level": "info",
+    "message": "This is test message 1",
+    "time": "2018-07-04T09:49:30-05:00"
+}
+```
+
+### Deleting Log Entries
+
+#### DELETE: /logentry
+
+#### Query Parameters
+* **fromDate** - Date in the format of *MM/DD/YYYY*. All log entries from this date back will be deleted
+
+#### Response
+A message detailing how many log entries were deleted. For example ```10 entries deleted```
+
+### Getting Application Names
+Retrieve a list of application names captured in log entries. When an application
+writes a log entry to Fireplace Server it provides an application name. This
+endpoint returns a list of those names.
+
+#### GET: /applicationname
+
+#### Response
+An array of application names.
+
+```
+[
+    "application name 1",
+    "application name 2"
+]
 ```
 
 ## License
