@@ -7,6 +7,8 @@ import { FilterPropType } from "../../propTypes/FilterPropType";
 import { PagingPropType } from "../../propTypes/PagingPropType";
 import { DetailsPropType } from "../../propTypes/DetailsPropType";
 
+import "./log-styles.css";
+
 export class LogTable extends Component {
 	constructor(props) {
 		super(props);
@@ -29,7 +31,8 @@ export class LogTable extends Component {
 				this.props.updatePaging({
 					...paging,
 					totalCount: result.totalCount,
-					pageSize: result.pageSize
+					pageSize: result.pageSize,
+					refresh: false
 				});
 			});
 	}

@@ -22,7 +22,8 @@ export class App extends Component {
 			paging: {
 				page: 1,
 				totalCount: 0,
-				pageSize: 0
+				pageSize: 0,
+				refresh: false
 			},
 			detailsModal: {
 				visible: false,

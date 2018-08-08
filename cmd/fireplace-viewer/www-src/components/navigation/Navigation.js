@@ -3,6 +3,10 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import { LogEntryService } from "../../services/LogEntryService";
 import { SearchBox } from "../../components/searchbox/SearchBox";
+import { FilterPropType } from "../../propTypes/FilterPropType";
+import { PagingPropType } from "../../propTypes/PagingPropType";
+
+import "./styles.css";
 
 export class Navigation extends Component {
 	constructor(props) {
@@ -13,6 +17,7 @@ export class Navigation extends Component {
 		this.onFirstPage = this.onFirstPage.bind(this);
 		this.onLastPage = this.onLastPage.bind(this);
 		this.onSearch = this.onSearch.bind(this);
+		this.onRefresh = this.onRefresh.bind(this);
 		this.showFilter = this.showFilter.bind(this);
 
 		this.logEntryService = new LogEntryService();
@@ -55,6 +60,21 @@ export class Navigation extends Component {
 		this.props.updateFilter({
 			...this.props.filter,
 			searchTerm: searchTerm
+		});
+
+		this.props.updatePaging({
+			...this.props.paging,
+			page: 1
+		});
+	}
+
+	onRefresh(e) {
+		e.preventDefault();
+
+		this.props.updatePaging({
+			...this.props.paging,
+			page: 1,
+			refresh: true
 		});
 	}
 
@@ -108,6 +128,9 @@ export class Navigation extends Component {
 							<a className="nav-link" onClick={this.onLastPage}><i className="fas fa-fast-forward fa-lg"></i></a>
 						</li>
 						<li className="nav-item">
+							<a className="nav-link" onClick={this.onRefresh}><i className="fas fa-sync-alt fa-lg"></i></a>
+						</li>
+						<li className="nav-item">
 							<a className="nav-link" onClick={this.showFilter}><i className="fas fa-filter fa-lg"></i></a>
 						</li>
 					</ul>
@@ -118,17 +141,8 @@ export class Navigation extends Component {
 }
 
 Navigation.propTypes = {
-	filter: PropTypes.exact({
-		application: PropTypes.string.isRequired,
-		level: PropTypes.oneOf(["", "debug", "info", "warn", "error", "fatal", "panic"]),
-		searchTerm: PropTypes.string.isRequired,
-		visible: PropTypes.bool.isRequired
-	}),
-	paging: PropTypes.exact({
-		page: PropTypes.number.isRequired,
-		totalCount: PropTypes.number.isRequired,
-		pageSize: PropTypes.number.isRequired
-	}),
+	filter: FilterPropType,
+	paging: PagingPropType,
 	updateFilter: PropTypes.func,
 	updatePaging: PropTypes.func
 };

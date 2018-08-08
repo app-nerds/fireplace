@@ -1,0 +1,43 @@
+/******************************************************************************
+ * Log Table Styles
+ *****************************************************************************/
+.table-header {
+	top: 56px;
+	position: fixed !important;
+}
+
+.table-log-entries {
+	margin-top: 50px;
+}
+
+.icon-error-status {
+	color: #ef4d3b;
+}
+
+.icon-warning-status {
+	color: #fcfc4b;
+}
+
+.icon-debug-status {
+	color: #33f7e3
+}
+
+.icon-info-status {
+	color: #0de815;
+}
+
+.column-icon {
+	width: 5%;
+}
+
+.column-message {
+	width: 65%;
+}
+
+.column-application {
+	width: 10%;
+}
+
+.column-date {
+	width: 20%;
+}
