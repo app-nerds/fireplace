@@ -44,6 +44,29 @@ $ npm install
 $ make
 ```
 
+## Capturing Logs in a Go Application
+To capture logs in your Go applications using Logurs and Fireplace, ensure you are importing
+Logrus and the Fireplace hook. Here is a small sample of logging to Fireplace Server.
+
+```
+package main
+
+import (
+    fireplacehook "github.com/adampresley/fireplace/cmd/fireplace-hook"
+    "github.com/sirupsen/logrus"
+)
+
+func main() {
+    logger := logrus.New()
+    logger.AddHook(fireplacehook.NewFireplaceHook(&fireplacehook.FireplaceHookConfig{
+        Application: "Sample Application",
+        FireplaceURL: "http://localhost:8999"
+    }))
+
+    logger.WithField("someKey", "someValue").Infof("This is a log entry!")
+}
+```
+
 ## Fireplace Server API
 
 ### Capturing A Log Entry
