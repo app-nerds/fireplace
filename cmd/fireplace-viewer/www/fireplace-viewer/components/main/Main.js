@@ -1,36 +1,38 @@
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
-import LogTable from "../../components/logs/LogTable";
+import { LogTable } from "../../components/logs/LogTable";
+import { DetailsModal } from "../detailsModal/DetailsModal";
+import { FilterModal } from "../filterModal/FilterModal";
+import { FilterPropType } from "../../propTypes/FilterPropType";
+import { PagingPropType } from "../../propTypes/PagingPropType";
+import { DetailsPropType } from "../../propTypes/DetailsPropType";
 
-class Main extends Component {
+export class Main extends Component {
 	constructor(props) {
 		super(props);
 	}
 
-	// componentWillReceiveProps(nextProps) {
-	// 	this.setState({
-	// 		filter: nextProps.filter,
-	// 		page: nextProps.page,
-	// 	});
-	// }
-
 	render() {
 		return (
 			<div className="container-fluid">
-				<LogTable />
+				<LogTable
+					details={this.props.details}
+					filter={this.props.filter}
+					paging={this.props.paging}
+					updateDetails={this.props.updateDetails}
+					updatePaging={this.props.updatePaging} />
+				<DetailsModal name="logEntryDetails" details={this.props.details} updateDetails={this.props.updateDetails} />
+				<FilterModal name="filterModal" filter={this.props.filter} updateFilter={this.props.updateFilter} />
 			</div>
 		);
 	}
 }
 
-// Main.propTypes = {
-// 	filter: PropTypes.exact({
-// 		application: PropTypes.string.isRequired,
-// 		level: PropTypes.oneOf(["", "debug", "info", "warn", "error", "fatal", "panic"]),
-// 		searchTerm: PropTypes.string.isRequired
-// 	}),
-// 	page: PropTypes.number.isRequired
-// }
-
-export default connect(state => state)(Main);
+Main.propTypes = {
+	details: DetailsPropType,
+	filter: FilterPropType,
+	paging: PagingPropType,
+	updateDetails: PropTypes.func,
+	updateFilter: PropTypes.func,
+	updatePaging: PropTypes.func
+}

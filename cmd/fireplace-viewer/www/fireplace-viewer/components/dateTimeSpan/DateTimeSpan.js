@@ -1,6 +1,7 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
-export default class FormatDateTime extends Component {
+export class DateTimeSpan extends Component {
 	constructor(props) {
 		super(props);
 	}
@@ -10,4 +11,6 @@ export default class FormatDateTime extends Component {
 	}
 }
 
-//window.FormatDateTime = FormatDateTime;
+DateTimeSpan.propTypes = {
+	date: PropTypes.any.isRequired
+};

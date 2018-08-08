@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := dev
+
 prepare:
 	npm run-script build
 	go generate

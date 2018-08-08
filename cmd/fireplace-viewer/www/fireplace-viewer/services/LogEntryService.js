@@ -2,7 +2,7 @@ export class LogEntryService {
 	constructor() {
 	}
 
-	getLogEntries(page, filter) {
+	getLogEntries(paging, filter) {
 		let options = {
 			method: "GET",
 			headers: {
@@ -11,9 +11,7 @@ export class LogEntryService {
 			cache: "no-store"
 		};
 
-		console.log("In LogEntryService.getLogEntries: page == ", page, " filter == ", filter);
-
-		let url = `/logentry?page=${page}`;
+		let url = `/logentry?page=${paging.page}`;
 
 		if (filter.searchTerm && filter.searchTerm.length > 0) {
 			url += `&search=${filter.searchTerm}`;
@@ -48,13 +46,19 @@ export class LogEntryService {
 		});
 	}
 
-	hasNextPage(page, pageSize, totalCount) {
-		let numPages = Math.ceil(totalCount / pageSize);
-		return page < numPages;
+	hasNextPage(paging) {
+		return paging.page < this.getNumPages(paging);
 	}
 
-	hasPreviousPage(page) {
-		return page > 1;
+	hasPreviousPage(paging) {
+		return paging.page > 1;
 	}
 
+	getLastPage(paging) {
+		return this.getNumPages(paging);
+	}
+
+	getNumPages(paging) {
+		return Math.ceil(paging.totalCount / paging.pageSize);
+	}
 }

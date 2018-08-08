@@ -35,6 +35,6 @@ export class LogEntryStatusIcon extends Component {
 	}
 }
 
-// LogEntryStatusIcon.propTypes = {
-// 	log: PropTypes.object
-// };
+LogEntryStatusIcon.propTypes = {
+	log: PropTypes.object
+};

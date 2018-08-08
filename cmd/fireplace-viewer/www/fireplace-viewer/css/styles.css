@@ -13,8 +13,24 @@ body {
 }
 
 /******************************************************************************
+ * Navigation styles
+ *****************************************************************************/
+.page-number {
+	padding: .5rem 1rem;
+}
+
+/******************************************************************************
  * Log Table Styles
  *****************************************************************************/
+.table-header {
+	top: 56px;
+	position: fixed !important;
+}
+
+.table-log-entries {
+	margin-top: 50px;
+}
+
 .icon-error-status {
 	color: #ef4d3b;
 }
@@ -32,9 +48,28 @@ body {
 }
 
 .column-icon {
-	width: 1%;
+	width: 5%;
 }
 
 .column-message {
-	width: 99%;
+	width: 65%;
+}
+
+.column-application {
+	width: 10%;
+}
+
+.column-date {
+	width: 20%;
+}
+
+/******************************************************************************
+ * Other
+ *****************************************************************************/
+.link {
+	text-decoration: underline !important;
+}
+
+.pointer {
+	cursor: pointer;
 }

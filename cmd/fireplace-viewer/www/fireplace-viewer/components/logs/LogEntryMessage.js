@@ -4,22 +4,28 @@ import React, { Component } from "react";
 export class LogEntryMessage extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			log: props.log
-		};
+
+		this.onSelectDetails = this.onSelectDetails.bind(this);
 	}
 
-	componentWillReceiveProps(nextProps) {
-		this.setState({
-			log: nextProps.log
-		});
+	onSelectDetails(e) {
+		e.preventDefault();
+		this.props.onSelectDetails(this.props.log);
 	}
 
 	render() {
-		return <p className="log-message">{this.state.log.message}</p>;
+		return (
+			<p className="log-message">
+				{this.props.log.details.length > 0 && (
+					<a className="pointer link" onClick={this.onSelectDetails}>{this.props.log.message}</a>
+				)}
+				{this.props.log.details.length <= 0 && this.props.log.message}
+			</p>
+		);
 	}
 }
 
-// LogEntryMessage.propTypes = {
-// 	log: PropTypes.object
-// };
+LogEntryMessage.propTypes = {
+	log: PropTypes.object,
+	onSelectDetails: PropTypes.func
+};
