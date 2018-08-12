@@ -10,19 +10,17 @@ import (
 	"syscall"
 	"time"
 
-	"gopkg.in/mgo.v2"
-
 	"github.com/adampresley/fireplace/pkg/filters"
 	"github.com/adampresley/fireplace/pkg/logentry"
 	"github.com/adampresley/fireplace/pkg/logging"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/mgo.v2"
 )
 
 const (
 	SERVER_VERSION string = "0.1.0"
-	DATA_DIRECTORY string = "./database"
 	PAGE_SIZE      int    = 100
 )
 

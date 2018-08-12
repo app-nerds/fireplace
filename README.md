@@ -44,6 +44,18 @@ $ npm install
 $ make
 ```
 
+## Server Flags
+The following are command line arguments that can be used to customize how the Fireplace Server
+runs.
+
+* **host** - IP/Port to bind to. Defaults to *0.0.0.0:8999*
+* **loglevel** - What level to write logs at. Defaults to *info*
+
+### Example
+```
+$ ./fireplace-server -host=127.0.0.1:8080
+```
+
 ## Capturing Logs in a Go Application
 To capture logs in your Go applications using Logurs and Fireplace, ensure you are importing
 Logrus and the Fireplace hook. Here is a small sample of logging to Fireplace Server.
