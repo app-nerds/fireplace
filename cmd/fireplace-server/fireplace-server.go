@@ -29,7 +29,6 @@ var host = flag.String("host", "0.0.0.0:8999", "Address and port to bind this se
 
 var logger *logrus.Entry
 
-//var db *badger.DB
 var db *mgo.Database
 var session *mgo.Session
 var logEntryService *logentry.LogEntryService
