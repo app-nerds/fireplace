@@ -5,24 +5,18 @@ export class ApplicationNameService {
 	/**
 	 * get retrieves a list of application names
 	 */
-	get() {
-		return new Promise((resolve, reject) => {
-			let options = {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
+	async get() {
+		let options = {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
 
-			fetch("/applicationname", options)
-				.then(response => response.json())
-				.then((result) => {
-					result.unshift("All");
-					return resolve(result);
-				})
-				.catch((err) => {
-					return reject(err);
-				});
-		});
+		let response = await fetch("/applicationname", options);
+		let result = await response.json();
+
+		result.unshift("All");
+		return result;
 	}
 }

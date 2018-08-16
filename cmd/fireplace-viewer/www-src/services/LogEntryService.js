@@ -3,7 +3,7 @@ export class LogEntryService {
 	constructor() {
 	}
 
-	getLogEntries(paging, filter) {
+	async getLogEntries(paging, filter) {
 		let options = {
 			method: "GET",
 			headers: {
@@ -26,47 +26,32 @@ export class LogEntryService {
 			url += `&level=${filter.level}`;
 		}
 
-		return new Promise((resolve, reject) => {
-			fetch(url, options)
-				.then(response => response.json())
-				.then((result) => {
-					let totalCount = result.totalCount;
-					let pageSize = result.pageSize;
-					let logEntries = result.logEntries;
+		let response = await fetch(url, options);
+		let result = await response.json();
 
-					return resolve({
-						totalCount: totalCount,
-						pageSize: pageSize,
-						logs: logEntries
-					});
-				})
-				.catch((err) => {
-					console.log(err);
-					return reject(err);
-				});
-		});
+		let totalCount = result.totalCount;
+		let pageSize = result.pageSize;
+		let logEntries = result.logEntries;
+
+		return {
+			totalCount: totalCount,
+			pageSize: pageSize,
+			logs: logEntries
+		};
 	}
 
-	delete(beforeDate) {
-		return new Promise((resolve, reject) => {
-			let options = {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				cache: "no-store"
-			};
+	async delete(beforeDate) {
+		let options = {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			cache: "no-store"
+		};
 
-			fetch("/logentry?fromDate=" + moment(beforeDate).format("MM/DD/YYYY"), options)
-				.then(response => response.text())
-				.then((result) => {
-					return resolve(result);
-				})
-				.catch((err) => {
-					console.log(err);
-					return reject(err);
-				});
-		});
+		let response = await fetch("/logentry?fromDate=" + moment(beforeDate).format("MM/DD/YYYY"), options);
+		let result = await response.text();
+		return result;
 	}
 
 	hasNextPage(paging) {
