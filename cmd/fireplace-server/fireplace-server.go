@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"strconv"
@@ -153,10 +154,13 @@ func getLogEntries(ctx echo.Context) error {
 	var page int
 	result := make(logentry.LogEntryCollection, 0, 500)
 
+	application, _ := url.QueryUnescape(ctx.QueryParam("application"))
+	search, _ := url.QueryUnescape(ctx.QueryParam("search"))
+
 	filter := &filters.LogEntryFilter{
-		Application: ctx.QueryParam("application"),
+		Application: application,
 		Level:       ctx.QueryParam("level"),
-		Search:      ctx.QueryParam("search"),
+		Search:      search,
 	}
 
 	if page, err = strconv.Atoi(ctx.QueryParam("page")); err != nil {
