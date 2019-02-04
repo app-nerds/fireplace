@@ -115,7 +115,7 @@ export default {
 			// Ensure we have a delay before dispatching the search event
 			this.typingInSearchBox = false;
 			this.$store.dispatch("setFilterSearchTerm", this.searchTerm);
-		}, 150)
+		}, 300)
 	},
 	methods: {
 		goToFirstPage: function() {
