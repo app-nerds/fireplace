@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/adampresley/fireplace/pkg/filters"
-	"github.com/adampresley/fireplace/pkg/logentry"
-	"github.com/adampresley/fireplace/pkg/logging"
+	"github.com/app-nerds/fireplace/pkg/filters"
+	"github.com/app-nerds/fireplace/pkg/logentry"
+	"github.com/app-nerds/fireplace/pkg/logging"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"

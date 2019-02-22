@@ -12,9 +12,9 @@ import (
 
 	"code.appninjas.biz/appninjas/kit/rendering"
 	"code.appninjas.biz/appninjas/kit/restclient"
-	"github.com/adampresley/fireplace/cmd/fireplace-viewer/configuration"
-	"github.com/adampresley/fireplace/pkg/logentry"
-	"github.com/adampresley/fireplace/pkg/logging"
+	"github.com/app-nerds/fireplace/cmd/fireplace-viewer/configuration"
+	"github.com/app-nerds/fireplace/pkg/logentry"
+	"github.com/app-nerds/fireplace/pkg/logging"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"

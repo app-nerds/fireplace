@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/adampresley/fireplace/cmd/fireplace-hook"
+	"github.com/app-nerds/fireplace/cmd/fireplace-hook"
 	"github.com/sirupsen/logrus"
 )
 

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/adampresley/fireplace/pkg/logentry"
+	"github.com/app-nerds/fireplace/pkg/logentry"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

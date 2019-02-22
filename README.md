@@ -32,13 +32,13 @@ the server application, perform the following on the terminal.
 
 ```
 $ cd $GOPATH/src
-$ mkdir -p github.com/adampresley
-$ cd github.com/adampresley
+$ mkdir -p github.com/app-nerds
+$ cd github.com/app-nerds
 $ git clone git@github.com:adampresley/fireplace.git
 $ cd fireplace/cmd/fireplace-server
 $ go get
 $ go build
-$ cd $GOPATH/src/github.com/adampresley/fireplace/cmd/fireplace-viewer
+$ cd $GOPATH/src/github.com/app-nerds/fireplace/cmd/fireplace-viewer
 $ go get
 $ npm install
 $ make
@@ -64,7 +64,7 @@ Logrus and the Fireplace hook. Here is a small sample of logging to Fireplace Se
 package main
 
 import (
-    fireplacehook "github.com/adampresley/fireplace/cmd/fireplace-hook"
+    fireplacehook "github.com/app-nerds/fireplace/cmd/fireplace-hook"
     "github.com/sirupsen/logrus"
 )
 

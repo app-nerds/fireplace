@@ -6,7 +6,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/adampresley/fireplace/pkg/filters"
+	"github.com/app-nerds/fireplace/pkg/filters"
 	"github.com/pkg/errors"
 )
 
