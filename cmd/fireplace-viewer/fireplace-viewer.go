@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"code.appninjas.biz/appninjas/kit/rendering"
-	"code.appninjas.biz/appninjas/kit/restclient"
+	"github.com/app-nerds/kit/rendering"
+	"github.com/app-nerds/kit/restclient"
 	"github.com/app-nerds/fireplace/cmd/fireplace-viewer/configuration"
 	"github.com/app-nerds/fireplace/pkg/logentry"
 	"github.com/app-nerds/fireplace/pkg/logging"

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/globalsign/mgo"
 	"context"
 	"flag"
 	"net/http"
@@ -17,7 +18,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/mgo.v2"
+
 )
 
 const (

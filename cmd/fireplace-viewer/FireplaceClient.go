@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"code.appninjas.biz/appninjas/kit/restclient"
+	"github.com/app-nerds/kit/restclient"
 	"github.com/pkg/errors"
 )
 
