@@ -1,18 +1,9 @@
-import moment from "moment";
-
-class LogEntryService {
-	constructor() {
+export class LogEntryService {
+	constructor($http) {
+		this.$http = $http;
 	}
 
 	async getLogEntries(page, filter) {
-		let options = {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			cache: "no-store"
-		};
-
 		let url = `/logentry?page=${page}`;
 
 		if (filter.searchTerm && filter.searchTerm.length > 0) {
@@ -27,8 +18,8 @@ class LogEntryService {
 			url += `&level=${filter.level}`;
 		}
 
-		let response = await fetch(url, options);
-		let result = await response.json();
+		let response = await this.$http.get(url);
+		let result = response.body;
 
 		let totalCount = result.totalCount;
 		let pageSize = result.pageSize;
@@ -42,17 +33,8 @@ class LogEntryService {
 	}
 
 	async delete(beforeDate) {
-		let options = {
-			method: "DELETE",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			cache: "no-store"
-		};
-
-		let response = await fetch("/logentry?fromDate=" + moment(beforeDate).format("MM/DD/YYYY"), options);
-		let result = await response.text();
-		return result;
+		let response = await this.$http.delete(`/logentry?fromDate=${moment(beforeDate).format("MM/DD/YYYY")}`);
+		return response.body;
 	}
 
 	hasNextPage(paging) {
@@ -72,4 +54,6 @@ class LogEntryService {
 	}
 }
 
-export default LogEntryService = new LogEntryService();
+export function LogEntryServiceInstaller(Vue) {
+	Vue.prototype.logEntryService = new LogEntryService(Vue.http);
+}

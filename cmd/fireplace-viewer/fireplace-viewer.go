@@ -2,7 +2,7 @@
  * Copyright (c) 2020. App Nerds LLC. All rights reserved
  */
 
-//go:generate esc -o ./frontend.go -pkg main -ignore "DS_Store|LICENSE|www\.go|(.*?)\.md|(.*?)\.svg|(.*?)\.html" -prefix /app/ ./app
+//go:generate esc -o ./frontend.go -pkg main -ignore DS_Store|LICENSE|www\.go|(.*?)\.md|(.*?)\.svg|(.*?)\.html -prefix /app/ ./app
 package main
 
 import (
@@ -14,14 +14,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/app-nerds/kit/v4/rendering"
 	"github.com/app-nerds/kit/v4/restclient"
-	"github.com/app-nerds/fireplace/cmd/fireplace-viewer/configuration"
-	"github.com/app-nerds/fireplace/pkg/logentry"
-	"github.com/app-nerds/fireplace/pkg/logging"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
+
+	"github.com/app-nerds/fireplace/cmd/fireplace-viewer/configuration"
+	"github.com/app-nerds/fireplace/pkg/logentry"
+	"github.com/app-nerds/fireplace/pkg/logging"
 )
 
 var logger *logrus.Entry
@@ -126,12 +126,13 @@ func handleMainPage(ctx echo.Context) error {
 	<script src="/app/assets/popper/popper.min.js"></script>
 	<script src="/app/assets/bootstrap/js/bootstrap.min.js"></script>
 	<script src="/app/assets/vue-loading-overlay/vue-loading-overlay.js"></script>
+	<script src="/app/assets/debouce/debouce.js"></script>
 	<script src="/app/assets/syncfusion/ej2-vue.min.js"></script>
 
 	<script src="/app/main.js" type="module"></script>
 	</body>
 </html>
-`
+`)
 }
 
 func getApplicationNames(ctx echo.Context) error {
