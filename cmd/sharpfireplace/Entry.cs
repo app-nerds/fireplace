@@ -60,7 +60,11 @@ namespace sharpfireplace
 
 		public Entry WithException(Exception error)
 		{
-			return this.WithField("error", error.Message);
+			return this.WithFields(new Dictionary<string, object>()
+			{
+				["error"] = error.Message,
+				["stackTrace"] = error.StackTrace
+			});
 		}
 
 		public Entry WithField(string key, object value)
