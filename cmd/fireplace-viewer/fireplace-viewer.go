@@ -43,24 +43,19 @@ func main() {
 		},
 	}
 
-	assetHandler := http.FileServer(FS(config.Debug))
-	renderer := rendering.NewRenderer(logger)
-
-	renderer.AddTemplates(
-		&rendering.Template{
-			Name:        "main",
-			PageContent: FSMustString(config.Debug, "/www/fireplace-viewer/pages/main.gohtml"),
-		},
-	)
-
 	httpServer := echo.New()
 	httpServer.HideBanner = true
 	httpServer.Use(middleware.CORS())
-	httpServer.Renderer = renderer
 
-	httpServer.GET("/www/*", echo.WrapHandler(assetHandler))
+	if config.Debug {
+		logger.Debug("Serving static assets from the filesystem")
+		httpServer.Static("/app", "app")
+	} else {
+		logger.Debug("Service static assets from the binary")
+		httpServer.GET("/app/*", echo.WrapHandler(http.FileServer(FS(config.Debug))))
+	}
+
 	httpServer.GET("/", handleMainPage)
-
 	httpServer.GET("/logentry", getLogEntries)
 	httpServer.GET("/logentry/:id", getLogEntry)
 	httpServer.DELETE("/logentry", delete)
@@ -70,13 +65,12 @@ func main() {
 		var err error
 
 		logger.WithFields(logrus.Fields{
-			"host":          config.Host,
 			"serverVersion": config.ServerVersion,
 			"debug":         config.Debug,
 			"logLevel":      config.LogLevel,
 		}).Infof("Starting Fireplace Viewer")
 
-		if err = httpServer.Start(config.Host); err != nil {
+		if err = httpServer.Start("127.0.0.1:0"); err != nil {
 			if err != http.ErrServerClosed {
 				logger.WithError(err).Fatalf("Unable to start application")
 			} else {
@@ -101,13 +95,43 @@ func main() {
 }
 
 func handleMainPage(ctx echo.Context) error {
-	viewModel := struct {
-		Title string
-	}{
-		Title: "Home",
-	}
+	return ctx.HTML(http.StatusOK, `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	return ctx.Render(http.StatusOK, "main", viewModel)
+	<title>Fireplace</title>
+
+	<link rel="shortcut icon" href="/app/assets/fireplace-viewer/images/fire_pit.ico" />
+	<link rel="stylesheet" type="text/css" href="/app/assets/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="/app/assets/fireplace-viewer/css/styles.css" />
+	<link rel="stylesheet" type="text/css" href="/app/assets/vue-loading-overlay/vue-loading-overlay.css" />
+	<link rel="stylesheet" type="text/css" href="/app/assets/fontawesome/css/all.min.css" />
+	<link rel="stylesheet" type="text/css" href="/app/assets/syncfusion/bootstrap4.css" />
+</head>
+
+<body>
+	<div id="app"></div>
+
+	<script src="/app/assets/babel/babel.min.js"></script>
+	<script src="/app/assets/moment/moment.min.js"></script>
+	<script src="/app/assets/vue/vue-2.6.10.js"></script>
+	<script src="/app/assets/vuejs-datepicker/vuejs-datepicker.min.js"></script>
+	<script src="/app/assets/vue-router/vue-router-3.1.3.min.js"></script>
+	<script src="/app/assets/vuex/vuex-3.1.1.min.js"></script>
+	<script src="/app/assets/vue-resource/vue-resource-1.5.1.min.js"></script>
+	<script src="/app/assets/jquery/jquery-3.3.1.min.js"></script>
+	<script src="/app/assets/popper/popper.min.js"></script>
+	<script src="/app/assets/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/app/assets/vue-loading-overlay/vue-loading-overlay.js"></script>
+	<script src="/app/assets/syncfusion/ej2-vue.min.js"></script>
+
+	<script src="/app/main.js" type="module"></script>
+	</body>
+</html>
+`
 }
 
 func getApplicationNames(ctx echo.Context) error {
