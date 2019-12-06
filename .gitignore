@@ -18,3 +18,4 @@ cmd/fireplace-viewer/fireplace-viewer
 .vs
 cmd/sharpfireplace/bin
 cmd/sharpfireplace/obj
+.idea
