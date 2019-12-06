@@ -1,8 +1,5 @@
-import Vuex from "vuex";
-import Vue from "vue";
-
-import ApplicationNameService from "../services/ApplicationNameService";
-import LogEntryService from "../services/LogEntryService";
+import ApplicationNameService from "/app/services/ApplicationNameService.js";
+import LogEntryService from "/app/services/LogEntryService.js";
 
 Vue.use(Vuex);
 
@@ -53,87 +50,87 @@ const store = new Vuex.Store({
 		}
 	},
 	actions: {
-		clearFilters: function (context) {
-			context.commit("SET_FILTER_APPLICATION", "");
-			context.commit("SET_FILTER_LEVEL", "");
-			context.commit("SET_FILTER_SEARCH_TERM", "");
+		clearFilters({ commit, dispatch }) {
+			commit("SET_FILTER_APPLICATION", "");
+			commit("SET_FILTER_LEVEL", "");
+			commit("SET_FILTER_SEARCH_TERM", "");
 
-			context.dispatch("getLogEntries", 1);
+			dispatch("getLogEntries", 1);
 		},
 
-		setFilterApplication: function (context, application) {
-			context.commit("SET_FILTER_APPLICATION", application);
-			context.dispatch("setPage", 1);
+		setFilterApplication({ commit, dispatch }, application) {
+			commit("SET_FILTER_APPLICATION", application);
+			dispatch("setPage", 1);
 		},
 
-		setFilterLevel: function (context, level) {
-			context.commit("SET_FILTER_LEVEL", level);
-			context.dispatch("setPage", 1);
+		setFilterLevel({ commit, dispatch }, level) {
+			commit("SET_FILTER_LEVEL", level);
+			dispatch("setPage", 1);
 		},
 
-		setFilterSearchTerm: function (context, searchTerm) {
-			context.commit("SET_FILTER_SEARCH_TERM", searchTerm);
-			context.dispatch("setPage", 1);
+		setFilterSearchTerm({ commit, dispatch }, searchTerm) {
+			commit("SET_FILTER_SEARCH_TERM", searchTerm);
+			dispatch("setPage", 1);
 		},
 
-		nextPage: function (context) {
-			if (context.state.page < context.state.lastPage) {
-				let nextPage = context.state.page + 1;
-				context.dispatch("setPage", nextPage);
+		nextPage({ state, dispatch }) {
+			if (state.page < state.lastPage) {
+				let nextPage = state.page + 1;
+				dispatch("setPage", nextPage);
 			}
 		},
 
-		previousPage: function (context) {
+		previousPage({ state, dispatch }) {
 			if (context.state.page > 1) {
-				let previousPage = context.state.page - 1;
-				context.dispatch("setPage", previousPage);
+				let previousPage = state.page - 1;
+				dispatch("setPage", previousPage);
 			}
 		},
 
-		firstPage: function (context) {
-			context.dispatch("setPage", 1);
+		firstPage({ dispatch }) {
+			dispatch("setPage", 1);
 		},
 
-		lastPage: function (context) {
-			context.dispatch("setPage", context.state.lastPage);
+		lastPage({ dispatch }) {
+			dispatch("setPage", context.state.lastPage);
 		},
 
-		setPage: function (context, page) {
-			context.dispatch("getLogEntries", page);
+		setPage({ dispatch }, page) {
+			dispatch("getLogEntries", page);
 		},
 
-		getLogEntries: function (context, page) {
+		async getLogEntries({ state, commit }, page) {
+			let logEntryService = new LogEntryService(Vue.http);
+
 			let filters = {
-				application: context.state.application,
-				level: context.state.level,
-				searchTerm: context.state.searchTerm
+				application: state.application,
+				level: state.level,
+				searchTerm: state.searchTerm
 			};
 
-			LogEntryService.getLogEntries(page, filters)
-				.then((response) => {
-					let totalPages = Math.ceil(response.totalCount / response.pageSize);
+			let response = await logEntryService.getLogEntries(page, filters);
+			let totalPages = Math.ceil(response.totalCount / response.pageSize);
 
-					context.commit("SET_PAGE", page);
-					context.commit("SET_LAST_PAGE", totalPages);
-					context.commit("SET_LOG_ENTRIES", response.logs);
-				});
+			commit("SET_PAGE", page);
+			commit("SET_LAST_PAGE", totalPages);
+			commit("SET_LOG_ENTRIES", response.logs);
 		},
 
-		getApplicationNames: function (context) {
-			ApplicationNameService.get()
-				.then((response) => {
-					context.commit("SET_APPLICATION_NAMES", response);
-				});
+		async getApplicationNames({ commit }) {
+			let applicationNameService = new ApplicationNameService(Vue.http);
+			let response = await applicationNameService.get();
+
+			commit("SET_APPLICATION_NAMES", response);
 		},
 
-		showNavigation: function (context) {
-			context.commit("SET_SHOW_NAVIGATION", true);
+		showNavigation({ commit }) {
+			commit("SET_SHOW_NAVIGATION", true);
 		},
 
-		hideNavigation: function (context) {
-			context.commit("SET_SHOW_NAVIGATION", false);
-		}
-	}
+		hideNavigation({ commit }) {
+			commit("SET_SHOW_NAVIGATION", false);
+		},
+	},
 });
 
 export default store;
