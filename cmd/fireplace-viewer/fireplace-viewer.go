@@ -1,4 +1,8 @@
-//go:generate esc -o ./www.go -pkg main -ignore DS_Store|LICENSE|www\.go|(.*?)\.md|(.*?)\.svg -prefix /www/ ./www
+/*
+ * Copyright (c) 2020. App Nerds LLC. All rights reserved
+ */
+
+//go:generate esc -o ./frontend.go -pkg main -ignore "DS_Store|LICENSE|www\.go|(.*?)\.md|(.*?)\.svg|(.*?)\.html" -prefix /app/ ./app
 package main
 
 import (
@@ -10,13 +14,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/app-nerds/kit/rendering"
-	"github.com/app-nerds/kit/restclient"
+	"github.com/app-nerds/kit/v4/rendering"
+	"github.com/app-nerds/kit/v4/restclient"
 	"github.com/app-nerds/fireplace/cmd/fireplace-viewer/configuration"
 	"github.com/app-nerds/fireplace/pkg/logentry"
 	"github.com/app-nerds/fireplace/pkg/logging"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 )
 
