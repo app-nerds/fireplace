@@ -10,8 +10,6 @@ export const Actions = {
 	lastPage: "lastPage",
 	setPage: "setPage",
 	getLogEntries: "getLogEntries",
-	showNavigation: "showNavigation",
-	hideNavigation: "hideNavigation",
 };
 
 export const Getters = {
@@ -19,7 +17,6 @@ export const Getters = {
 	level: "level",
 	logEntries: "logEntries",
 	page: "page",
-	showNavigation: "showNavigation",
 };
 
 const store = new Vuex.Store({
@@ -34,8 +31,8 @@ const store = new Vuex.Store({
 		totalCount: 0,
 		lastPage: 0,
 		logEntries: [],
-		showNavigation: true,
 	},
+
 	mutations: {
 		SET_PAGE: function (state, page) {
 			state.page = page;
@@ -48,11 +45,8 @@ const store = new Vuex.Store({
 		SET_LOG_ENTRIES: (state, logEntries) => {
 			state.logEntries = logEntries;
 		},
-
-		SET_SHOW_NAVIGATION: (state, showNavigation) => {
-			state.showNavigation = showNavigation;
-		},
 	},
+
 	getters: {
 		filterPanelVisible(state) {
 			return state.filterPanelVisible;
@@ -69,11 +63,8 @@ const store = new Vuex.Store({
 		page(state) {
 			return state.page;
 		},
-
-		showNavigation(state) {
-			return state.showNavigation;
-		},
 	},
+
 	actions: {
 		nextPage({ state, dispatch }) {
 			if (state.page < state.lastPage) {
@@ -108,20 +99,14 @@ const store = new Vuex.Store({
 				searchTerm: getters["filterPanel/searchTerm"],
 			};
 
+			page = page || 1;
+
 			let response = await Vue.prototype.logEntryService.getLogEntries(page, filters);
 			let totalPages = Math.ceil(response.totalCount / response.pageSize);
 
 			commit("SET_PAGE", page);
 			commit("SET_LAST_PAGE", totalPages);
 			commit("SET_LOG_ENTRIES", response.logs);
-		},
-
-		showNavigation({ commit }) {
-			commit("SET_SHOW_NAVIGATION", true);
-		},
-
-		hideNavigation({ commit }) {
-			commit("SET_SHOW_NAVIGATION", false);
 		},
 	},
 });

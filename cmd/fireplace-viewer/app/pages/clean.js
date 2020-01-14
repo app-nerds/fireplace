@@ -1,28 +1,23 @@
-import LogEntryService from "/app/services/LogEntryService.js";
-
 export default {
-	data: function () {
+	data() {
 		return {
 			date: moment().format("YYYY-MM-DD"),
-			modalVisible: false,
-			modalMessage: ""
+			maxDate: new Date(),
 		};
 	},
-	mounted: function () {
+
+	mounted() {
 		this.$store.dispatch("hideNavigation");
 	},
-	methods: {
-		deleteEntries: function () {
-			let self = this;
 
-			LogEntryService.delete(this.date)
-				.then(result => {
-					self.modalMessage = result;
-					self.modalVisible = true;
-				})
-				.catch(e => {
-					console.log(e);
-				});
+	methods: {
+		async deleteEntries() {
+			try {
+				let result = await this.logEntryService.delete(this.date);
+				this.alertService.success(result);
+			} catch (e) {
+				this.alertService.error(e);
+			}
 		}
 	},
 
@@ -36,51 +31,11 @@ export default {
 			<form>
 				<div class="form-group">
 					<label for="date">Date</label>
-					<datepicker v-model="date" format="yyyy-MM-dd"></datepicker>
+					<ejs-datepicker :max="maxDate" :value="date" v-model="date"></ejs-datepicker>
 				</div>
 
 				<button type="button" class="btn btn-danger" @click="deleteEntries">Delete</button>
 			</form>
-
-			<div v-if="modalVisible">
-				<transition name="modal">
-					<div class="modal-mask">
-						<div class="modal-wrapper">
-							<div class="modal-dialog">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title">Success!</h5>
-										<button
-											type="button"
-											class="close"
-											data-dismiss="modal"
-											aria-label="close"
-											@click="modalVisible = false"
-										>
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-
-									<div class="modal-body">
-										<p>{{modalMessage}}</p>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</transition>
-			</div>
 		</div>
 	`
 };
-
-
-// import Datepicker from "vuejs-datepicker";
-//
-// export default {
-// 	components: {
-// 		Datepicker
-// 	},
-//
-// };
-// </script>

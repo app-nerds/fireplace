@@ -14,7 +14,7 @@ export default {
 		},
 
 		showNavigation() {
-			return this.$store.getters[Getters.showNavigation];
+			return this.$route.name === "logs";
 		},
 	},
 

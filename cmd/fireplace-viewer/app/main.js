@@ -4,6 +4,7 @@ import { ApplicationNameServiceInstaller } from "/app/services/ApplicationNameSe
 import { LogEntryServiceInstaller } from "/app/services/LogEntryService.js";
 import TheNavigation from "/app/components/navigation/the-navigation.js";
 import router from "/app/router.js";
+import { AlertServiceInstaller} from "/app/services/AlertService.js";
 
 /*
  * Core plugins
@@ -19,12 +20,14 @@ Vue.use(ejs.buttons.ButtonPlugin);
 Vue.use(ejs.grids.GridPlugin);
 Vue.use(ejs.popups.DialogPlugin);
 Vue.use(ejs.notifications.ToastPlugin);
+Vue.use(ejs.calendars.DatePickerPlugin);
 
 /*
  * Service plugins
  */
 Vue.use(ApplicationNameServiceInstaller);
 Vue.use(LogEntryServiceInstaller);
+Vue.use(AlertServiceInstaller);
 
 /*
  * HTTP interceptor to show a loading shim
