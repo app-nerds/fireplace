@@ -6,6 +6,7 @@ export const FilterPanelGetters = {
 	applicationNames: "filterPanel/applicationNames",
 	level: "filterPanel/level",
 	right: "filterPanel/right",
+	searchTerm: "filterPanel/searchTerm",
 	width: "filterPanel/width",
 };
 
@@ -80,6 +81,10 @@ export const FilterPanelState = {
 
 		right(state) {
 			return state.right;
+		},
+
+		searchTerm(state) {
+			return state.searchTerm;
 		},
 
 		width(state) {

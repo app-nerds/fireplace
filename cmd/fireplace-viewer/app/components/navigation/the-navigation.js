@@ -1,6 +1,6 @@
 import debounce from "/app/assets/debounce/debounce.js";
 import { Actions, Getters } from "/app/state/store.js";
-import { FilterPanelActions } from "/app/components/filter-panel/filter-panel-state.js";
+import { FilterPanelActions, FilterPanelGetters } from "/app/components/filter-panel/filter-panel-state.js";
 import { DetailPanelActions } from "/app/components/detail-panel/detail-panel-state.js";
 
 export default {
@@ -16,27 +16,30 @@ export default {
 		showNavigation() {
 			return this.$route.name === "logs";
 		},
+
+		searchTerm: {
+			get() {
+				return this.$store.getters[FilterPanelGetters.searchTerm];
+			},
+
+			set: debounce(function(newValue) {
+				this.$store.dispatch(FilterPanelActions.setSearchTerm, newValue);
+				this.$store.dispatch(Actions.getLogEntries);
+			}, 400),
+		}
+	},
+
+	data() {
+		return {
+			// searchTerm: "",
+			typingInSearchBox: false
+		};
 	},
 
 	mounted() {
 		this.$root.$on("clear-search-term", () => {
 			this.searchTerm = "";
 		});
-	},
-
-	data() {
-		return {
-			searchTerm: "",
-			typingInSearchBox: false
-		};
-	},
-
-	watch: {
-		searchTerm: debounce(function () {
-			// Ensure we have a delay before dispatching the search event
-			this.typingInSearchBox = false;
-			this.$store.dispatch(Actions.setFilterSearchTerm, this.searchTerm);
-		}, 300)
 	},
 
 	methods: {
@@ -74,6 +77,15 @@ export default {
 		onSearchChange() {
 			this.typingInSearchBox = true;
 		},
+	},
+
+	watch: {
+		// searchTerm: debounce(function () {
+		// 	// Ensure we have a delay before dispatching the search event
+		// 	this.typingInSearchBox = false;
+		// 	this.$store.dispatch(FilterPanelActions.setSearchTerm, this.searchTerm);
+		// 	this.$store.dispatch(Actions.getLogEntries);
+		// }, 400)
 	},
 
 	template: `
