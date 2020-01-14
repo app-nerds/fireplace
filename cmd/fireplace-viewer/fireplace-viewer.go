@@ -118,7 +118,6 @@ func handleMainPage(ctx echo.Context) error {
 	<script src="/app/assets/babel/babel.min.js"></script>
 	<script src="/app/assets/moment/moment.min.js"></script>
 	<script src="/app/assets/vue/vue-2.6.10.js"></script>
-	<script src="/app/assets/vuejs-datepicker/vuejs-datepicker.min.js"></script>
 	<script src="/app/assets/vue-router/vue-router-3.1.3.min.js"></script>
 	<script src="/app/assets/vuex/vuex-3.1.1.min.js"></script>
 	<script src="/app/assets/vue-resource/vue-resource-1.5.1.min.js"></script>
