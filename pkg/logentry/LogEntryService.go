@@ -3,6 +3,7 @@ package logentry
 import (
 	"time"
 
+	"github.com/app-nerds/kit/v4/database"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 
@@ -11,7 +12,7 @@ import (
 )
 
 type LogEntryService struct {
-	DB       *mgo.Database
+	DB       database.Database
 	PageSize int
 }
 
