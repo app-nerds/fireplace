@@ -1,5 +1,8 @@
 import DetailPanel from "/app/components/detail-panel/detail-panel.js";
-import LogEntryStatusIcon from "/app/components/log-entry-status-icon.js";
+import LogEntryStatusIcon from "/app/components/log-entry-table/log-entry-status-icon.js";
+import { Getters } from "/app/state/store.js";
+import { DetailPanelActions } from "/app/components/detail-panel/detail-panel-state.js";
+import { FilterPanelActions } from "/app/components/filter-panel/filter-panel-state.js";
 
 export default {
 	components: {
@@ -15,7 +18,7 @@ export default {
 
 	computed: {
 		logEntries() {
-			let result = this.$store.state.logEntries;
+			let result = this.$store.getters[Getters.logEntries];
 
 			if (!result) {
 				result = [];
@@ -34,8 +37,9 @@ export default {
 			window.scrollTo(0, 0);
 		},
 
-		showDetails(logEntry) {
-			this.$root.$emit("toggle-detail-panel", logEntry);
+		showDetails(id) {
+			this.$store.dispatch(FilterPanelActions.close);
+			this.$store.dispatch(DetailPanelActions.viewLogEntryDetails, id);
 		}
 	},
 
@@ -72,7 +76,7 @@ export default {
 							<a
 								v-if="logEntry.details.length > 0"
 								class="pointer link"
-								@click="showDetails(logEntry)"
+								v-on:click="showDetails(logEntry.id)"
 							>{{logEntry.message}}</a>
 							<span v-if="logEntry.details.length <= 0">{{logEntry.message}}</span>
 						</p>
@@ -84,7 +88,7 @@ export default {
 				</tbody>
 			</table>
 
-			<detail-panel></detail-panel>
+			<detail-panel :id="'detailPanel'" v-bind:width="600" ref="detailPanel"></detail-panel>
 		</div>
 	`
 };

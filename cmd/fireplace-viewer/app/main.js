@@ -1,8 +1,9 @@
-import { App } from "/app/components/app/app.js";
-import store from "/app/state/store.js";
+import { mainTemplate } from "/app/main-template.js";
+import { store } from "/app/state/store.js";
 import { ApplicationNameServiceInstaller } from "/app/services/ApplicationNameService.js";
 import { LogEntryServiceInstaller } from "/app/services/LogEntryService.js";
 import TheNavigation from "/app/components/navigation/the-navigation.js";
+import router from "/app/router.js";
 
 /*
  * Core plugins
@@ -36,12 +37,6 @@ Vue.http.interceptors.push(function () {
 	};
 });
 
-const router = new VueRouter({
-	routes: [
-		{ path: "/", name: "logs", component: () => import("/app/components/home/home.js") },
-		{ path: "/clean", name: "clean", component: () => import("/app/components/clean/clean.js") },
-	],
-});
 
 new Vue({
 	el: "#app",
@@ -56,5 +51,5 @@ new Vue({
 		this.$store.dispatch("getLogEntries", 1);
 	},
 
-	template: App,
+	template: mainTemplate,
 });

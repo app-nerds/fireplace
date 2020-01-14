@@ -3,6 +3,13 @@ export class LogEntryService {
 		this.$http = $http;
 	}
 
+	async getLogEntry(id) {
+		let url = `/logentry/${id}`;
+		let response = await this.$http.get(url);
+
+		return response.body;
+	}
+
 	async getLogEntries(page, filter) {
 		let url = `/logentry?page=${page}`;
 

@@ -1,21 +1,23 @@
+import { FilterPanelActions, FilterPanelGetters } from "/app/components/filter-panel/filter-panel-state.js";
+import {Actions} from "/app/state/store.js";
+
 export default {
 	computed: {
 		application: {
 			get() {
-				return this.$store.state.application;
+				return this.$store.getters[FilterPanelGetters.application];
 			},
-
 			set(newValue) {
-				this.$store.dispatch("setFilterApplication", newValue);
-				this.$root.$emit("page-changed");
-			}
+				this.$store.dispatch(FilterPanelActions.setApplication, newValue);
+				this.$store.dispatch(Actions.firstPage);
+			},
 		},
 
 		applicationNames: {
 			get() {
-				return this.$store.state.applicationNames;
-			}
-		}
+				return this.$store.getters[FilterPanelGetters.applicationNames];
+			},
+		},
 	},
 
 	template: `

@@ -1,19 +1,9 @@
-import RightPanel from "/app/components/right-panel/right-panel.js";
+import { DetailPanelActions, DetailPanelGetters } from "/app/components/detail-panel/detail-panel-state.js";
 
 export default {
-	components: {
-		RightPanel
-	},
-
-	data() {
-		return {
-			logEntry: { details: {} },
-			isOpen: false,
-		};
-	},
-
-	mounted() {
-		this.$root.$on("toggle-detail-panel", this.onPanelOpened);
+	props: {
+		id: String,
+		width: Number,
 	},
 
 	filters: {
@@ -48,35 +38,42 @@ export default {
 
 			return result;
 		},
+
+		logEntry: {
+			get() {
+				return this.$store.getters[DetailPanelGetters.logEntry];
+			},
+		},
+
+		right: {
+			get() {
+				return this.$store.getters[DetailPanelGetters.right];
+			},
+		},
+
+		styles: {
+			get() {
+				return {
+					width: `${this.width}px`,
+					right: `${this.right}px`,
+				};
+			},
+		},
+	},
+
+	created() {
+		this.$store.dispatch(DetailPanelActions.setWidth, this.width);
+		this.$store.dispatch(DetailPanelActions.close);
 	},
 
 	methods: {
 		close() {
-			if (this.isOpen) {
-				this.isOpen = false;
-				this.$root.$emit("toggle-right-panel", "detailPanel");
-			}
+			this.$store.dispatch(DetailPanelActions.close);
 		},
-
-		onPanelOpened(logEntry) {
-			if (!this.isOpen) {
-				this.isOpen = true;
-				this.logEntry = logEntry;
-				this.$root.$emit("toggle-right-panel", "detailPanel");
-			} else {
-				if (this.logEntry.id === logEntry.id) {
-					this.isOpen = false;
-					this.$root.$emit("toggle-right-panel", "detailPanel");
-				} else {
-					this.isOpen = true;
-					this.logEntry = logEntry;
-				}
-			}
-		}
 	},
 
 	template: `
-		<right-panel id="detailPanel" v-bind:width="600">
+		<div class="right-panel" :id="id" :style="styles">
 			<h5 v-if="logEntry.time">{{logEntry.time | longDate}}</h5>
 
 			<p>
@@ -106,7 +103,7 @@ export default {
 
 			<br>
 			<button type="button" class="btn btn-primary" @click="close">Close</button>
-		</right-panel>
+		</div>
 	`
 };
 

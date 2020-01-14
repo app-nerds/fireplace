@@ -1,25 +1,20 @@
 .DEFAULT_GOAL := run
 
-javascript:
-	npm run-script build
-
 prepare:
 	go generate
 
-run: prepare
+run:
 	go run *.go -debug=true
 
-prod:
-	npm run-script build-prod
-	go generate
+prod: prepare
 	go build
 
-build-windows:
+build-windows: prepare
 	GOOS=windows GOARCH=amd64 go build
 
-build-linux:
+build-linux: prepare
 	GOOS=linux GOARCH=amd64 go build
 
-build-mac:
+build-mac: prepare
 	GOOS=darwin GOARCH=amd64 go build
 

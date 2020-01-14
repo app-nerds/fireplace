@@ -1,34 +1,42 @@
-import { ApplicationNameService } from "/app/services/ApplicationNameService.js";
-import { LogEntryService } from "/app/services/LogEntryService.js";
+import { DetailPanelState } from "/app/components/detail-panel/detail-panel-state.js";
+import { FilterPanelState } from "/app/components/filter-panel/filter-panel-state.js";
 
 Vue.use(Vuex);
 
+export const Actions = {
+	nextPage: "nextPage",
+	previousPage: "previousPage",
+	firstPage: "firstPage",
+	lastPage: "lastPage",
+	setPage: "setPage",
+	getLogEntries: "getLogEntries",
+	showNavigation: "showNavigation",
+	hideNavigation: "hideNavigation",
+};
+
+export const Getters = {
+	lastPage: "lastPage",
+	level: "level",
+	logEntries: "logEntries",
+	page: "page",
+	showNavigation: "showNavigation",
+};
+
 const store = new Vuex.Store({
+	modules: {
+		detailPanel: DetailPanelState,
+		filterPanel: FilterPanelState,
+	},
+
 	state: {
-		application: "",
-		applicationNames: [],
-		level: "",
-		searchTerm: "",
 		page: 0,
 		pageSize: 0,
 		totalCount: 0,
 		lastPage: 0,
 		logEntries: [],
-		showNavigation: true
+		showNavigation: true,
 	},
 	mutations: {
-		SET_FILTER_APPLICATION: (state, application) => {
-			state.application = application;
-		},
-
-		SET_FILTER_LEVEL: (state, level) => {
-			state.level = level;
-		},
-
-		SET_FILTER_SEARCH_TERM: (state, searchTerm) => {
-			state.searchTerm = searchTerm;
-		},
-
 		SET_PAGE: function (state, page) {
 			state.page = page;
 		},
@@ -41,38 +49,32 @@ const store = new Vuex.Store({
 			state.logEntries = logEntries;
 		},
 
-		SET_APPLICATION_NAMES: (state, applicationNames) => {
-			state.applicationNames = applicationNames;
-		},
-
 		SET_SHOW_NAVIGATION: (state, showNavigation) => {
 			state.showNavigation = showNavigation;
-		}
+		},
+	},
+	getters: {
+		filterPanelVisible(state) {
+			return state.filterPanelVisible;
+		},
+
+		lastPage(state) {
+			return state.lastPage;
+		},
+
+		logEntries(state) {
+			return state.logEntries;
+		},
+
+		page(state) {
+			return state.page;
+		},
+
+		showNavigation(state) {
+			return state.showNavigation;
+		},
 	},
 	actions: {
-		clearFilters({ commit, dispatch }) {
-			commit("SET_FILTER_APPLICATION", "");
-			commit("SET_FILTER_LEVEL", "");
-			commit("SET_FILTER_SEARCH_TERM", "");
-
-			dispatch("getLogEntries", 1);
-		},
-
-		setFilterApplication({ commit, dispatch }, application) {
-			commit("SET_FILTER_APPLICATION", application);
-			dispatch("setPage", 1);
-		},
-
-		setFilterLevel({ commit, dispatch }, level) {
-			commit("SET_FILTER_LEVEL", level);
-			dispatch("setPage", 1);
-		},
-
-		setFilterSearchTerm({ commit, dispatch }, searchTerm) {
-			commit("SET_FILTER_SEARCH_TERM", searchTerm);
-			dispatch("setPage", 1);
-		},
-
 		nextPage({ state, dispatch }) {
 			if (state.page < state.lastPage) {
 				let nextPage = state.page + 1;
@@ -99,28 +101,19 @@ const store = new Vuex.Store({
 			dispatch("getLogEntries", page);
 		},
 
-		async getLogEntries({ state, commit }, page) {
-			let logEntryService = new LogEntryService(Vue.http);
-
+		async getLogEntries({ state, commit, getters }, page) {
 			let filters = {
-				application: state.application,
-				level: state.level,
-				searchTerm: state.searchTerm
+				application: getters["filterPanel/application"],
+				level: getters["filterPanel/level"],
+				searchTerm: getters["filterPanel/searchTerm"],
 			};
 
-			let response = await logEntryService.getLogEntries(page, filters);
+			let response = await Vue.prototype.logEntryService.getLogEntries(page, filters);
 			let totalPages = Math.ceil(response.totalCount / response.pageSize);
 
 			commit("SET_PAGE", page);
 			commit("SET_LAST_PAGE", totalPages);
 			commit("SET_LOG_ENTRIES", response.logs);
-		},
-
-		async getApplicationNames({ commit }) {
-			let applicationNameService = new ApplicationNameService(Vue.http);
-			let response = await applicationNameService.get();
-
-			commit("SET_APPLICATION_NAMES", response);
 		},
 
 		showNavigation({ commit }) {
@@ -133,4 +126,4 @@ const store = new Vuex.Store({
 	},
 });
 
-export default store;
+export { store };

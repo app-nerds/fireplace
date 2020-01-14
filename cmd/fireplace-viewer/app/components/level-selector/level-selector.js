@@ -1,13 +1,15 @@
+import { FilterPanelActions, FilterPanelGetters } from "/app/components//filter-panel/filter-panel-state.js";
+import { Actions } from "/app//state/store.js";
+
 export default {
 	computed: {
 		level: {
 			get() {
-				return this.$store.state.level;
+				return this.$store.getters[FilterPanelGetters.level];
 			},
-
 			set(newValue) {
-				this.$store.dispatch("setFilterLevel", newValue);
-				this.$root.$emit("page-changed");
+				this.$store.dispatch(FilterPanelActions.setLevel, newValue);
+				this.$store.dispatch(Actions.firstPage);
 			},
 		},
 	},

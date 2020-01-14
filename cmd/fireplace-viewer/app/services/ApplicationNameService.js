@@ -7,7 +7,7 @@ export class ApplicationNameService {
 	 * get retrieves a list of application names
 	 */
 	async get() {
-		let response = await this.$http.get("/applicationnames");
+		let response = await this.$http.get("/applicationname");
 		return response.body;
 	}
 }

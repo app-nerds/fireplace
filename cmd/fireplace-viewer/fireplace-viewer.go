@@ -49,7 +49,7 @@ func main() {
 
 	if config.Debug {
 		logger.Debug("Serving static assets from the filesystem")
-		httpServer.Static("/app", "app")
+		httpServer.Static("/app", "cmd/fireplace-viewer/app")
 	} else {
 		logger.Debug("Service static assets from the binary")
 		httpServer.GET("/app/*", echo.WrapHandler(http.FileServer(FS(config.Debug))))
@@ -70,7 +70,7 @@ func main() {
 			"logLevel":      config.LogLevel,
 		}).Infof("Starting Fireplace Viewer")
 
-		if err = httpServer.Start("127.0.0.1:0"); err != nil {
+		if err = httpServer.Start(config.Host); err != nil {
 			if err != http.ErrServerClosed {
 				logger.WithError(err).Fatalf("Unable to start application")
 			} else {

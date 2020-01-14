@@ -1,4 +1,4 @@
-export const App = `
+const mainTemplate = `
 	<div>
 		<the-navigation/>
 
@@ -7,3 +7,5 @@ export const App = `
 		</div>
 	</div>
 	`;
+
+export { mainTemplate };
