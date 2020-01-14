@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/app-nerds/kit/restclient"
+	"github.com/app-nerds/kit/v4/restclient"
 	"github.com/pkg/errors"
 )
 

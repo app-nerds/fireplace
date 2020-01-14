@@ -1,37 +1,39 @@
-import Vuex from "vuex";
-import Vue from "vue";
-
-import ApplicationNameService from "../services/ApplicationNameService";
-import LogEntryService from "../services/LogEntryService";
+import { DetailPanelState } from "/app/components/detail-panel/detail-panel-state.js";
+import { FilterPanelState } from "/app/components/filter-panel/filter-panel-state.js";
 
 Vue.use(Vuex);
 
+export const Actions = {
+	nextPage: "nextPage",
+	previousPage: "previousPage",
+	firstPage: "firstPage",
+	lastPage: "lastPage",
+	setPage: "setPage",
+	getLogEntries: "getLogEntries",
+};
+
+export const Getters = {
+	lastPage: "lastPage",
+	level: "level",
+	logEntries: "logEntries",
+	page: "page",
+};
+
 const store = new Vuex.Store({
+	modules: {
+		detailPanel: DetailPanelState,
+		filterPanel: FilterPanelState,
+	},
+
 	state: {
-		application: "",
-		applicationNames: [],
-		level: "",
-		searchTerm: "",
 		page: 0,
 		pageSize: 0,
 		totalCount: 0,
 		lastPage: 0,
 		logEntries: [],
-		showNavigation: true
 	},
+
 	mutations: {
-		SET_FILTER_APPLICATION: (state, application) => {
-			state.application = application;
-		},
-
-		SET_FILTER_LEVEL: (state, level) => {
-			state.level = level;
-		},
-
-		SET_FILTER_SEARCH_TERM: (state, searchTerm) => {
-			state.searchTerm = searchTerm;
-		},
-
 		SET_PAGE: function (state, page) {
 			state.page = page;
 		},
@@ -43,97 +45,70 @@ const store = new Vuex.Store({
 		SET_LOG_ENTRIES: (state, logEntries) => {
 			state.logEntries = logEntries;
 		},
-
-		SET_APPLICATION_NAMES: (state, applicationNames) => {
-			state.applicationNames = applicationNames;
-		},
-
-		SET_SHOW_NAVIGATION: (state, showNavigation) => {
-			state.showNavigation = showNavigation;
-		}
 	},
+
+	getters: {
+		filterPanelVisible(state) {
+			return state.filterPanelVisible;
+		},
+
+		lastPage(state) {
+			return state.lastPage;
+		},
+
+		logEntries(state) {
+			return state.logEntries;
+		},
+
+		page(state) {
+			return state.page;
+		},
+	},
+
 	actions: {
-		clearFilters: function (context) {
-			context.commit("SET_FILTER_APPLICATION", "");
-			context.commit("SET_FILTER_LEVEL", "");
-			context.commit("SET_FILTER_SEARCH_TERM", "");
-
-			context.dispatch("getLogEntries", 1);
-		},
-
-		setFilterApplication: function (context, application) {
-			context.commit("SET_FILTER_APPLICATION", application);
-			context.dispatch("setPage", 1);
-		},
-
-		setFilterLevel: function (context, level) {
-			context.commit("SET_FILTER_LEVEL", level);
-			context.dispatch("setPage", 1);
-		},
-
-		setFilterSearchTerm: function (context, searchTerm) {
-			context.commit("SET_FILTER_SEARCH_TERM", searchTerm);
-			context.dispatch("setPage", 1);
-		},
-
-		nextPage: function (context) {
-			if (context.state.page < context.state.lastPage) {
-				let nextPage = context.state.page + 1;
-				context.dispatch("setPage", nextPage);
+		nextPage({ state, dispatch }) {
+			if (state.page < state.lastPage) {
+				let nextPage = state.page + 1;
+				dispatch("setPage", nextPage);
 			}
 		},
 
-		previousPage: function (context) {
+		previousPage({ state, dispatch }) {
 			if (context.state.page > 1) {
-				let previousPage = context.state.page - 1;
-				context.dispatch("setPage", previousPage);
+				let previousPage = state.page - 1;
+				dispatch("setPage", previousPage);
 			}
 		},
 
-		firstPage: function (context) {
-			context.dispatch("setPage", 1);
+		firstPage({ dispatch }) {
+			dispatch("setPage", 1);
 		},
 
-		lastPage: function (context) {
-			context.dispatch("setPage", context.state.lastPage);
+		lastPage({ dispatch }) {
+			dispatch("setPage", context.state.lastPage);
 		},
 
-		setPage: function (context, page) {
-			context.dispatch("getLogEntries", page);
+		setPage({ dispatch }, page) {
+			dispatch("getLogEntries", page);
 		},
 
-		getLogEntries: function (context, page) {
+		async getLogEntries({ state, commit, getters }, page) {
 			let filters = {
-				application: context.state.application,
-				level: context.state.level,
-				searchTerm: context.state.searchTerm
+				application: getters["filterPanel/application"],
+				level: getters["filterPanel/level"],
+				searchTerm: getters["filterPanel/searchTerm"],
 			};
 
-			LogEntryService.getLogEntries(page, filters)
-				.then((response) => {
-					let totalPages = Math.ceil(response.totalCount / response.pageSize);
+			page = page || 1;
 
-					context.commit("SET_PAGE", page);
-					context.commit("SET_LAST_PAGE", totalPages);
-					context.commit("SET_LOG_ENTRIES", response.logs);
-				});
+			let response = await Vue.prototype.logEntryService.getLogEntries(page, filters);
+			let totalPages = Math.ceil(response.totalCount / response.pageSize);
+
+			commit("SET_PAGE", page);
+			commit("SET_LAST_PAGE", totalPages);
+			commit("SET_LOG_ENTRIES", response.logs);
 		},
-
-		getApplicationNames: function (context) {
-			ApplicationNameService.get()
-				.then((response) => {
-					context.commit("SET_APPLICATION_NAMES", response);
-				});
-		},
-
-		showNavigation: function (context) {
-			context.commit("SET_SHOW_NAVIGATION", true);
-		},
-
-		hideNavigation: function (context) {
-			context.commit("SET_SHOW_NAVIGATION", false);
-		}
-	}
+	},
 });
 
-export default store;
+export { store };

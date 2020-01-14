@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/globalsign/mgo"
 	"context"
 	"flag"
 	"net/http"
@@ -12,27 +11,29 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/app-nerds/kit/v4/database"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/sirupsen/logrus"
+
 	"github.com/app-nerds/fireplace/pkg/filters"
 	"github.com/app-nerds/fireplace/pkg/logentry"
 	"github.com/app-nerds/fireplace/pkg/logging"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"github.com/sirupsen/logrus"
-
 )
 
 const (
-	SERVER_VERSION string = "0.1.0"
+	SERVER_VERSION string = "1.1.2"
 	PAGE_SIZE      int    = 100
 )
 
 var logLevel = flag.String("loglevel", "info", "Level of logs to write. Valid values are 'debug', 'info', or 'error'. Default is 'info'")
 var host = flag.String("host", "0.0.0.0:8999", "Address and port to bind this server to")
+var databaseURL = flag.String("databaseurl", "localhost:27017", "Address and port to MongoDB database. Defaults to localhost:27017")
 
 var logger *logrus.Entry
 
-var db *mgo.Database
-var session *mgo.Session
+var db database.Database
+var session database.Session
 var logEntryService *logentry.LogEntryService
 
 func main() {
@@ -49,8 +50,8 @@ func main() {
 	/*
 	 * Setup database
 	 */
-	if session, err = mgo.Dial("localhost:27017"); err != nil {
-		logger.WithError(err).Fatalf("Error opening database connection")
+	if session, err = database.Dial(*databaseURL); err != nil {
+		logger.WithError(err).Fatal("Error opening database connection")
 	}
 
 	db = session.DB("fireplace")
@@ -104,12 +105,12 @@ func createLogEntry(ctx echo.Context) error {
 	entry := &logentry.CreateLogEntryRequest{}
 
 	if err = ctx.Bind(&entry); err != nil {
-		logger.WithError(err).Errorf("Error binding create request")
+		logger.WithError(err).Error("Error binding create request")
 		return ctx.String(http.StatusBadRequest, "Invalid log entry")
 	}
 
 	if newID, err = logEntryService.CreateLogEntry(entry); err != nil {
-		logger.WithError(err).Errorf("Error creatig log entry in createLogEntry")
+		logger.WithError(err).Error("Error creating log entry in createLogEntry")
 		return ctx.String(http.StatusInternalServerError, "Error creating log entry")
 	}
 
@@ -133,7 +134,7 @@ func deleteLogEntries(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "Error deleting log entries: "+err.Error())
 	}
 
-	logger.WithFields(logrus.Fields{"fromDate": ctx.QueryParam("fromDate"), "numRecords": numRecordsDeleted}).Infof("Deleted log entries")
+	logger.WithFields(logrus.Fields{"fromDate": ctx.QueryParam("fromDate"), "numRecords": numRecordsDeleted}).Info("Deleted log entries")
 	return ctx.String(http.StatusOK, strconv.Itoa(numRecordsDeleted)+" entries deleted")
 }
 
@@ -142,7 +143,7 @@ func getApplicationNames(ctx echo.Context) error {
 	var applicationNames []string
 
 	if applicationNames, err = logEntryService.GetApplicationNames(); err != nil {
-		logger.WithError(err).Errorf("Error getting application names")
+		logger.WithError(err).Error("Error getting application names")
 		return ctx.String(http.StatusInternalServerError, "Error getting application names")
 	}
 
@@ -165,18 +166,18 @@ func getLogEntries(ctx echo.Context) error {
 	}
 
 	if page, err = strconv.Atoi(ctx.QueryParam("page")); err != nil {
-		logger.WithError(err).WithField("requestedPage", ctx.QueryParam("page")).Errorf("Unable to get page info")
+		logger.WithError(err).WithField("requestedPage", ctx.QueryParam("page")).Error("Unable to get page info")
 		page = 1
 	}
 
 	filter.Page = page
 
 	if result, totalRecords, err = logEntryService.GetLogEntries(filter); err != nil {
-		logger.WithError(err).WithField("filter", filter).Errorf("Error getting log entries")
-		return ctx.String(http.StatusInternalServerError, "Error getting log enries: "+err.Error())
+		logger.WithError(err).WithField("filter", filter).Error("Error getting log entries")
+		return ctx.String(http.StatusInternalServerError, "Error getting log entries: "+err.Error())
 	}
 
-	logger.WithFields(logrus.Fields{"totalRecords": totalRecords, "count": len(result), "page": page}).Infof("Log entries retrieved")
+	logger.WithFields(logrus.Fields{"totalRecords": totalRecords, "count": len(result), "page": page}).Info("Log entries retrieved")
 
 	response := &logentry.GetLogEntriesResponse{
 		LogEntries: result,
@@ -196,6 +197,6 @@ func getLogEntry(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, "Error getting log entry "+ctx.Param("id"))
 	}
 
-	logger.WithField("id", ctx.Param("id")).Infof("Retrieved log entry")
+	logger.WithField("id", ctx.Param("id")).Info("Retrieved log entry")
 	return ctx.JSON(http.StatusOK, result)
 }

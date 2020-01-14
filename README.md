@@ -27,21 +27,18 @@ Fireplace Server is a Go application that runs an HTTP server for capturing
 and serving up structured log entries. Fireplace Viewer is a web application
 used to view these captured logs.
 
-To begin, ensure you have [Go 1.10+](https://golang.org/dl/), and [NPM](https://www.npmjs.com) installed. To compile
+To begin, ensure you have [Go 1.13+](https://golang.org/dl/) installed. To compile
 the server application, perform the following on the terminal.
 
 ```
-$ cd $GOPATH/src
-$ mkdir -p github.com/app-nerds
-$ cd github.com/app-nerds
-$ git clone git@github.com:adampresley/fireplace.git
-$ cd fireplace/cmd/fireplace-server
-$ go get
-$ go build
-$ cd $GOPATH/src/github.com/app-nerds/fireplace/cmd/fireplace-viewer
-$ go get
-$ npm install
-$ make
+git git@github.com:app-nerds/fireplace.git
+cd fireplace/cmd/fireplace-server
+go get
+go build
+cd ../fireplace-viewer 
+go get
+go generate
+go build
 ```
 
 ## Server Flags
@@ -241,7 +238,7 @@ An array of application names.
 ## License
 MIT License
 
-Copyright (c) 2018 Adam Presley
+Copyright (c) 2020 App Nerds LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

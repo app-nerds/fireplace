@@ -1,23 +1,18 @@
-class ApplicationNameService {
-	constructor() {
+export class ApplicationNameService {
+	constructor($http) {
+		this.$http = $http;
 	}
 
 	/**
 	 * get retrieves a list of application names
 	 */
 	async get() {
-		let options = {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		let response = await fetch("/applicationname", options);
-		let result = await response.json();
-
-		return result;
+		let response = await this.$http.get("/applicationname");
+		return response.body;
 	}
 }
 
-export default ApplicationNameService = new ApplicationNameService();
+export function ApplicationNameServiceInstaller(Vue) {
+	Vue.prototype.applicationNameService = new ApplicationNameService(Vue.http);
+}
+
