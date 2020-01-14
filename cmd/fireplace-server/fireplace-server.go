@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	SERVER_VERSION string = "0.2.0"
+	SERVER_VERSION string = "1.1.2"
 	PAGE_SIZE      int    = 100
 )
 

@@ -29,7 +29,7 @@ var fireplaceClient IFireplaceClient
 
 func main() {
 	var err error
-	config := configuration.NewConfig("0.3.0")
+	config := configuration.NewConfig("1.1.2")
 
 	logger = logging.GetLogger(config.LogLevel, "Fireplace Viewer")
 
