@@ -1,15 +1,4 @@
-import TheNavigation from "/app/components/navigation/the-navigation.js";
-
-export default {
-	components: {
-		TheNavigation,
-	},
-
-	mounted() {
-		this.$store.dispatch("getLogEntries", 1);
-	},
-
-	template: `
+export const App = `
 	<div>
 		<the-navigation/>
 
@@ -17,5 +6,4 @@ export default {
 			<router-view></router-view>
 		</div>
 	</div>
-	`
-};
+	`;

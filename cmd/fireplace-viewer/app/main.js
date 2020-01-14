@@ -1,6 +1,8 @@
-import App from "/app/components/app/app.js";
-
-import store from "/app/state/store";
+import { App } from "/app/components/app/app.js";
+import store from "/app/state/store.js";
+import { ApplicationNameServiceInstaller } from "/app/services/ApplicationNameService.js";
+import { LogEntryServiceInstaller } from "/app/services/LogEntryService.js";
+import TheNavigation from "/app/components/navigation/the-navigation.js";
 
 /*
  * Core plugins
@@ -18,6 +20,12 @@ Vue.use(ejs.popups.DialogPlugin);
 Vue.use(ejs.notifications.ToastPlugin);
 
 /*
+ * Service plugins
+ */
+Vue.use(ApplicationNameServiceInstaller);
+Vue.use(LogEntryServiceInstaller);
+
+/*
  * HTTP interceptor to show a loading shim
  */
 Vue.http.interceptors.push(function () {
@@ -30,8 +38,8 @@ Vue.http.interceptors.push(function () {
 
 const router = new VueRouter({
 	routes: [
-		{ path: "/", component: () => import("/app/components/home/home.js") },
-		{ path: "/clean", component: () => import("/app/components/clean/clean.js") },
+		{ path: "/", name: "logs", component: () => import("/app/components/home/home.js") },
+		{ path: "/clean", name: "clean", component: () => import("/app/components/clean/clean.js") },
 	],
 });
 
@@ -39,6 +47,14 @@ new Vue({
 	el: "#app",
 	router,
 	store,
+
+	components: {
+		TheNavigation,
+	},
+
+	mounted() {
+		this.$store.dispatch("getLogEntries", 1);
+	},
 
 	template: App,
 });

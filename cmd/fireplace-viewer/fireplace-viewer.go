@@ -108,7 +108,7 @@ func handleMainPage(ctx echo.Context) error {
 	<link rel="stylesheet" type="text/css" href="/app/assets/bootstrap/css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="/app/assets/fireplace-viewer/css/styles.css" />
 	<link rel="stylesheet" type="text/css" href="/app/assets/vue-loading-overlay/vue-loading-overlay.css" />
-	<link rel="stylesheet" type="text/css" href="/app/assets/fontawesome/css/all.min.css" />
+	<link rel="stylesheet" type="text/css" href="/app/assets/font-awesome/css/all.min.css" />
 	<link rel="stylesheet" type="text/css" href="/app/assets/syncfusion/bootstrap4.css" />
 </head>
 
@@ -124,9 +124,9 @@ func handleMainPage(ctx echo.Context) error {
 	<script src="/app/assets/vue-resource/vue-resource-1.5.1.min.js"></script>
 	<script src="/app/assets/jquery/jquery-3.3.1.min.js"></script>
 	<script src="/app/assets/popper/popper.min.js"></script>
-	<script src="/app/assets/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/app/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<script src="/app/assets/vue-loading-overlay/vue-loading-overlay.js"></script>
-	<script src="/app/assets/debouce/debouce.js"></script>
+	<script src="/app/assets/debounce/debounce.js" type="module"></script>
 	<script src="/app/assets/syncfusion/ej2-vue.min.js"></script>
 
 	<script src="/app/main.js" type="module"></script>

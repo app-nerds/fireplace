@@ -1,5 +1,5 @@
-import ApplicationNameService from "/app/services/ApplicationNameService.js";
-import LogEntryService from "/app/services/LogEntryService.js";
+import { ApplicationNameService } from "/app/services/ApplicationNameService.js";
+import { LogEntryService } from "/app/services/LogEntryService.js";
 
 Vue.use(Vuex);
 
