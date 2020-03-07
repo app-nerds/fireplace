@@ -29,6 +29,8 @@ const (
 var logLevel = flag.String("loglevel", "info", "Level of logs to write. Valid values are 'debug', 'info', or 'error'. Default is 'info'")
 var host = flag.String("host", "0.0.0.0:8999", "Address and port to bind this server to")
 var databaseURL = flag.String("databaseurl", "localhost:27017", "Address and port to MongoDB database. Defaults to localhost:27017")
+var databaseUser = flag.String("databaseuser", "", "User name to connect to database with. Defaults to blank")
+var databasePassword = flag.String("databasepassword", "", "Password to connect to database with. Defaults to blank")
 
 var logger *logrus.Entry
 
@@ -50,7 +52,20 @@ func main() {
 	/*
 	 * Setup database
 	 */
-	if session, err = database.Dial(*databaseURL); err != nil {
+	dbURL := "mongodb://"
+
+	if *databaseUser != "" {
+		dbURL += *databaseUser
+		dbURL += ":"
+		dbURL += *databasePassword
+		dbURL += "@"
+	}
+
+	dbURL += *databaseURL
+	dbURL += "/"
+	dbURL += "fireplace"
+
+	if session, err = database.Dial(dbURL); err != nil {
 		logger.WithError(err).Fatal("Error opening database connection")
 	}
 
