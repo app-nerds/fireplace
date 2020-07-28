@@ -19,3 +19,6 @@ cmd/fireplace-viewer/fireplace-viewer
 cmd/sharpfireplace/bin
 cmd/sharpfireplace/obj
 .idea
+.undodir
+*.swp
+
