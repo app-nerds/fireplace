@@ -17,9 +17,6 @@ endif
 generate: verifydeps
 	go generate
 
-run: 
-	go run .
-
 build-linux: generate
 	GOOS=linux ${GC} && ${UPX} ./${PROJECTNAME}
 
@@ -36,7 +33,7 @@ run:
 	go run -tags dev github.com/app-nerds/${PROJECTNAME}
 
 run-docker:
-	docker-compose -f docker-compose.yml up
+	docker-compose -f docker-compose.yml up -d
 
 docker-bash:
 	docker exec -it ${PROJECTNAME} /bin/bash

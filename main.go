@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"os/signal"
 	"strconv"
 	"syscall"
@@ -35,6 +36,8 @@ var logEntryService *logentry.LogEntryService
 
 func main() {
 	var err error
+	var nodeContext context.Context
+	var nodeContextCancel context.CancelFunc
 
 	config = viper.New()
 	config.Set("version", Version)
@@ -74,6 +77,20 @@ func main() {
 		PageSize: PAGE_SIZE,
 	}
 
+	if Version == "development" {
+		go func(ctx context.Context) {
+			logger.Info("Starting Node development server...")
+			// var cmd *exec.Cmd
+			var err error
+
+			if _, err = startNode(ctx); err != nil {
+				logger.WithError(err).Fatal("Error starting development Node!")
+			}
+
+			logger.Info("Stopping Node development server...")
+		}(nodeContext)
+	}
+
 	httpServer.POST("/logentry", createLogEntry)
 	httpServer.GET("/logentry", getLogEntries)
 	httpServer.GET("/logentry/:id", getLogEntry)
@@ -97,6 +114,10 @@ func main() {
 	/*
 	 * Setup shutdown handler
 	 */
+	if Version == "development" {
+		nodeContext, nodeContextCancel = context.WithCancel(context.Background())
+	}
+
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt, syscall.SIGQUIT, syscall.SIGTERM)
 	<-quit
@@ -106,6 +127,10 @@ func main() {
 
 	if err = httpServer.Shutdown(ctx); err != nil {
 		logger.Errorf("There was an error shutting down the server - %s", err.Error())
+	}
+
+	if Version == "development" {
+		nodeContextCancel()
 	}
 }
 
@@ -209,4 +234,18 @@ func getLogEntry(ctx echo.Context) error {
 
 	logger.WithField("id", ctx.Param("id")).Info("Retrieved log entry")
 	return ctx.JSON(http.StatusOK, result)
+}
+
+func startNode(ctx context.Context) (*exec.Cmd, error) {
+	var cmd *exec.Cmd
+	var err error
+
+	cmd = exec.CommandContext(ctx, "npm", "run", "serve")
+	cmd.Dir = "./app"
+
+	if err == cmd.Start() {
+		return cmd, err
+	}
+
+	return cmd, nil
 }

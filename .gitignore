@@ -21,4 +21,5 @@ cmd/sharpfireplace/obj
 .idea
 .undodir
 *.swp
+data/
 
