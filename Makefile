@@ -5,7 +5,7 @@ UPX := $(shell command -v upx 2> /dev/null)
 
 VERSION=1.1.2
 BUILDFLAGS=-s -w -X 'main.Version=${VERSION}'
-PROJECTNAME=fireplace-server
+PROJECTNAME=fireplace
 GCVARS=GOARCH=amd64 CGO_ENABLED=0 GOPRIVATE="github.com/app-nerds/*" GONOPROXY="github.com/app-nerds/*"
 GC=${GCVARS} go build -ldflags="${BUILDFLAGS}" -tags prod -o ${PROJECTNAME}
 

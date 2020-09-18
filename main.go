@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"net/http"
-	"net/url"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -16,9 +14,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/app-nerds/fireplace/pkg/filters"
-	"github.com/app-nerds/fireplace/pkg/logentry"
-	"github.com/app-nerds/fireplace/pkg/logging"
+	"github.com/app-nerds/fireplace/api/logentry/logentry_controllers"
+	"github.com/app-nerds/fireplace/api/logentry/logentry_services"
 )
 
 var Version string = "development"
@@ -27,29 +24,29 @@ const (
 	PAGE_SIZE int = 100
 )
 
-var logger *logrus.Entry
-var config *viper.Viper
-var db database.Database
-var session database.Session
-var logEntryService *logentry.LogEntryService
-
 func main() {
 	var err error
+	var config *viper.Viper
+	var logger *logrus.Entry
+	var logLevel logrus.Level
+	var db database.Database
+	var session database.Session
+	var logEntryService logentry_services.LogEntryService
+	var logEntryController logentry_controllers.ILogEntryController
 
-	config = viper.New()
-	config.Set("version", Version)
-	config.SetDefault("server.host", "0.0.0.0:8999")
-	config.BindEnv("server.host", "FIREPLACE_SERVER_HOST")
-	config.SetDefault("server.loglevel", "debug")
-	config.BindEnv("server.loglevel", "FIREPLACE_SERVER_LOGLEVEL")
-	config.SetDefault("database.url", "mongodb://localhost:27017")
-	config.BindEnv("database.url", "FIREPLACE_DATABASE_URL")
+	config = getConfig(Version)
+
+	if logLevel, err = logrus.ParseLevel(config.GetString("server.loglevel")); err != nil {
+		panic("Invalid log level")
+	}
+
+	logger = logrus.New().WithField("who", "Fireplace")
+	logger.Logger.SetLevel(logLevel)
 
 	httpServer := echo.New()
 	httpServer.HideBanner = true
 	httpServer.Use(middleware.CORS())
 
-	logger = logging.GetLogger(config.GetString("server.loglevel"), "Fireplace Server")
 	logger.WithFields(logrus.Fields{
 		"version":  Version,
 		"database": config.GetString("database.url"),
@@ -65,32 +62,48 @@ func main() {
 	}
 
 	db = session.DB("fireplace")
+	defer session.Close()
 
 	/*
 	 * Setup services
 	 */
-	logEntryService = &logentry.LogEntryService{
+	logEntryService = logentry_services.NewLogEntryService(logentry_services.LogEntryServiceConfig{
 		DB:       db,
 		PageSize: PAGE_SIZE,
-	}
+	})
 
-	httpServer.POST("/logentry", createLogEntry)
-	httpServer.GET("/logentry", getLogEntries)
-	httpServer.GET("/logentry/:id", getLogEntry)
-	httpServer.DELETE("/logentry", deleteLogEntries)
-	httpServer.GET("/applicationname", getApplicationNames)
+	/*
+	 * Setup controllers
+	 */
+	logEntryController = logentry_controllers.NewLogEntryController(logentry_controllers.LogEntryControllerConfig{
+		Logger:          logger.WithField("who", "LogEntryController"),
+		LogEntryService: logEntryService,
+		PageSize:        PAGE_SIZE,
+	})
 
+	/*
+	 * Server routes
+	 */
+	httpServer.POST("/logentry", logEntryController.CreateLogEntry)
+	httpServer.GET("/logentry", logEntryController.GetLogEntries)
+	httpServer.GET("/logentry/:id", logEntryController.GetLogEntry)
+	httpServer.DELETE("/logentry", logEntryController.DeleteLogEntries)
+	httpServer.GET("/applicationname", logEntryController.GetApplicationNames)
+
+	/*
+	 * Run the server
+	 */
 	go func() {
 		var err error
 
-		logger.WithField("host", config.GetString("server.host")).Infof("Starting Fireplace Server v%s", Version)
+		logger.WithField("host", config.GetString("server.host")).Infof("Starting Fireplace Server version %s", Version)
 
-		if err = httpServer.Start(config.GetString("server.host")); err != nil {
-			if err != http.ErrServerClosed {
-				logger.WithError(err).Fatalf("Unable to start application")
-			} else {
-				logger.Infof("Shutting down the server...")
-			}
+		err = httpServer.Start(config.GetString("server.host"))
+
+		if err != http.ErrServerClosed {
+			logger.WithError(err).Fatal("Unable to start application")
+		} else {
+			logger.Info("Shutting down the server...")
 		}
 	}()
 
@@ -105,108 +118,8 @@ func main() {
 	defer cancel()
 
 	if err = httpServer.Shutdown(ctx); err != nil {
-		logger.Errorf("There was an error shutting down the server - %s", err.Error())
-	}
-}
-
-func createLogEntry(ctx echo.Context) error {
-	var err error
-	var newID string
-	entry := &logentry.CreateLogEntryRequest{}
-
-	if err = ctx.Bind(&entry); err != nil {
-		logger.WithError(err).Error("Error binding create request")
-		return ctx.String(http.StatusBadRequest, "Invalid log entry")
+		logger.Error("There was an error shutting down the server - %s", err.Error())
 	}
 
-	if newID, err = logEntryService.CreateLogEntry(entry); err != nil {
-		logger.WithError(err).Error("Error creating log entry in createLogEntry")
-		return ctx.String(http.StatusInternalServerError, "Error creating log entry")
-	}
-
-	logger.WithFields(logrus.Fields{"id": newID, "application": entry.Application}).Infof("New log entry captured")
-	return ctx.String(http.StatusOK, newID)
-}
-
-func deleteLogEntries(ctx echo.Context) error {
-	var err error
-	var initialFromDate time.Time
-	var fromDate time.Time
-	var numRecordsDeleted int
-
-	if initialFromDate, err = time.Parse("1/2/2006", ctx.QueryParam("fromDate")); err != nil {
-		return ctx.String(http.StatusBadRequest, "Invalid fromDate value")
-	}
-
-	fromDate = initialFromDate.Add(24 * time.Hour)
-
-	if numRecordsDeleted, err = logEntryService.Delete(fromDate); err != nil {
-		return ctx.String(http.StatusInternalServerError, "Error deleting log entries: "+err.Error())
-	}
-
-	logger.WithFields(logrus.Fields{"fromDate": ctx.QueryParam("fromDate"), "numRecords": numRecordsDeleted}).Info("Deleted log entries")
-	return ctx.String(http.StatusOK, strconv.Itoa(numRecordsDeleted)+" entries deleted")
-}
-
-func getApplicationNames(ctx echo.Context) error {
-	var err error
-	var applicationNames []string
-
-	if applicationNames, err = logEntryService.GetApplicationNames(); err != nil {
-		logger.WithError(err).Error("Error getting application names")
-		return ctx.String(http.StatusInternalServerError, "Error getting application names")
-	}
-
-	return ctx.JSON(http.StatusOK, applicationNames)
-}
-
-func getLogEntries(ctx echo.Context) error {
-	var err error
-	totalRecords := 0
-	var page int
-	result := make(logentry.LogEntryCollection, 0, 500)
-
-	application, _ := url.QueryUnescape(ctx.QueryParam("application"))
-	search, _ := url.QueryUnescape(ctx.QueryParam("search"))
-
-	filter := &filters.LogEntryFilter{
-		Application: application,
-		Level:       ctx.QueryParam("level"),
-		Search:      search,
-	}
-
-	if page, err = strconv.Atoi(ctx.QueryParam("page")); err != nil {
-		logger.WithError(err).WithField("requestedPage", ctx.QueryParam("page")).Error("Unable to get page info")
-		page = 1
-	}
-
-	filter.Page = page
-
-	if result, totalRecords, err = logEntryService.GetLogEntries(filter); err != nil {
-		logger.WithError(err).WithField("filter", filter).Error("Error getting log entries")
-		return ctx.String(http.StatusInternalServerError, "Error getting log entries: "+err.Error())
-	}
-
-	logger.WithFields(logrus.Fields{"totalRecords": totalRecords, "count": len(result), "page": page}).Info("Log entries retrieved")
-
-	response := &logentry.GetLogEntriesResponse{
-		LogEntries: result,
-		TotalCount: totalRecords,
-		Count:      len(result),
-		PageSize:   PAGE_SIZE,
-	}
-
-	return ctx.JSON(http.StatusOK, response)
-}
-
-func getLogEntry(ctx echo.Context) error {
-	var err error
-	result := &logentry.LogEntry{}
-
-	if result, err = logEntryService.GetLogEntry(ctx.Param("id")); err != nil {
-		return ctx.String(http.StatusInternalServerError, "Error getting log entry "+ctx.Param("id"))
-	}
-
-	logger.WithField("id", ctx.Param("id")).Info("Retrieved log entry")
-	return ctx.JSON(http.StatusOK, result)
+	logger.Info("Server stopped")
 }
