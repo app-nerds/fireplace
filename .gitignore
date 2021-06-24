@@ -22,4 +22,4 @@ cmd/sharpfireplace/obj
 .undodir
 *.swp
 data/
-
+.env
