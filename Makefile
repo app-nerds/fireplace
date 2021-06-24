@@ -105,4 +105,7 @@ run-docker: ## Starts all containers in Docker
 build-docker: ## Builds the application into a docker image
 	docker-compose build
 
+docker-push: ## Tags and pushes the image to Dockerhub
+	docker tag fireplace_fireplace appnerds/fireplace:${VERSION}
+	docker push appnerds/fireplace:${VERSION}
 
