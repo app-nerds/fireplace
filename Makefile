@@ -105,7 +105,6 @@ run-docker: ## Starts all containers in Docker
 build-docker: ## Builds the application into a docker image
 	docker-compose build
 
-docker-push: ## Tags and pushes the image to Dockerhub
-	docker tag fireplace_fireplace appnerds/fireplace:${VERSION}
-	docker push appnerds/fireplace:${VERSION}
+docker-tag: ## Builds a docker image and tags a release. It is then pushed up to Docker. GITHUB_TOKEN must be defined as an environment variable. Usage: make USERNAME="username" docker-tag
+	echo ${GITHUB_TOKEN} | docker login -u ${USERNAME} --password-stdin && docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --tag fireplace:${VERSION} . && docker tag fireplace:${VERSION} appnerds/fireplace:${VERSION} && docker push appnerds/fireplace:${VERSION}
 
