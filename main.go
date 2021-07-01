@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/app-nerds/kit/v4/database"
+	"github.com/app-nerds/kit/v5/database"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
