@@ -1,0 +1,290 @@
+:root {
+	--font-color: #1e1e1e;
+	--debug-color: #0ff458;
+	--warning-color: #f49f0e;
+	--info-color: #4eaed9;
+	--error-color: #f40e18;
+	--fatal-color: #f10ef4;
+	--border-color: #eee;
+	--light-border-color: rgba(239, 239, 239, 0.8);
+	--table-hover-background-color: rgba(228, 228, 230, 0.5);
+	--primary-color: #35a2d3;
+	--secondary-color: #76848a;
+	--link-color: #d36635;
+}
+
+/* Reset */
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+/* Base */
+html {
+	width: 100%;
+	max-width: 100%;
+	height: 100vh;
+}
+
+body {
+	margin: 0px;
+	overflow-x: hidden;
+	width: 100%;
+	max-width: 100%;
+	height: 100vh;
+	box-sizing: border-box;
+	color: var(--font-color);
+
+	--border-color: #ccc;
+	--menu-background-color: #eee;
+	--calendar-entry-color: #00a9ff;
+}
+
+input {
+	outline-color: var(--link-color);
+}
+
+#app {
+	padding: 1rem;
+}
+
+#previousPageButton,
+#nextPageButton,
+#pageSelect,
+#levelSelect,
+#applicationSelect,
+#generalSearch,
+#resetButton {
+	border-radius: 8px;
+	background-color: white;
+	border: 1px solid var(--border-color);
+	border-bottom: 2px solid var(--border-color);
+}
+
+#topNav {
+	background-color: #143d4f;
+	padding: 1rem;
+}
+
+#topNav h1 {
+	color: var(--menu-background-color);
+	font-family: "Helvetica Neue", sans-serif;
+}
+
+/* Log entry level colors */
+.debug,
+.warning,
+.info,
+.error,
+.fatal {
+	width: 14px;
+	height: 14px;
+}
+
+.debug {
+	filter: invert(61%) sepia(96%) saturate(460%) hue-rotate(82deg) brightness(104%) contrast(93%);
+}
+
+.warning {
+	filter: invert(75%) sepia(34%) saturate(4987%) hue-rotate(357deg) brightness(100%) contrast(92%);
+}
+
+.info {
+	filter: invert(69%) sepia(27%) saturate(1184%) hue-rotate(167deg) brightness(89%) contrast(90%);
+}
+
+.error {
+	filter: invert(13%) sepia(89%) saturate(4022%) hue-rotate(349deg) brightness(109%) contrast(107%);
+}
+
+.fatal {
+	filter: invert(19%) sepia(92%) saturate(2931%) hue-rotate(287deg) brightness(109%) contrast(122%);
+}
+
+/* Information Bar */
+information-bar {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	padding: 0.4rem 1rem 1rem 0;
+	border-radius: 0px 5000px 0px 0px;
+}
+
+#previousPageButton {
+	padding: 0.3rem 0.5rem;
+}
+
+#pageSelect {
+	padding: 0.3rem 0.5rem;
+	min-width: 78px;
+	margin: 0 0.1rem 0 0.1rem;
+}
+
+#pageSelect:focus,
+#levelSelect:focus,
+#applicationSelect:focus {
+	outline: none;
+}
+
+#nextPageButton {
+	padding: 0.3rem 0.5rem;
+}
+
+#levelSelect,
+#applicationSelect,
+#generalSearch, 
+#resetButton {
+	padding: 0.3rem 0.5rem;
+	margin-left: 0.7rem;
+}
+
+#previousPageButton img,
+#nextPageButton img {
+	width: 16px;
+	height: 14px;
+	position: relative;
+	top: 2px;
+}
+
+#resetButton { margin-left: 0; }
+
+/* Log Viewer */
+log-viewer {
+	width: 100%;
+}
+
+#logEntriesTable table {
+	width: 100%;
+	height: 80vh;
+	display: block;
+	border-collapse: collapse;
+}
+
+#logEntriesTable table thead {
+	border-top: 1px solid var(--border-color);
+	border-bottom: 2px solid var(--border-color);
+	background-color: #efefef;
+	color: #777777;
+}
+
+#logEntriesTable table thead th {
+	text-align: center;
+	font-weight: 300;
+	font-size: 0.9rem;
+}
+
+#logEntriesTable table th.level-header,
+td.level-column {
+	width: 2%;
+}
+
+#logEntriesTable table th.time-header,
+td.time-column {
+	width: 15%;
+	text-align: center;
+}
+
+#logEntriesTable table th.message-header,
+#logEntriesTable table td.message-column {
+	width: 63%;
+}
+
+#logEntriesTable table th.application-header,
+#logEntriesTable table td.application-column {
+	width: 20%;
+}
+
+#logEntriesTable table tbody {
+	display: block;
+	height: 100%;
+	overflow-y: scroll;
+}
+
+#logEntriesTable table td:first-child {
+	text-align: center;
+}
+
+#logEntriesTable table tbody tr {
+	border-bottom: 1px solid var(--light-border-color);
+}
+
+#logEntriesTable table tbody tr:hover {
+	background-color: var(--table-hover-background-color);
+}
+
+/* Log Entry Viewer */
+#logEntryViewer {
+	visibility: hidden;
+	position: absolute;
+	left: 5vw;
+	top: 0;
+	margin: 10vh 0;
+	width: 90vw;
+	height: 80vh;
+	background-color: white;
+	box-sizing: border-box;
+	border: 3px solid var(--border-color);
+	padding: 1rem;
+	overflow-y: scroll;
+	z-index: 2;
+}
+
+.logEntryLabel {
+	font-weight: bold;
+}
+
+#logEntryViewer .closeButton {
+	position: absolute;
+	top: 5px;
+	right: 15px;
+	cursor: pointer;
+}
+
+#logEntryViewer nav {
+	margin-top: 2rem;
+}
+
+#logEntryViewer nav button {
+	padding: 0.5rem;
+	font-size: large;
+	border-radius: 8px;
+	background-color: var(--light-border-color);
+	border: 1px solid var(--border-color);
+	border-bottom: 2px solid var(--border-color);
+}
+
+#logEntryViewer table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 1rem;
+}
+
+#logEntryViewer table thead {
+	border-top: 1px solid var(--border-color);
+	border-bottom: 2px solid var(--border-color);
+	background-color: #efefef;
+	color: #777777;
+}
+
+#logEntryViewer table thead th {
+	text-align: center;
+	font-weight: 300;
+	font-size: 0.9rem;
+}
+
+#logEntryViewer table th {
+	border-bottom: 1px solid var(--border-color);
+}
+
+#logEntryViewer table th:first-child {
+	width: 20%;
+}
+
+#logEntryViewer table td:first-child {
+	width: 20%;
+}
+
+#logEntryViewer table tr:nth-child(even) {
+	background-color: var(--table-hover-background-color);
+}
