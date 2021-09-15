@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020. App Nerds LLC. All rights reserved
+ * Copyright (c) 2021. App Nerds LLC. All rights reserved
  */
 
 package main
@@ -17,19 +17,18 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/app-nerds/fireplace-viewer/configuration"
-	"github.com/app-nerds/kit/v4/restclient"
+	"github.com/app-nerds/fireplace/v2/cmd/fireplace-viewer/configuration"
+	"github.com/app-nerds/fireplace/v2/pkg"
+	"github.com/app-nerds/kit/v5/restclient2"
 	"github.com/app-nerds/nerdweb"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-
-	"github.com/app-nerds/fireplace/api/logentry/logentry_models"
 )
 
 var (
 	Version         string = "development"
 	logger          *logrus.Entry
-	fireplaceClient IFireplaceClient
+	fireplaceClient restclient2.JSONClient
 
 	//go:embed app
 	appFs embed.FS
@@ -56,12 +55,12 @@ func main() {
 	/*
 	 * Setup fireplace server HTTP client
 	 */
-	fireplaceClient = &FireplaceClient{
-		IRestClient: &restclient.RestClient{
-			BaseURL:    config.FireplaceServerURL,
-			HTTPClient: &http.Client{},
+	fireplaceClient = restclient2.NewJSONClient(
+		config.FireplaceServerURL,
+		&restclient2.HTTPClient{
+			Client: &http.Client{},
 		},
-	}
+	)
 
 	router := mux.NewRouter()
 	router.Use(mux.CORSMethodMiddleware(router))
@@ -70,7 +69,6 @@ func main() {
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	apiRouter.HandleFunc("/logentry", getLogEntries).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/logentry/{id}", getLogEntry).Methods(http.MethodGet)
-	apiRouter.HandleFunc("/logentry", deleteLogEntries).Methods(http.MethodDelete)
 
 	apiRouter.HandleFunc("/applicationname", getApplicationNames).Methods(http.MethodGet)
 	router.PathPrefix("/static/").Handler(staticFS).Methods(http.MethodGet)
@@ -135,28 +133,25 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleError(ok bool, notOKStatus int, errorResponse pkg.GenericResponse, message string, w http.ResponseWriter) {
+	if !ok {
+		logger.WithField("errorResponse", errorResponse).Error(message)
+		nerdweb.WriteJSON(logger, w, notOKStatus, pkg.GenericResponse{
+			Message: message,
+		})
+	}
+}
+
 func getApplicationNames(w http.ResponseWriter, r *http.Request) {
 	var (
-		err              error
-		response         *http.Response
-		applicationNames []string
+		ok bool
 	)
 
-	if response, err = fireplaceClient.GET("/applicationname", restclient.EmptyHTTPParameters); err != nil {
-		logger.WithError(err).Errorf("Error getting application names")
+	applicationNames := make([]string, 0, 50)
+	errorResponse := pkg.GenericResponse{}
 
-		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, ErrorResponse{
-			Message: "Error getting application names",
-		})
-
-		return
-	}
-
-	if err = fireplaceClient.GetResponseJSON(response, &applicationNames); err != nil {
-		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, ErrorResponse{
-			Message: "Error unmarshalling application names",
-		})
-
+	if ok, _ = fireplaceClient.GET("/applicationname", &applicationNames, &errorResponse); !ok {
+		handleError(ok, http.StatusInternalServerError, errorResponse, "Error getting application names", w)
 		return
 	}
 
@@ -165,30 +160,15 @@ func getApplicationNames(w http.ResponseWriter, r *http.Request) {
 
 func getLogEntry(w http.ResponseWriter, r *http.Request) {
 	var (
-		err      error
-		response *http.Response
-		logEntry *logentry_models.LogEntry
+		ok            bool
+		logEntry      pkg.LogEntry
+		errorResponse pkg.GenericResponse
 	)
 
 	vars := mux.Vars(r)
 
-	if response, err = fireplaceClient.GET("/logentry/"+vars["id"], nil); err != nil {
-		logger.WithError(err).Errorf("Error getting log entries")
-
-		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, ErrorResponse{
-			Message: "Error getting log entries",
-		})
-
-		return
-	}
-
-	if err = fireplaceClient.GetResponseJSON(response, &logEntry); err != nil {
-		logger.WithError(err).Errorf("Error unmarshalling log entry %s", vars["id"])
-
-		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, ErrorResponse{
-			Message: "Error unmarshalling log entry",
-		})
-
+	if ok, _ = fireplaceClient.GET("/logentry/"+vars["id"], &logEntry, &errorResponse); !ok {
+		handleError(ok, http.StatusInternalServerError, errorResponse, "Error getting log entry "+vars["id"], w)
 		return
 	}
 
@@ -197,65 +177,25 @@ func getLogEntry(w http.ResponseWriter, r *http.Request) {
 
 func getLogEntries(w http.ResponseWriter, r *http.Request) {
 	var (
-		err        error
-		response   *http.Response
-		logEntries *logentry_models.GetLogEntriesResponse
+		ok            bool
+		logEntries    pkg.GetLogEntriesResponse
+		errorResponse pkg.GenericResponse
 	)
 
 	queryParams := r.URL.Query()
+	parameters := url.Values{}
 
-	parameters := restclient.HTTPParameters{
-		"page":        queryParams.Get("page"),
-		"search":      url.QueryEscape(queryParams.Get("search")),
-		"application": url.QueryEscape(queryParams.Get("application")),
-		"level":       url.QueryEscape(queryParams.Get("level")),
-	}
+	parameters.Set("page", queryParams.Get("page"))
+	parameters.Set("search", queryParams.Get("search"))
+	parameters.Set("application", queryParams.Get("application"))
+	parameters.Set("level", queryParams.Get("level"))
 
-	if response, err = fireplaceClient.GET("/logentry", parameters); err != nil {
-		logger.WithError(err).Errorf("Error getting log entries")
-
-		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, ErrorResponse{
-			Message: "Error getting log entries",
-		})
-
-		return
-	}
-
-	if err = fireplaceClient.GetResponseJSON(response, &logEntries); err != nil {
-		logger.WithError(err).Errorf("Error unmarshalling log entries")
-
-		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, ErrorResponse{
-			Message: "Error unmarshalling log entry",
-		})
-
+	if ok, _ = fireplaceClient.GET("/logentry?"+parameters.Encode(), &logEntries, &errorResponse); !ok {
+		handleError(ok, http.StatusInternalServerError, errorResponse, "Error getting log entries", w)
 		return
 	}
 
 	nerdweb.WriteJSON(logger, w, http.StatusOK, logEntries)
-}
-
-func deleteLogEntries(w http.ResponseWriter, r *http.Request) {
-	var (
-		err error
-	)
-
-	queryParams := r.URL.Query()
-
-	parameters := restclient.HTTPParameters{
-		"fromDate": queryParams.Get("fromDate"),
-	}
-
-	if _, err = fireplaceClient.DELETE("/logentry", parameters); err != nil {
-		logger.WithError(err).Errorf("Error asking Fireplace server to delete log entries")
-
-		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, ErrorResponse{
-			Message: "Error asking Fireplace server to delete log entries",
-		})
-
-		return
-	}
-
-	nerdweb.WriteJSON(logger, w, http.StatusNoContent, "")
 }
 
 func getClientAppFileSystem(useOS bool) http.FileSystem {
