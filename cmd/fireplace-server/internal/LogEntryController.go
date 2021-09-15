@@ -208,7 +208,7 @@ func (c LogEntryController) GetLogEntries(w http.ResponseWriter, r *http.Request
 		LogEntries: result,
 		TotalCount: totalRecords,
 		Count:      len(result),
-		PageSize:   c.config.GetPageSize(),
+		PageSize:   c.config.PageSize,
 	}
 
 	nerdweb.WriteJSON(c.logger, w, http.StatusOK, response)

@@ -1,0 +1,20 @@
+[ req ]
+default_bits = 2048
+x509_extensions = v3_req
+distinguished_name = req_distinguished_name
+prompt = no
+
+[ req_distinguished_name ]
+C = US
+ST = Texas
+O = App Nerds
+CN = localhost
+
+[ v3_req ]
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[ alt_names]
+DNS.1 = localhost
+DNS.2 = 127.0.0.1

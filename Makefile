@@ -50,6 +50,11 @@ setup: ## Perform initial setup of dependencies. Requires Go 1.16
 	go mod download
 	go get
 
+generate-cert: ## Creates a self-signed SSL certificate into the assets folder
+	openssl req -x509 -nodes -days 3560 -newkey rsa:2048 -keyout server.key -out server.crt -config ./assets/localhost-cert.cnf -extensions 'v3_req'
+	mv *.key ./assets
+	mv *.crt ./assets
+
 bench: ## Run all benchmark tests
 	go test ./... -bench=.
 

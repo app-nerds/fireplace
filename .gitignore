@@ -23,3 +23,5 @@ cmd/sharpfireplace/obj
 *.swp
 data/
 .env
+server.crt
+server.key

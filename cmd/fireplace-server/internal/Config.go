@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
@@ -12,24 +14,23 @@ import (
 Config provides configuration information for the Fireplace server
 */
 type Config struct {
-	serverHost     string
-	serverLogLevel logrus.Level
-	serverCert     string
-	serverPassword string
-	pageSize       int
-	databaseURL    string
+	Version     string
+	Host        string `mapstructure:"FIREPLACE_SERVER_HOST"`
+	LogLevel    logrus.Level
+	Cert        string `mapstructure:"FIREPLACE_SERVER_CERT"`
+	Password    string `mapstructure:"FIREPLACE_SERVER_PASSWORD"`
+	PageSize    int    `mapstructure:"FIREPLACE_PAGE_SIZE"`
+	DatabaseURL string `mapstructure:"FIREPLACE_DATABASE_URL"`
 }
 
-func getString(config *viper.Viper, name, defaultValue, envName, description string) {
-	config.SetDefault(name, defaultValue)
-	config.BindEnv(name, envName)
-	pflag.String(name, defaultValue, description)
+func getString(name, defaultValue, description string) {
+	viper.SetDefault(name, defaultValue)
+	_ = flag.String(name, defaultValue, description)
 }
 
-func getInt(config *viper.Viper, name string, defaultValue int, envName, description string) {
-	config.SetDefault(name, defaultValue)
-	config.BindEnv(name, envName)
-	pflag.Int(name, defaultValue, description)
+func getInt(name string, defaultValue int, description string) {
+	viper.SetDefault(name, defaultValue)
+	_ = flag.Int(name, defaultValue, description)
 }
 
 /*
@@ -39,92 +40,43 @@ func GetConfig(version string) Config {
 	var (
 		err      error
 		logLevel logrus.Level
+		result   Config
 	)
 
-	config := viper.New()
+	getString("FIREPLACE_SERVER_HOST", "localhost:8999", "Host and port to bind to")
+	getString("FIREPLACE_SERVER_LOGLEVEL", "debug", "Log level. debug,info,error")
+	getString("FIREPLACE_SERVER_CERT", "", "Filename (no extension) for SSL cert")
+	getString("FIREPLACE_SERVER_PASSWORD", "password", "Password for writing and reading from Fireplace Server")
+	getInt("FIREPLACE_PAGE_SIZE", 100, "Number of items to return per page")
+	getString("FIREPLACE_DATABASE_URL", "mongodb://localhost:27017", "Database URL")
 
-	config.Set("version", version)
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+	pflag.Parse()
+	viper.BindPFlags(pflag.CommandLine)
 
-	getString(config, "server.host", "0.0.0.0:8999", "FIREPLACE_SERVER_HOST", "Host and port to bind to")
-	getString(config, "server.loglevel", "debug", "FIREPLACE_SERVER_LOGLEVEL", "Log level. debug,info,error")
-	getString(config, "server.cert", "", "FIREPLACE_SERVER_CERT", "Filename (no extension) for SSL cert")
-	getString(config, "server.password", "password", "FIREPLACE_SERVER_PASSWORD", "Password for writing and reading from Fireplace Server")
-	getInt(config, "pagesize", 100, "PAGE_SIZE", "Number of items to return per page")
-	getString(config, "database.url", "mongodb://localhost:27017", "FIREPLACE_DATABASE_URL", "Database URL")
+	viper.SetConfigFile(".env")
+	viper.SetConfigType("env")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("/opt/fireplace-server")
+	viper.AddConfigPath("$HOME/.fireplace-server")
+	viper.AutomaticEnv()
 
-	config.BindPFlags(pflag.CommandLine)
-
-	config.SetConfigName(".env")
-	config.SetConfigType("env")
-	config.AddConfigPath(".")
-	config.AddConfigPath("/opt/fireplace-server")
-	config.AddConfigPath("$HOME/.fireplace-server")
-
-	if err = config.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			fmt.Printf("Error reading configuration file. Stack and error below:\n\n")
-			panic(err)
-		}
+	if err = viper.ReadInConfig(); err != nil && !strings.Contains(err.Error(), "no such file") {
+		fmt.Printf("Error reading configuration file. Stack and error below:\n\n")
+		panic(err)
 	}
 
-	logLevelString := config.GetString("server.loglevel")
+	if err = viper.Unmarshal(&result); err != nil {
+		panic(err)
+	}
 
+	logLevelString := viper.GetString("FIREPLACE_SERVER_LOGLEVEL")
 	if logLevel, err = logrus.ParseLevel(logLevelString); err != nil {
 		panic("Invalid log level in configuration")
 	}
 
-	result := Config{
-		serverHost:     config.GetString("server.host"),
-		serverLogLevel: logLevel,
-		serverCert:     config.GetString("server.cert"),
-		serverPassword: config.GetString("server.password"),
-		pageSize:       config.GetInt("pagesize"),
-		databaseURL:    config.GetString("database.url"),
-	}
+	result.Version = version
+	result.LogLevel = logLevel
 
 	return result
-}
-
-/*
-GetServerHost returns this Fireplace server's configured host and port
-*/
-func (c Config) GetServerHost() string {
-	return c.serverHost
-}
-
-/*
-GetServerLogLevel returns this Fireplace server's configured minimum log level
-*/
-func (c Config) GetServerLogLevel() logrus.Level {
-	return c.serverLogLevel
-}
-
-/*
-GetServerCert returns this Fireplace server's configured SSL certificate file name
-*/
-func (c Config) GetServerCert() string {
-	return c.serverCert
-}
-
-/*
-GetServerPassword returns the password for working with this Fireplace
-Server.
-*/
-func (c Config) GetServerPassword() string {
-	return c.serverPassword
-}
-
-/*
-GetPageSize returns this Fireplace server's configured page size for
-retrieving records.
-*/
-func (c Config) GetPageSize() int {
-	return c.pageSize
-}
-
-/*
-GetDatabaseURL returns this Firepalce server's configured MongoDB URL.
-*/
-func (c Config) GetDatabaseURL() string {
-	return c.databaseURL
 }

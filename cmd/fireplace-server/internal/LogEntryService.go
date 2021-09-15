@@ -144,8 +144,8 @@ func (s LogEntryService) GetLogEntries(filter pkg.LogEntryFilter) (pkg.LogEntryC
 	}
 
 	if filter.Page > 0 {
-		skip := (filter.Page - 1) * s.config.GetPageSize()
-		recordSet.Skip(skip).Limit(s.config.GetPageSize())
+		skip := (filter.Page - 1) * s.config.PageSize
+		recordSet.Skip(skip).Limit(s.config.PageSize)
 	}
 
 	if err = recordSet.All(&result); err != nil {

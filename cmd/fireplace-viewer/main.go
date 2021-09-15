@@ -6,9 +6,12 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"embed"
 	"io"
 	"io/fs"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -17,7 +20,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/app-nerds/fireplace/v2/cmd/fireplace-viewer/configuration"
+	"github.com/app-nerds/fireplace/v2/cmd/fireplace-viewer/internal"
 	"github.com/app-nerds/fireplace/v2/pkg"
 	"github.com/app-nerds/kit/v5/restclient2"
 	"github.com/app-nerds/nerdweb"
@@ -41,13 +44,16 @@ var (
 )
 
 func main() {
-	var err error
+	var (
+		err        error
+		httpClient *http.Client
+	)
 
-	config := configuration.NewConfig(Version)
+	config := internal.GetConfig(Version)
 
 	logger = logrus.New().WithField("who", "Fireplace Viewer")
 	logger.WithFields(logrus.Fields{
-		"version":      config.ServerVersion,
+		"version":      config.Version,
 		"host":         config.Host,
 		"fireplaceurl": config.FireplaceServerURL,
 	}).Info("Welcome to Fireplace Viewer!")
@@ -55,10 +61,24 @@ func main() {
 	/*
 	 * Setup fireplace server HTTP client
 	 */
+	if config.Cert != "" {
+		certPool := loadCert(config.Cert)
+
+		httpClient = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: certPool,
+				},
+			},
+		}
+	} else {
+		httpClient = &http.Client{}
+	}
+
 	fireplaceClient = restclient2.NewJSONClient(
 		config.FireplaceServerURL,
 		&restclient2.HTTPClient{
-			Client: &http.Client{},
+			Client: httpClient,
 		},
 	).WithAuthorization("Bearer " + config.FireplaceServerPassword)
 
@@ -87,12 +107,16 @@ func main() {
 
 		logger.Infof("Starting Fireplace Viewer")
 
-		if err = server.ListenAndServe(); err != nil {
-			if err != http.ErrServerClosed {
-				logger.WithError(err).Fatal("Unable to start application")
-			} else {
-				logger.Info("Shutting down the server...")
-			}
+		if config.Cert == "" {
+			err = server.ListenAndServe()
+		} else {
+			err = server.ListenAndServeTLS(config.Cert+".crt", config.Cert+".key")
+		}
+
+		if err != http.ErrServerClosed {
+			logger.WithError(err).Fatal("Unable to start application")
+		} else {
+			logger.Info("Shutting down the server...")
 		}
 	}()
 
@@ -237,4 +261,16 @@ func getFile(fileName string) []byte {
 	}
 
 	return indexHTML
+}
+
+func loadCert(certFile string) *x509.CertPool {
+	caCert, err := ioutil.ReadFile(certFile + ".crt")
+	if err != nil {
+		panic(err)
+	}
+
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	return caCertPool
 }

@@ -39,20 +39,20 @@ func main() {
 	config = internal.GetConfig(Version)
 
 	logger = logrus.New().WithField("who", "Fireplace")
-	logger.Logger.SetLevel(config.GetServerLogLevel())
+	logger.Logger.SetLevel(config.LogLevel)
 
 	logger.WithFields(logrus.Fields{
 		"version":  Version,
-		"database": config.GetDatabaseURL(),
-		"host":     config.GetServerHost(),
-		"cert":     config.GetServerCert(),
-		"loglevel": config.GetServerLogLevel(),
+		"database": config.DatabaseURL,
+		"host":     config.Host,
+		"cert":     config.Cert,
+		"loglevel": config.LogLevel,
 	}).Info("Welcome to Fireplace Server!")
 
 	/*
 	 * Setup database
 	 */
-	if session, err = database.Dial(config.GetDatabaseURL()); err != nil {
+	if session, err = database.Dial(config.DatabaseURL); err != nil {
 		logger.WithError(err).Fatal("Error opening database connection")
 	}
 
@@ -80,7 +80,7 @@ func main() {
 	 * Server routes
 	 */
 	router := mux.NewRouter()
-	auth := NewAuthMiddleware(logger, config.GetServerPassword())
+	auth := NewAuthMiddleware(logger, config.Password)
 
 	router.Use(auth.Middleware)
 
@@ -100,15 +100,15 @@ func main() {
 
 		httpServer = &http.Server{
 			Handler:      router,
-			Addr:         config.GetServerHost(),
+			Addr:         config.Host,
 			WriteTimeout: 30 * time.Second,
 			ReadTimeout:  30 * time.Second,
 		}
 
-		if config.GetServerCert() == "" {
+		if config.Cert == "" {
 			err = httpServer.ListenAndServe()
 		} else {
-			err = httpServer.ListenAndServeTLS(config.GetServerCert()+".crt", config.GetServerCert()+".key")
+			err = httpServer.ListenAndServeTLS(config.Cert+".crt", config.Cert+".key")
 		}
 
 		if err != http.ErrServerClosed {
