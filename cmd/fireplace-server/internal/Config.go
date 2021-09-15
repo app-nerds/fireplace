@@ -15,6 +15,7 @@ type Config struct {
 	serverHost     string
 	serverLogLevel logrus.Level
 	serverCert     string
+	serverPassword string
 	pageSize       int
 	databaseURL    string
 }
@@ -47,6 +48,7 @@ func GetConfig(version string) Config {
 	getString(config, "server.host", "0.0.0.0:8999", "FIREPLACE_SERVER_HOST", "Host and port to bind to")
 	getString(config, "server.loglevel", "debug", "FIREPLACE_SERVER_LOGLEVEL", "Log level. debug,info,error")
 	getString(config, "server.cert", "", "FIREPLACE_SERVER_CERT", "Filename (no extension) for SSL cert")
+	getString(config, "server.password", "password", "FIREPLACE_SERVER_PASSWORD", "Password for writing and reading from Fireplace Server")
 	getInt(config, "pagesize", 100, "PAGE_SIZE", "Number of items to return per page")
 	getString(config, "database.url", "mongodb://localhost:27017", "FIREPLACE_DATABASE_URL", "Database URL")
 
@@ -75,6 +77,7 @@ func GetConfig(version string) Config {
 		serverHost:     config.GetString("server.host"),
 		serverLogLevel: logLevel,
 		serverCert:     config.GetString("server.cert"),
+		serverPassword: config.GetString("server.password"),
 		pageSize:       config.GetInt("pagesize"),
 		databaseURL:    config.GetString("database.url"),
 	}
@@ -101,6 +104,14 @@ GetServerCert returns this Fireplace server's configured SSL certificate file na
 */
 func (c Config) GetServerCert() string {
 	return c.serverCert
+}
+
+/*
+GetServerPassword returns the password for working with this Fireplace
+Server.
+*/
+func (c Config) GetServerPassword() string {
+	return c.serverPassword
 }
 
 /*

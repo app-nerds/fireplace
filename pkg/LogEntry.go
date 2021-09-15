@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2021. App Nerds LLC. All rights reserved
+ */
+
 package pkg
 
 import (

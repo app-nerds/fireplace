@@ -28,7 +28,7 @@ import (
 var (
 	Version         string = "development"
 	logger          *logrus.Entry
-	fireplaceClient restclient2.JSONClient
+	fireplaceClient restclient2.RESTClient
 
 	//go:embed app
 	appFs embed.FS
@@ -60,7 +60,7 @@ func main() {
 		&restclient2.HTTPClient{
 			Client: &http.Client{},
 		},
-	)
+	).WithAuthorization("Bearer " + config.FireplaceServerPassword)
 
 	router := mux.NewRouter()
 	router.Use(mux.CORSMethodMiddleware(router))
@@ -133,10 +133,18 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleError(ok bool, notOKStatus int, errorResponse pkg.GenericResponse, message string, w http.ResponseWriter) {
-	if !ok {
+func handleError(err error, response *http.Response, errorResponse pkg.GenericResponse, message string, w http.ResponseWriter) {
+	if err != nil {
+		logger.WithError(err).Error(message)
+		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, pkg.GenericResponse{
+			Message: message,
+		})
+		return
+	}
+
+	if response.StatusCode > 299 {
 		logger.WithField("errorResponse", errorResponse).Error(message)
-		nerdweb.WriteJSON(logger, w, notOKStatus, pkg.GenericResponse{
+		nerdweb.WriteJSON(logger, w, response.StatusCode, pkg.GenericResponse{
 			Message: message,
 		})
 	}
@@ -144,14 +152,15 @@ func handleError(ok bool, notOKStatus int, errorResponse pkg.GenericResponse, me
 
 func getApplicationNames(w http.ResponseWriter, r *http.Request) {
 	var (
-		ok bool
+		err      error
+		response *http.Response
 	)
 
 	applicationNames := make([]string, 0, 50)
 	errorResponse := pkg.GenericResponse{}
 
-	if ok, _ = fireplaceClient.GET("/applicationname", &applicationNames, &errorResponse); !ok {
-		handleError(ok, http.StatusInternalServerError, errorResponse, "Error getting application names", w)
+	if response, err = fireplaceClient.GET("/applicationname", &applicationNames, &errorResponse); err != nil || response.StatusCode > 299 {
+		handleError(err, response, errorResponse, "Error getting application names", w)
 		return
 	}
 
@@ -160,15 +169,16 @@ func getApplicationNames(w http.ResponseWriter, r *http.Request) {
 
 func getLogEntry(w http.ResponseWriter, r *http.Request) {
 	var (
-		ok            bool
-		logEntry      pkg.LogEntry
-		errorResponse pkg.GenericResponse
+		err      error
+		response *http.Response
+		logEntry pkg.LogEntry
 	)
 
 	vars := mux.Vars(r)
+	errorResponse := pkg.GenericResponse{}
 
-	if ok, _ = fireplaceClient.GET("/logentry/"+vars["id"], &logEntry, &errorResponse); !ok {
-		handleError(ok, http.StatusInternalServerError, errorResponse, "Error getting log entry "+vars["id"], w)
+	if response, err = fireplaceClient.GET("/logentry/"+vars["id"], &logEntry, &errorResponse); err != nil || response.StatusCode > 299 {
+		handleError(err, response, errorResponse, "Error getting log entry "+vars["id"], w)
 		return
 	}
 
@@ -177,11 +187,12 @@ func getLogEntry(w http.ResponseWriter, r *http.Request) {
 
 func getLogEntries(w http.ResponseWriter, r *http.Request) {
 	var (
-		ok            bool
-		logEntries    pkg.GetLogEntriesResponse
-		errorResponse pkg.GenericResponse
+		err        error
+		response   *http.Response
+		logEntries pkg.GetLogEntriesResponse
 	)
 
+	errorResponse := pkg.GenericResponse{}
 	queryParams := r.URL.Query()
 	parameters := url.Values{}
 
@@ -190,8 +201,8 @@ func getLogEntries(w http.ResponseWriter, r *http.Request) {
 	parameters.Set("application", queryParams.Get("application"))
 	parameters.Set("level", queryParams.Get("level"))
 
-	if ok, _ = fireplaceClient.GET("/logentry?"+parameters.Encode(), &logEntries, &errorResponse); !ok {
-		handleError(ok, http.StatusInternalServerError, errorResponse, "Error getting log entries", w)
+	if response, err = fireplaceClient.GET("/logentry?"+parameters.Encode(), &logEntries, &errorResponse); err != nil || response.StatusCode > 299 {
+		handleError(err, response, errorResponse, "Error getting log entries", w)
 		return
 	}
 

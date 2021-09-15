@@ -80,6 +80,9 @@ func main() {
 	 * Server routes
 	 */
 	router := mux.NewRouter()
+	auth := NewAuthMiddleware(logger, config.GetServerPassword())
+
+	router.Use(auth.Middleware)
 
 	router.HandleFunc("/logentry", logEntryController.CreateLogEntry).Methods(http.MethodPost)
 	router.HandleFunc("/logentry", logEntryController.GetLogEntries).Methods(http.MethodGet)

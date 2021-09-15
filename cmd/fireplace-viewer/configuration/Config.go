@@ -10,11 +10,12 @@ import (
 )
 
 type Config struct {
-	Debug              bool
-	FireplaceServerURL string
-	Host               string
-	LogLevel           logrus.Level
-	ServerVersion      string
+	Debug                   bool
+	FireplaceServerURL      string
+	FireplaceServerPassword string
+	Host                    string
+	LogLevel                logrus.Level
+	ServerVersion           string
 }
 
 func setString(config *viper.Viper, name, envName, defaultValue, description string) {
@@ -41,6 +42,7 @@ func NewConfig(serverVersion string) *Config {
 	setString(config, "server.loglevel", "FIREPLACEVIEWER_SERVER_LOGLEVEL", "debug", "Minimum logging level")
 	setBool(config, "server.debug", "FIREPLACEVIEWER_SERVER_DEBUG", true, "Set to debug mode")
 	setString(config, "fireplace.url", "FIREPLACEVIEWER_FIREPLACE_URL", "http://0.0.0.0:8999", "FQDN to a Fireplace server")
+	setString(config, "fireplace.password", "FIREPLACEVIEWER_FIREPLACE_PASSWORD", "password", "Password to connect to the Fireplace Server")
 
 	config.SetConfigName(".env")
 	config.SetConfigType("env")
@@ -66,11 +68,12 @@ func NewConfig(serverVersion string) *Config {
 	}
 
 	result := &Config{
-		Debug:              config.GetBool("server.debug"),
-		FireplaceServerURL: config.GetString("fireplace.url"),
-		Host:               config.GetString("server.host"),
-		LogLevel:           loglevel,
-		ServerVersion:      serverVersion,
+		Debug:                   config.GetBool("server.debug"),
+		FireplaceServerURL:      config.GetString("fireplace.url"),
+		FireplaceServerPassword: config.GetString("fireplace.password"),
+		Host:                    config.GetString("server.host"),
+		LogLevel:                loglevel,
+		ServerVersion:           serverVersion,
 	}
 
 	return result
