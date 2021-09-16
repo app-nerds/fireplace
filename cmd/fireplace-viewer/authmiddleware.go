@@ -6,7 +6,7 @@ import (
 
 	"github.com/app-nerds/fireplace/v2/pkg"
 	"github.com/app-nerds/kit/v5/identity"
-	"github.com/app-nerds/nerdweb"
+	"github.com/app-nerds/nerdweb/v2"
 	"github.com/sirupsen/logrus"
 )
 

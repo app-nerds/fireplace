@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/app-nerds/fireplace/v2/pkg"
-	"github.com/app-nerds/nerdweb"
+	"github.com/app-nerds/nerdweb/v2"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )

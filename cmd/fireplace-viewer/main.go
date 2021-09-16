@@ -24,7 +24,8 @@ import (
 	"github.com/app-nerds/fireplace/v2/pkg"
 	"github.com/app-nerds/kit/v5/identity"
 	"github.com/app-nerds/kit/v5/restclient2"
-	"github.com/app-nerds/nerdweb"
+	"github.com/app-nerds/nerdweb/v2"
+	"github.com/app-nerds/nerdweb/v2/middlewares"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
@@ -111,7 +112,7 @@ func main() {
 	}
 
 	router := mux.NewRouter()
-	router.Use(mux.CORSMethodMiddleware(router))
+	router.Use(middlewares.AccessControl(middlewares.AllowAllOrigins, middlewares.AllowAllMethods, middlewares.AllowAllMethods))
 
 	router.HandleFunc("/login", login).Methods(http.MethodPost)
 
