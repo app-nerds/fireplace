@@ -65,7 +65,7 @@ func main() {
 	/*
 	 * Setup services
 	 */
-	dateTimeService = &datetime.DateTimeParser{}
+	dateTimeService = datetime.DateTimeParser{}
 
 	logEntryService = internal.NewLogEntryService(
 		config,
