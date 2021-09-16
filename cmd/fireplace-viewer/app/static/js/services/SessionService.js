@@ -13,7 +13,7 @@ export function setSessionToken(token) {
 }
 
 export async function validatePassword(password) {
-	let response = await post(`/login`, { password: password }, "Error logging in");
+	let response = await post(`/login`, { password: password }, "Unable logging in");
 	return response;
 }
 

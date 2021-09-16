@@ -11,8 +11,9 @@ export default class LoginPage extends BaseView {
 
 		document.querySelector("#frmLogin").addEventListener("submit", async (e) => {
 			e.preventDefault();
-			
-			let password = document.querySelector("#password").value;
+
+			const passwordEl = document.querySelector("#password");
+			let password = passwordEl.value;
 
 			try {
 				let response = await validatePassword(password);
@@ -21,6 +22,7 @@ export default class LoginPage extends BaseView {
 				this.navigateTo("/");
 			} catch (e) {
 				this.displayErrorMessage(e);
+				passwordEl.focus();
 			}
 		});
 
@@ -34,6 +36,7 @@ export default class LoginPage extends BaseView {
 	_render() {
 		let html = `<title>Fireplace Viewer - Login</title>
 			<form id="frmLogin" class="login-container">
+				<label for="password">Password:</label>
 				<input type="password" id="password" maxlength="50" />
 				<button type="submit" id="btnSubmit">Login</button>
 			</form>
