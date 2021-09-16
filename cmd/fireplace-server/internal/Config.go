@@ -14,13 +14,15 @@ import (
 Config provides configuration information for the Fireplace server
 */
 type Config struct {
-	Version     string
-	Host        string `mapstructure:"FIREPLACE_SERVER_HOST"`
-	LogLevel    logrus.Level
-	Cert        string `mapstructure:"FIREPLACE_SERVER_CERT"`
-	Password    string `mapstructure:"FIREPLACE_SERVER_PASSWORD"`
-	PageSize    int    `mapstructure:"FIREPLACE_PAGE_SIZE"`
-	DatabaseURL string `mapstructure:"FIREPLACE_DATABASE_URL"`
+	Version              string
+	Host                 string `mapstructure:"FIREPLACE_SERVER_HOST"`
+	LogLevel             logrus.Level
+	Cert                 string `mapstructure:"FIREPLACE_SERVER_CERT"`
+	Password             string `mapstructure:"FIREPLACE_SERVER_PASSWORD"`
+	PageSize             int    `mapstructure:"FIREPLACE_PAGE_SIZE"`
+	DatabaseURL          string `mapstructure:"FIREPLACE_DATABASE_URL"`
+	CleanLogIntervalDays int    `mapstructure:"FIREPLACE_CLEAN_LOG_INTERVAL_DAYS"`
+	CleanLogSchedule     string `mapstructure:"FIREPLACE_CLEAN_LOG_SCHEDULE"`
 }
 
 func getString(name, defaultValue, description string) {
@@ -49,6 +51,8 @@ func GetConfig(version string) Config {
 	getString("FIREPLACE_SERVER_PASSWORD", "password", "Password for writing and reading from Fireplace Server")
 	getInt("FIREPLACE_PAGE_SIZE", 100, "Number of items to return per page")
 	getString("FIREPLACE_DATABASE_URL", "mongodb://localhost:27017", "Database URL")
+	getInt("FIREPLACE_CLEAN_LOG_INTERVAL_DAYS", 60, "Number of days to keep log entries before they are deleted")
+	getString("FIREPLACE_CLEAN_LOG_SCHEDULE", "0 0 0 * * *", "Schedule of when to clean logs. Defaults to daily at midnight")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()

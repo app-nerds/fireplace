@@ -12,11 +12,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/app-nerds/fireplace/v2/cmd/fireplace-server/internal"
 	"github.com/app-nerds/kit/v5/database"
 	"github.com/gorilla/mux"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-
-	"github.com/app-nerds/fireplace/v2/cmd/fireplace-server/internal"
 )
 
 var (
@@ -34,6 +34,7 @@ func main() {
 		logEntryService    internal.ILogEntryService
 		logEntryController internal.ILogEntryController
 		httpServer         *http.Server
+		deleteLogsCron     *cron.Cron
 	)
 
 	config = internal.GetConfig(Version)
@@ -119,11 +120,25 @@ func main() {
 	}()
 
 	/*
+	 * Run the delete logs cron
+	 */
+	logger.WithFields(logrus.Fields{
+		"schedule":  config.CleanLogSchedule,
+		"ageInDays": config.CleanLogIntervalDays,
+	}).Info("Starting log entry cleaner")
+
+	deleteLogsCron = cron.New()
+	deleteLogsCron.AddFunc(config.CleanLogSchedule, deleteLogEntries(config.CleanLogIntervalDays, logger, logEntryService))
+	deleteLogsCron.Start()
+
+	/*
 	 * Setup shutdown handler
 	 */
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt, syscall.SIGQUIT, syscall.SIGTERM)
 	<-quit
+
+	deleteLogsCron.Stop()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -133,4 +148,30 @@ func main() {
 	}
 
 	logger.Info("Server stopped")
+}
+
+func deleteLogEntries(cleanLogIntervalDays int, logger *logrus.Entry, logEntryService internal.ILogEntryService) func() {
+	return func() {
+		var (
+			err        error
+			numDeleted int
+			daysAgo    time.Time
+		)
+
+		daysAgo = time.Now().UTC().Add((time.Duration(cleanLogIntervalDays) * -1) * (time.Hour * 24))
+		logger.Infof("Deleting log entries older than %s (UTC)...", daysAgo.Format("2006-01-02"))
+
+		numDeleted, err = logEntryService.Delete(daysAgo)
+
+		if err != nil {
+			logger.WithError(err).WithFields(logrus.Fields{
+				"intervalDays": cleanLogIntervalDays,
+			}).Error("Error deleting old log entries")
+			return
+		}
+
+		logger.WithFields(logrus.Fields{
+			"numDeleted": numDeleted,
+		}).Info("Deleted old records")
+	}
 }
