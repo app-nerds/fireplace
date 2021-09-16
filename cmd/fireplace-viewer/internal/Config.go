@@ -18,6 +18,8 @@ type Config struct {
 	FireplaceServerPassword string `mapstructure:"FIREPLACEVIEWER_FIREPLACE_PASSWORD"`
 	Host                    string `mapstructure:"FIREPLACEVIEWER_SERVER_HOST"`
 	Cert                    string `mapstructure:"FIREPLACEVIEWER_SERVER_CERT"`
+	ServerPassword          string `mapstructure:"FIREPLACEVIEWER_SERVER_PASSWORD"`
+	JWTSecret               string `mapstructure:"FIREPLACEVIEWER_JWT_SECRET"`
 	LogLevel                logrus.Level
 	Version                 string
 }
@@ -46,6 +48,9 @@ func GetConfig(version string) Config {
 	getString("FIREPLACEVIEWER_SERVER_LOGLEVEL", "debug", "Minimum logging level")
 	getString("FIREPLACEVIEWER_FIREPLACE_URL", "http://0.0.0.0:8999", "FQDN to a Fireplace server")
 	getString("FIREPLACEVIEWER_FIREPLACE_PASSWORD", "password", "Password to connect to the Fireplace Server")
+	getString("FIREPLACEVIEWER_SERVER_CERT", "", "File name (no extension) of the SSL certifiate")
+	getString("FIREPLACEVIEWER_SERVER_PASSWORD", "password", "Password to access the Viewer")
+	getString("FIREPLACEVIEWER_JWT_SECRET", "password", "Password and salt used to encrypt JWT tokens")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()

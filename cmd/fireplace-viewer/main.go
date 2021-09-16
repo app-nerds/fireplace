@@ -22,16 +22,26 @@ import (
 
 	"github.com/app-nerds/fireplace/v2/cmd/fireplace-viewer/internal"
 	"github.com/app-nerds/fireplace/v2/pkg"
+	"github.com/app-nerds/kit/v5/identity"
 	"github.com/app-nerds/kit/v5/restclient2"
 	"github.com/app-nerds/nerdweb"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
+/*
+LoginRequest is used to login to the Fireplace Viewer
+*/
+type LoginRequest struct {
+	Password string `json:"password"`
+}
+
 var (
 	Version         string = "development"
+	config          internal.Config
 	logger          *logrus.Entry
 	fireplaceClient restclient2.RESTClient
+	jwtService      identity.IJWTService
 
 	//go:embed app
 	appFs embed.FS
@@ -49,7 +59,7 @@ func main() {
 		httpClient *http.Client
 	)
 
-	config := internal.GetConfig(Version)
+	config = internal.GetConfig(Version)
 
 	logger = logrus.New().WithField("who", "Fireplace Viewer")
 	logger.WithFields(logrus.Fields{
@@ -82,15 +92,38 @@ func main() {
 		},
 	).WithAuthorization("Bearer " + config.FireplaceServerPassword)
 
+	/*
+	 * Setup JWT Service
+	 */
+	jwtService = identity.NewJWTService(&identity.JWTServiceConfig{
+		AuthSalt:         config.JWTSecret,
+		AuthSecret:       config.JWTSecret,
+		Issuer:           "issuer://net.appnerds.fireplaceviewer",
+		TimeoutInMinutes: 60,
+	})
+
+	/*
+	 * Setup router mux and server
+	 */
+	auth := &authMiddleware{
+		logger:     logger,
+		jwtService: jwtService,
+	}
+
 	router := mux.NewRouter()
 	router.Use(mux.CORSMethodMiddleware(router))
+
+	router.HandleFunc("/login", login).Methods(http.MethodPost)
+
 	staticFS := http.FileServer(getClientAppFileSystem(Version == "development"))
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
+	apiRouter.Use(auth.Middleware)
+
 	apiRouter.HandleFunc("/logentry", getLogEntries).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/logentry/{id}", getLogEntry).Methods(http.MethodGet)
-
 	apiRouter.HandleFunc("/applicationname", getApplicationNames).Methods(http.MethodGet)
+
 	router.PathPrefix("/static/").Handler(staticFS).Methods(http.MethodGet)
 	router.HandleFunc(`/{path:[a-zA-Z0-9\-_\/\.]*}`, rootHandler)
 
@@ -172,6 +205,51 @@ func handleError(err error, response *http.Response, errorResponse pkg.GenericRe
 			Message: message,
 		})
 	}
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	var (
+		err   error
+		token string
+	)
+
+	loginRequest := LoginRequest{}
+
+	if err = nerdweb.ReadJSONBody(r, &loginRequest); err != nil {
+		logger.WithError(err).Error("Invalid login request")
+		nerdweb.WriteJSON(logger, w, http.StatusBadRequest, pkg.GenericResponse{
+			Message: "Invalid login request",
+		})
+		return
+	}
+
+	if loginRequest.Password != config.ServerPassword {
+		logger.WithFields(logrus.Fields{
+			"ip": nerdweb.RealIP(r),
+		}).Error("Invalid password during login attempt")
+
+		nerdweb.WriteJSON(logger, w, http.StatusUnauthorized, pkg.GenericResponse{
+			Message: "Invalid password",
+		})
+		return
+	}
+
+	if token, err = jwtService.CreateToken(&identity.CreateTokenRequest{}); err != nil {
+		logger.WithError(err).WithFields(logrus.Fields{
+			"ip": nerdweb.RealIP(r),
+		}).Error("error creating JWT token")
+
+		nerdweb.WriteJSON(logger, w, http.StatusInternalServerError, pkg.GenericResponse{
+			Message: "Error creating token",
+		})
+		return
+	}
+
+	result := map[string]string{
+		"token": token,
+	}
+
+	nerdweb.WriteJSON(logger, w, http.StatusOK, result)
 }
 
 func getApplicationNames(w http.ResponseWriter, r *http.Request) {
