@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/app-nerds/kit/v5/database"
+	"github.com/app-nerds/kit/v6/database"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 

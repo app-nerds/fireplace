@@ -13,7 +13,8 @@ import (
 	"time"
 
 	"github.com/app-nerds/fireplace/v2/cmd/fireplace-server/internal"
-	"github.com/app-nerds/kit/v5/database"
+	"github.com/app-nerds/kit/v6/database"
+	"github.com/app-nerds/kit/v6/datetime"
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
@@ -31,6 +32,7 @@ func main() {
 		logger             *logrus.Entry
 		db                 database.Database
 		session            database.Session
+		dateTimeService    datetime.IDateTimeParser
 		logEntryService    internal.ILogEntryService
 		logEntryController internal.ILogEntryController
 		httpServer         *http.Server
@@ -63,6 +65,8 @@ func main() {
 	/*
 	 * Setup services
 	 */
+	dateTimeService = &datetime.DateTimeParser{}
+
 	logEntryService = internal.NewLogEntryService(
 		config,
 		db,
@@ -128,7 +132,7 @@ func main() {
 	}).Info("Starting log entry cleaner")
 
 	deleteLogsCron = cron.New()
-	deleteLogsCron.AddFunc(config.CleanLogSchedule, deleteLogEntries(config.CleanLogIntervalDays, logger, logEntryService))
+	deleteLogsCron.AddFunc(config.CleanLogSchedule, deleteLogEntries(config.CleanLogIntervalDays, logger, logEntryService, dateTimeService))
 	deleteLogsCron.Start()
 
 	/*
@@ -150,7 +154,7 @@ func main() {
 	logger.Info("Server stopped")
 }
 
-func deleteLogEntries(cleanLogIntervalDays int, logger *logrus.Entry, logEntryService internal.ILogEntryService) func() {
+func deleteLogEntries(cleanLogIntervalDays int, logger *logrus.Entry, logEntryService internal.ILogEntryService, dateTimeService datetime.IDateTimeParser) func() {
 	return func() {
 		var (
 			err        error
@@ -158,7 +162,7 @@ func deleteLogEntries(cleanLogIntervalDays int, logger *logrus.Entry, logEntrySe
 			daysAgo    time.Time
 		)
 
-		daysAgo = time.Now().UTC().Add((time.Duration(cleanLogIntervalDays) * -1) * (time.Hour * 24))
+		daysAgo, _ = dateTimeService.DaysAgo(cleanLogIntervalDays)
 		logger.Infof("Deleting log entries older than %s (UTC)...", daysAgo.Format("2006-01-02"))
 
 		numDeleted, err = logEntryService.Delete(daysAgo)

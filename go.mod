@@ -3,7 +3,7 @@ module github.com/app-nerds/fireplace/v2
 go 1.16
 
 require (
-	github.com/app-nerds/kit/v5 v5.3.3
+	github.com/app-nerds/kit/v6 v6.0.0
 	github.com/app-nerds/nerdweb/v2 v2.0.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/gorilla/mux v1.8.0
@@ -16,4 +16,4 @@ require (
 	golang.org/x/sys v0.0.0-20210915083310-ed5796bab164 // indirect
 )
 
-replace github.com/app-nerds/kit/v5 => /Users/adampresley/code/kit
+replace github.com/app-nerds/kit/v6 => /Users/adampresley/code/kit
