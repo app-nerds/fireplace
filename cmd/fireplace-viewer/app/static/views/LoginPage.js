@@ -9,29 +9,31 @@ export default class LoginPage extends BaseView {
 	async render() {
 		this._render();
 
-		document.querySelector("#frmLogin").addEventListener("submit", async (e) => {
-			e.preventDefault();
-
-			const passwordEl = document.querySelector("#password");
-			let password = passwordEl.value;
-
-			try {
-				let response = await validatePassword(password);
-				setSessionToken(response.token);
-
-				this.navigateTo("/");
-			} catch (e) {
-				this.displayErrorMessage(e);
-				passwordEl.focus();
-			}
-		});
-
+		document.querySelector("#frmLogin").addEventListener("submit", this._onSubmit.bind(this));
 		document.querySelector("#password").focus();
 	}
 
 	/*****************************************************************************
 	 * Private methods
 	 ****************************************************************************/
+
+	async _onSubmit(e) {
+		e.preventDefault();
+
+		const passwordEl = document.querySelector("#password");
+		let password = passwordEl.value;
+
+		try {
+			let response = await validatePassword(password);
+			setSessionToken(response.token);
+
+			this.navigateTo("/");
+		} catch (e) {
+			this.displayErrorMessage(e);
+			passwordEl.value = "";
+			passwordEl.focus();
+		}
+	}
 
 	_render() {
 		let html = `<title>Fireplace Viewer - Login</title>
