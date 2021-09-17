@@ -112,6 +112,7 @@ func (h *FireplaceHook) send(entry *pkg.CreateLogEntryRequest) error {
 	}
 
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+h.config.Password)
 
 	if response, err = h.client.Do(request); err != nil {
 		return fmt.Errorf("Error sending log entry to Fireplace Server: %w", err)
