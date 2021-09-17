@@ -19,6 +19,7 @@ Hook.
 type FireplaceHookConfig struct {
 	Application  string
 	FireplaceURL string
+	Password     string
 }
 
 /*
@@ -93,9 +94,12 @@ func (h *FireplaceHook) Levels() []logrus.Level {
 }
 
 func (h *FireplaceHook) send(entry *pkg.CreateLogEntryRequest) error {
-	var err error
-	var entryJSON []byte
-	var response *http.Response
+	var (
+		err       error
+		entryJSON []byte
+		request   *http.Request
+		response  *http.Response
+	)
 
 	if entryJSON, err = json.Marshal(entry); err != nil {
 		return errors.Wrapf(err, "Error converting log entry to JSON")
@@ -103,8 +107,14 @@ func (h *FireplaceHook) send(entry *pkg.CreateLogEntryRequest) error {
 
 	reader := bytes.NewReader(entryJSON)
 
-	if response, err = h.client.Post(h.config.FireplaceURL+"/logentry", "application/json", reader); err != nil {
-		return errors.Wrapf(err, "Error sending log entry to Fireplace Server")
+	if request, err = http.NewRequest(http.MethodPost, h.config.FireplaceURL+"/logentry", reader); err != nil {
+		return fmt.Errorf("unable to create the HTTP request: %w", err)
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	if response, err = h.client.Do(request); err != nil {
+		return fmt.Errorf("Error sending log entry to Fireplace Server: %w", err)
 	}
 
 	defer response.Body.Close()

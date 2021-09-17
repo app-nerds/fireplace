@@ -23,7 +23,7 @@ import (
 	"github.com/app-nerds/fireplace/v2/cmd/fireplace-viewer/internal"
 	"github.com/app-nerds/fireplace/v2/pkg"
 	"github.com/app-nerds/kit/v6/identity"
-	"github.com/app-nerds/kit/v6/restclient2"
+	"github.com/app-nerds/kit/v6/restclient"
 	"github.com/app-nerds/nerdweb/v2"
 	"github.com/app-nerds/nerdweb/v2/middlewares"
 	"github.com/gorilla/mux"
@@ -41,7 +41,7 @@ var (
 	Version         string = "development"
 	config          internal.Config
 	logger          *logrus.Entry
-	fireplaceClient restclient2.RESTClient
+	fireplaceClient restclient.RESTClient
 	jwtService      identity.IJWTService
 
 	//go:embed app
@@ -86,9 +86,9 @@ func main() {
 		httpClient = &http.Client{}
 	}
 
-	fireplaceClient = restclient2.NewJSONClient(
+	fireplaceClient = restclient.NewJSONClient(
 		config.FireplaceServerURL,
-		&restclient2.HTTPClient{
+		&restclient.HTTPClient{
 			Client: httpClient,
 		},
 	).WithAuthorization("Bearer " + config.FireplaceServerPassword)
@@ -96,7 +96,7 @@ func main() {
 	/*
 	 * Setup JWT Service
 	 */
-	jwtService = identity.NewJWTService(&identity.JWTServiceConfig{
+	jwtService = identity.NewJWTService(identity.JWTServiceConfig{
 		AuthSalt:         config.JWTSecret,
 		AuthSecret:       config.JWTSecret,
 		Issuer:           "issuer://net.appnerds.fireplaceviewer",
@@ -235,7 +235,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if token, err = jwtService.CreateToken(&identity.CreateTokenRequest{}); err != nil {
+	if token, err = jwtService.CreateToken(identity.CreateTokenRequest{}); err != nil {
 		logger.WithError(err).WithFields(logrus.Fields{
 			"ip": nerdweb.RealIP(r),
 		}).Error("error creating JWT token")
