@@ -12,4 +12,10 @@ const routes = [
 	{ path: "/", view: LogViewer },
 ];
 
+window.onload = () => {
+	if ("serviceWorker" in navigator) {
+		navigator.serviceWorker.register("/static/js/serviceworker/ServiceWorker.js");
+	}
+}
+
 application("#app", routes);

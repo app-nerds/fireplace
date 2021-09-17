@@ -149,7 +149,7 @@ information-bar {
 
 #levelSelect,
 #applicationSelect,
-#generalSearch, 
+#generalSearch,
 #resetButton {
 	padding: 0.3rem 0.5rem;
 	margin-left: 0.7rem;
@@ -163,7 +163,9 @@ information-bar {
 	top: 2px;
 }
 
-#resetButton { margin-left: 0; }
+#resetButton {
+	margin-left: 0;
+}
 
 /* Log Viewer */
 log-viewer {
@@ -303,4 +305,32 @@ td.time-column {
 
 #logEntryViewer table tr:nth-child(even) {
 	background-color: var(--table-hover-background-color);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+	.login-container {
+		width: 90%;
+	}
+
+	information-bar {
+		display: flex;
+		flex-direction: column;
+	}
+
+	#levelSelect,
+	#applicationSelect,
+	#generalSearch,
+	#resetButton {
+		margin-left: 0;
+		margin-top: 0.3rem;
+	}
+
+	#clearGeneralSearch {
+		display: none;
+	}
+
+	#logEntriesTable table {
+		height: 60vh;
+	}
 }

@@ -52,6 +52,9 @@ var (
 
 	//go:embed app/main.js
 	mainJS []byte
+
+	//go:embed app/manifest.json
+	manifestJSON []byte
 )
 
 func main() {
@@ -179,6 +182,12 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	case "/main.js":
 		w.Header().Set("Content-Type", "text/javascript")
 		_, _ = w.Write(getFile("main.js"))
+		return
+
+	case "/manifest.json":
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(getFile("manifest.json"))
+		return
 
 	default:
 		if strings.Index(path, ".") > -1 {
@@ -337,6 +346,10 @@ func getFile(fileName string) []byte {
 
 	if fileName == "main.js" {
 		return mainJS
+	}
+
+	if fileName == "manifest.json" {
+		return manifestJSON
 	}
 
 	return indexHTML

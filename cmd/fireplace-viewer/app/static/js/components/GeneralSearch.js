@@ -57,6 +57,7 @@ export class GeneralSearch extends HTMLInputElement {
 
 		let clearButton = document.createElement("button");
 		clearButton.type = "button";
+		clearButton.id = "clearGeneralSearch";
 		clearButton.setAttribute("aria-label", "General search");
 		clearButton.style.position = "relative";
 		clearButton.style.right = "26px";
