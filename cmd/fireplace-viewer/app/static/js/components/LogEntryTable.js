@@ -120,6 +120,10 @@ export class LogEntryTable extends HTMLElement {
 			html += createRow(le);
 		});
 
+		if (logEntries.length <= 0) {
+			html = `<tr><td colspan="4">No log entries to show!</td></tr>`;
+		}
+
 		document.querySelector("#logEntryTableBody").innerHTML = html;
 		const links = this.querySelectorAll(`a[data-id]`);
 
