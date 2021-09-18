@@ -1,36 +1,14 @@
-# Fireplace
+# Fireplace Server
 
-![Fire Pit](../../assets/fire-pit.jpg)
-
-Fireplace is a set of tools for capturing and viewing structured log entries
-from your applications. Currently it is specifically tailored to log entries
-coming from Go applications using [https://github.com/sirupsen/logrus](Logrus)
-for logging. Fireplace provides a hook which will automatically send logs
-to Fireplace Server and capture them into a MongoDB database. Fireplace
-Viewer can then be used to sort through logs using a web UI.
-
-### Notice
-This project is hardly ready for prime-time, and I only really put it together
-for my own personal use. But it is MIT licensed so if you want to use it,
-go for it!
-
-### Screenshots
-
-![Main Screen](../../assets/screenshot-1.png)
-
-![Filtering](../../assets/screenshot-2.png)
-
-![Details](../../assets/screenshot-3.png)
+Fireplace Server is a Go application that runs an HTTP server for capturing
+and serving up structured log entries. 
 
 ## Getting Started
-Fireplace Server is a Go application that runs an HTTP server for capturing
-and serving up structured log entries. Fireplace Viewer is a web application
-used to view these captured logs.
 
 To begin, ensure you have [Go 1.16+](https://golang.org/dl/) installed. To compile
 the server application, perform the following on the terminal.
 
-```
+```bash
 git git@github.com:app-nerds/fireplace.git
 cd fireplace/cmd/fireplace-server
 go get
