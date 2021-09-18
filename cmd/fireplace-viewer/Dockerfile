@@ -20,7 +20,7 @@ RUN GOPRIVATE="github.com/app-nerds/*" GONOPROXY="github.com/app-nerds/*" go mod
 # Now build the application
 #
 COPY . .
-RUN cd cmd/fireplace-server && make build-linux
+RUN cd cmd/fireplace-viewer && make build-linux
 
 #
 # Restore Git back to normal
@@ -34,6 +34,7 @@ FROM alpine:latest
 
 # Change to directory for building
 WORKDIR /app
-COPY --from=builder /build/cmd/fireplace-server/fireplace-server .
+COPY --from=builder /build/cmd/fireplace-viewer/fireplace-viewer .
 
-ENTRYPOINT ["./fireplace-server"]
+ENTRYPOINT ["./fireplace-viewer"]
+

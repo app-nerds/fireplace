@@ -3,20 +3,19 @@ version: "3"
 services:
   fireplace:
     container_name: "fireplace"
-    restart: always
+    restart: unless-stopped
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./cmd/fireplace-server/Dockerfile
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - "0.0.0.0:8999:8999"
     depends_on:
       - mongo
-    networks:
-      - fireplace
     env_file:
       - ./.env
+
   mongo:
     container_name: mongo-fireplace
     image: mongo:bionic
@@ -24,13 +23,22 @@ services:
       - mongo:/data/db
     ports:
       - "127.0.0.1:27017:27017"
-    networks:
+
+  fireplaceviewer:
+    container_name: "fireplace-viewer"
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./cmd/fireplace-viewer/Dockerfile
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    ports:
+      - "0.0.0.0:8090:8090"
+    depends_on:
       - fireplace
+    env_file:
+      - ./.env
 
 volumes:
   mongo:
-
-networks:
-  fireplace:
-    driver: bridge
 
