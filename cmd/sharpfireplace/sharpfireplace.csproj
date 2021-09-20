@@ -1,12 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="6.0.8" />
-    <PackageReference Include="RestSharp" Version="105.2.3" />
-  </ItemGroup>
-
+	<PropertyGroup>
+		<TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+		<PackageId>SharpFireplace</PackageId>
+		<Version>2.0.0</Version>
+		<Authors>Adam Presley</Authors>
+		<Company>App Nerds LLC</Company>
+		<PackageDescription>Logging library that interfaces to a Fireplace Server</PackageDescription>
+		<RepositoryUrl>https://github.com/app-nerds/fireplace</RepositoryUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="6.0.8" />
+		<PackageReference Include="RestSharp" Version="106.12.0" />
+	</ItemGroup>
 </Project>
