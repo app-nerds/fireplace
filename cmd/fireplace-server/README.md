@@ -13,23 +13,27 @@ git git@github.com:app-nerds/fireplace.git
 cd fireplace/cmd/fireplace-server
 go get
 go build
-cd ../fireplace-viewer 
-go get
-go generate
-go build
 ```
 
-## Server Flags
-The following are command line arguments that can be used to customize how the Fireplace Server
-runs.
+## Configuring
+Fireplace Server allows for configuring both via command line flag and an environment file. The following are command line arguments that can be used to customize how the Fireplace Server runs.
 
-* **host** - IP/Port to bind to. Defaults to *0.0.0.0:8999*
-* **loglevel** - What level to write logs at. Defaults to *info*
+* **FIREPLACE_SERVER_HOST** - IP/Port to bind to. Defaults to *localhost:8999*
+* **FIREPLACE_SERVER_LOGLEVEL** - What level to write logs at. Defaults to *debug*
+* **FIREPLACE_SERVER_CERT** - Path and name to *.crt* and *.key* files. This should be the filename with no extension. When provided this server will run over SSL. When empty the server will run without SSL
+* **FIREPLACE_SERVER_PASSWORD** - Password for accessing and writing to this server
+* **FIREPLACE_PAGE_SIZE** - Number of records to return per page. Defaults to 100
+* **FIREPLACE_DATABASE_URL** - URL to a MongoDB database. Default is *mongodb://localhost:27017*
+* **FIREPLACE_CLEAN_LOG_INTERVAL_DAYS** - How many days to keep log entries before they are deleted
+* **FIREPLACE_CLEAN_LOG_SCHEDULE** - String telling Fireplace Server the schedule with which to delete log entries. This string should be formatted in [CRON format](https://crontab.guru)
 
 ### Example
 ```
-$ ./fireplace-server -host=127.0.0.1:8080
+$ ./fireplace-server -FIREPLACE_SERVER_HOST=127.0.0.1:8080
 ```
+
+### Environment File
+In the root of this repository is a sample environment file named **env.template**. In it you will find a sample configuration for all the variables listed above.
 
 ## Capturing Logs in a Go Application
 To capture logs in your Go applications using Logurs and Fireplace, ensure you are importing
@@ -39,7 +43,7 @@ Logrus and the Fireplace hook. Here is a small sample of logging to Fireplace Se
 package main
 
 import (
-    fireplacehook "github.com/app-nerds/fireplace/cmd/fireplace-hook"
+    "github.com/app-nerds/fireplace/v2/cmd/fireplace-hook"
     "github.com/sirupsen/logrus"
 )
 
@@ -48,6 +52,7 @@ func main() {
     logger.AddHook(fireplacehook.NewFireplaceHook(&fireplacehook.FireplaceHookConfig{
         Application: "Sample Application",
         FireplaceURL: "http://localhost:8999"
+			Password: "password",
     }))
 
     logger.WithField("someKey", "someValue").Infof("This is a log entry!")
@@ -56,9 +61,14 @@ func main() {
 
 ## Fireplace Server API
 
+The following documents the API for working with a Fireplace Server. Note that all endpoints request an *Authorization* header with the server password provided. For example:
+
+```text
+Authorization: Bearer password
+```
+
 ### Capturing A Log Entry
-This is the main function of Fireplace Server. Application call this endpoint
-to capture log entries into the database.
+This is the main function of Fireplace Server. Application call this endpoint to capture log entries into the database.
 
 #### POST: /logentry
 
@@ -95,8 +105,7 @@ to provide arbitrary key/value pairs of additional data.
 * panic
 
 #### Response
-Upon successful capture a *200* status code and the new log entry
-**ID** will be returned.
+Upon successful capture a *200* status code and the new log entry **ID** will be returned.
 
 ### Getting Captured Log Entries
 
@@ -109,8 +118,7 @@ Upon successful capture a *200* status code and the new log entry
 * **search** - Filter results by a search term. This will apply against the log message. *Optional*
 
 #### Response
-Upon return the payload will return a structure which contains the total count of records, the number of records in this
-response, the size of a page, and the collection of matching log entries. Here is a sample.
+Upon return the payload will return a structure which contains the total count of records, the number of records in this response, the size of a page, and the collection of matching log entries. Here is a sample.
 
 ```json
 {
@@ -197,9 +205,7 @@ Upon return the payload will return a structure which contains the specified log
 A message detailing how many log entries were deleted. For example ```10 entries deleted```
 
 ### Getting Application Names
-Retrieve a list of application names captured in log entries. When an application
-writes a log entry to Fireplace Server it provides an application name. This
-endpoint returns a list of those names.
+Retrieve a list of application names captured in log entries. When an application writes a log entry to Fireplace Server it provides an application name. This endpoint returns a list of those names.
 
 #### GET: /applicationname
 
@@ -216,7 +222,7 @@ An array of application names.
 ## License
 MIT License
 
-Copyright (c) 2020 App Nerds LLC
+Copyright (c) 2021 App Nerds LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
