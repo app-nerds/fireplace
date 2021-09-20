@@ -26,6 +26,7 @@ about either the server or viewer, check out their respective READMEs.
 * [Fireplace Server README](./cmd/fireplace-server/README.md)
 * [Fireplace Viewer README](./cmd/fireplace-viewer/README.md)
 * [Fireplace Logrus Hook](./cmd/fireplace-hook/README.md)
+* [CSharp Library](./cmd/sharpfireplace/README.md)
 
 ### Build and Run from Docker Registry
 
