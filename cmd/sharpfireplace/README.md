@@ -40,7 +40,7 @@ There are 7 log levels.
 
 ## Logging Methods
 
-There are two logging methods for each log level. The first simply logs a message, and the second logs a formatted message with arguments, similar to how `String.Format()` works.Console.Writebb. Here are some examples.
+There are two logging methods for each log level. The first simply logs a message, and the second logs a formatted message with arguments, similar to how `String.Format()` works. Here are some examples.
 
 ```csharp
 logger.Trace("This is a trace");
