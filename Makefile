@@ -111,5 +111,6 @@ build-docker: ## Builds the application into a docker image
 	docker-compose build
 
 docker-tag: ## Builds a docker image and tags a release. It is then pushed up to Docker. GITHUB_TOKEN must be defined as an environment variable. Usage: make USERNAME="username" docker-tag
-	docker login -u ${USERNAME} && docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --tag appnerds/fireplace:${VERSION} . && docker push appnerds/fireplace:${VERSION}
+	docker login -u ${USERNAME} && docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} -f ./cmd/fireplace-server/Dockerfile --tag appnerds/fireplace:${VERSION} . && docker push appnerds/fireplace:${VERSION}
+	docker login -u ${USERNAME} && docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} -f ./cmd/fireplace-viewer/Dockerfile --tag appnerds/fireplace-viewer:${VERSION} . && docker push appnerds/fireplace-viewer:${VERSION}
 
