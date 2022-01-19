@@ -2,6 +2,7 @@ package fireplacehook
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -37,7 +38,14 @@ to a Fireplace Server.
 */
 func NewFireplaceHook(config *FireplaceHookConfig) *FireplaceHook {
 	return &FireplaceHook{
-		client: &http.Client{Timeout: time.Second * 2},
+		client: &http.Client{
+			Timeout: time.Second * 2,
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			},
+		},
 		config: config,
 	}
 }
