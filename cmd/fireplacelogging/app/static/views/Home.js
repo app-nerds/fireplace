@@ -23,11 +23,11 @@ export default class Home extends BaseView {
         <img src="/static/images/screen.webp" alt="Picture of an administrative dashboard" />
       </section>
 
-      <section class="about">
+      <section class="about" id="about">
         <div>
           <h2>Simple Logging</h2>
 
-          <article>
+          <article class="fade-scroll-in">
             <h3>00. Easy to Use</h3>
             <p>
               Fireplace is designed to do one thing: capture logs. It does this through
@@ -36,7 +36,7 @@ export default class Home extends BaseView {
             </p>
           </article>
 
-          <article>
+          <article class="fade-scroll-in">
             <h3>01. Structured</h3>
             <p>
               Logs are sent to Fireplace using JSON. It's simple. There are four
@@ -64,7 +64,7 @@ export default class Home extends BaseView {
             </code>
           </article>
 
-          <article>
+          <article class="fade-scroll-in">
             <h3>02. Searchable</h3>
             <p>
               Fireplace offers REST endpoints to search for log entries by application
@@ -78,23 +78,47 @@ export default class Home extends BaseView {
         </aside>
       </section>
 
-      <section class="call-to-action">
-        <h2>Get Fireplace</h2>
+      <section class="call-to-action" id="getfireplace">
+        <h2 class="fade-in">Get Fireplace</h2>
 
-        <p>
+        <p class="fade-in">
           Fireplace Server is written in Go, making it easy to compile and install on your
           platform of choice, be it AWS, Azure, GCP, or even a virtual private server.
           The easiest way to get started is to click on the button below, clone the code,
           and run <span class="run-code">docker compose up</span>!
         </p>
 
-        <button id="getFireplace">Get Fireplace</button>
+        <button id="getFireplace" class="fade-in">Get Fireplace</button>
       </section>
     `;
   }
 
   async afterRender() {
-    // Do any initialization, event binding, etc... here
+    const fadeScrollInElements = document.getElementsByClassName("fade-scroll-in");
+    const fadeInElements = document.getElementsByClassName("fade-in");
+
+    document.addEventListener("wheel", () => {
+      for (let el of fadeScrollInElements) {
+        if (this.#isInViewport(el)) {
+          el.classList.add("is-visible");
+        }
+      }
+
+      for (let el of fadeInElements) {
+        if (this.#isInViewport(el)) {
+          el.classList.add("is-visible");
+        }
+      }
+    }, { capture: false, passive: true });
+  }
+
+  #isInViewport(el) {
+    const rect = el.getBoundingClientRect();
+
+    return (
+      rect.top >= 0 &&
+      rect.top <= (window.innerHeight || document.documentElement.clientHeight)
+    );
   }
 }
 

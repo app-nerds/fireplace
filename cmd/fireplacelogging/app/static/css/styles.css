@@ -241,3 +241,32 @@ footer section {
 footer section a {
   color: var(--link-color-2);
 }
+
+/*
+ * Utility
+ */
+.fade-scroll-in {
+  opacity: 0;
+  transform: translateY(20vh);
+  visibility: hidden;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  will-change: opacity, visibility;
+}
+
+.fade-scroll-in.is-visible {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+.fade-in {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease-out;
+  will-change: opacity;
+}
+
+.fade-in.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
