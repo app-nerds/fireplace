@@ -1,0 +1,243 @@
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+:root {
+  /* Colors */
+  --primary-color: #3A50FD;
+  --link-color-1: #000e;
+  --link-color-2: #71FFFF;
+  --text-color: rgba(0, 0, 0, 0.8);
+  --section-gradient: radial-gradient(circle at 47.74248758951823% 27.788899739583332%, #3C53F4 0%, 38.76%, rgba(60,83,244,0) 68%), radial-gradient(circle at 94.35384114583333% 89.61588541666666%, #3C53F4 0%, 13.200000000000001%, rgba(60,83,244,0) 40%), radial-gradient(circle at 6.503906249999999% 88.037109375%, rgba(60,83,244,0.99) 0%, 25%, rgba(60,83,244,0) 50%), radial-gradient(circle at 6.165364583333333% 12.617187499999998%, #8CCFDD 0%, 42%, rgba(140,207,221,0) 70%), radial-gradient(circle at 93.90768686930339% 11.448923746744793%, #3C53F4 0%, 42%, rgba(60,83,244,0) 70%), radial-gradient(circle at 48.9013671875% 49.521484375%, #FFFFFF 0%, 100%, rgba(255,255,255,0) 100%);
+
+  /*
+   * Header
+   */
+  --header-height: 5rem;
+
+  /*
+   * Tables
+   */
+  --table-border: #EEEEEE;
+	--table-header-background-color: #394263;
+	--table-header-color: #fff;
+
+  /* Elements */
+  --sidebar-width: 240px;
+}
+
+/* Resets */
+html,body,div,p,
+h1,h2,h3,h4,h5,h6,
+ul,ol,li,
+dl,dt,dd,
+form,fieldset,caption,
+table,tr,td,th,
+address,blockquote,img {
+  margin:0;
+  padding:0;
+}
+img, fieldset {
+  border:none;
+}
+*, *:after, *:before {
+  box-sizing:border-box;
+}
+
+/*
+ * Base
+ */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+header {
+  height: var(--header-height);
+  background-color: #fff;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+header div.header-left {
+  align-items: center;
+  display: flex;
+  height: var(--header-height);
+  margin-left: 1rem;
+}
+
+header div.header-left img, header div.header-left h1 {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 300;
+}
+
+header div.header-left img {
+  margin-right: 0.5rem;
+}
+
+header div.header-right {
+  margin-left: auto;
+  align-items: center;
+  height: var(--header-height);
+  margin-right: 1.5rem;
+}
+
+header div.header-right nav {
+  display: inline-flex;
+  align-items: center;
+  height: var(--header-height);
+}
+
+header div.header-right nav ul {
+  list-style: none;
+}
+
+header div.header-right nav ul li {
+  display: inline-flex;
+  margin-left: 1rem;
+}
+
+header div.header-right nav ul li a {
+  color: var(--link-color-1);
+}
+
+#app {
+  width: 100%;
+  padding: 0;
+}
+
+.hero-banner {
+  background: url("/static/images/hero-banner-background.webp"), var(--section-gradient);
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.hero-banner div.description {
+  display: flex;
+  flex-direction: row;
+  padding: 5rem 10rem;
+  gap: 3rem 1rem;
+}
+
+.hero-banner div.description h2 {
+  font-size: 52pt;
+  width: 160%;
+}
+
+.hero-banner div.description p {
+  font-size: 12pt;
+  line-height: 2rem;
+}
+
+.hero-banner img {
+  margin: 1rem 10rem;
+  border: 30px solid #fff;
+  border-radius: 50px;
+}
+
+.about {
+  background-color: #fff;
+  color: var(--text-color);
+  padding: 5rem 10rem;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem 20rem;
+  align-items: center;
+}
+
+.about div h2 {
+  color: var(--primary-color);
+  font-size: 40pt;
+  opacity: 0.9;
+  margin-bottom: 5rem;
+}
+
+.about div article h3 {
+  font-size: 24pt;
+  margin-bottom: 1.6rem;
+  margin-top: 3rem;
+}
+
+.about div article p {
+  font-weight: 300;
+  line-height: 1.8rem;
+}
+
+.about div article code {
+  font-size: 12pt;
+  font-family: monospace;
+  margin: 1rem 0;
+  display: block;
+}
+
+.about aside img {
+  border: 1px solid var(--primary-color);
+  border-radius: 60px;
+  padding: 1rem;
+}
+
+.call-to-action {
+  background: url("/static/images/call-to-action-background.webp"), var(--section-gradient);
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  padding: 5rem 20rem;
+  align-items: center;
+}
+
+.call-to-action h2 {
+  font-size: 42pt;
+  margin-bottom: 4rem;
+}
+
+.call-to-action p {
+  padding: 0 5rem;
+  line-height: 1.6rem;
+  margin-bottom: 3rem;
+}
+
+.call-to-action button {
+  border: 1px solid #fff;
+  padding: 1rem 2rem;
+  background: transparent;
+  border-radius: 60px;
+  color: #fff;
+  font-size: 12pt;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.call-to-action button:hover {
+  background-color: #fff;
+  color: var(--primary-color);
+}
+
+footer {
+  width: 100%;
+  background-color: var(--primary-color);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2rem 5rem;
+  margin-top: 5rem;
+  color: #fffe;
+  opacity: 0.9;
+  line-height: 1.5rem;
+}
+
+footer section {
+  flex-grow: 1;
+  display: inline-flex;
+  justify-content: center;
+}
+
+footer section a {
+  color: var(--link-color-2);
+}

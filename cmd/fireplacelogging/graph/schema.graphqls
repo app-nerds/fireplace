@@ -1,0 +1,12 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Version {
+  version: String!
+}
+
+type Query {
+  getVersion: Version!
+}
+
