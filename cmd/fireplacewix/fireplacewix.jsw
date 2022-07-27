@@ -1,0 +1,46 @@
+import wixFetch from "wix-fetch";
+import wixSecretsBackend from "wix-secrets-backend";
+
+export async function WriteLog(application, level, message, details = []) {
+    // TODO: move these to secrets
+    // let baseURL = await wixSecretsBackend.getSecret("FIREPLACE_URL");
+    // let serverPassword = await wixSecretsBackend.getSecret("FIREPLACE_SERVER_PASSWORD");
+    let baseURL = "https://fireplace.appnerds.net";
+    let serverPassword = "NuQCJ$dmG$?s2@tZRc3u";
+
+    let lowerLevel = level.toLowerCase();
+
+    if (!_isValidLevel(lowerLevel)) {
+        throw new Error(`invalid log level ${lowerLevel}`);
+    }
+
+    let payload = {
+        "application": application,
+        "level": lowerLevel,
+        "message": message,
+        "time": new Date().toISOString(),
+        "details": details
+    };
+
+    let options = {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${serverPassword}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    };
+
+    let response = await wixFetch.fetch(`${baseURL}/logentry`, options);
+    let body = await response.text();
+
+    if (!response.ok) {
+        throw new Error(body);
+    }
+
+    return JSON.parse(body);
+}
+
+function _isValidLevel(level) {
+    return ["debug", "warning", "info", "error", "fatal", "panic"].includes(level.toLowerCase());
+}
