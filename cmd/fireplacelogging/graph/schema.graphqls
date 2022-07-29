@@ -22,6 +22,7 @@ type Version {
 }
 
 type Query {
+  getServer(id: Int!): Server!
   getServers: [Server!]!
   getVersion: Version!
 }
@@ -33,6 +34,16 @@ input CreateServer {
   url: String!
 }
 
+input UpdateServer {
+  id: Int!
+  description: String!
+  password: String!
+  serverName: String!
+  url: String!
+}
+
 type Mutation {
     createServer(input: CreateServer!): Server!
+    deleteServer(id: Int!): Server!
+    updateServer(input: UpdateServer!): Server!
 }

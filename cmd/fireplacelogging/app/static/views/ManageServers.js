@@ -20,7 +20,8 @@ export default class ManageServers extends BaseView {
 
   async afterRender() {
     await this.#loadAndRender();
-    feather.replace();
+
+    document.getElementById("btnAddNewServer").addEventListener("click", this.#onAddNewServerClick.bind(this));
   }
 
   async #getServers() {
@@ -42,7 +43,28 @@ export default class ManageServers extends BaseView {
 
   async #loadAndRender() {
     const servers = await this.#getServers();
+    document.getElementById("servers").innerHTML = "";
     this.#renderServerCards(servers);
+
+    feather.replace();
+  }
+
+  #onAddNewServerClick() {
+    this.navigateTo("/edit-server/0");
+  }
+
+  async #onDeleteServerClick(id) {
+    try {
+      let query = `deleteServer(id: ${id}) {
+        id
+      }`;
+
+      await this.params.graphql.mutation(query);
+      this.params.nerdalert.success("Server deleted");
+    } catch (e) {
+      console.log(e);
+      this.nerdalert.error(e.message);
+    }
   }
 
   #renderServerCards(servers) {
@@ -73,10 +95,17 @@ export default class ManageServers extends BaseView {
     const editButton = document.createElement("button");
     editButton.classList.add("action-button");
     editButton.innerHTML = `<i data-feather="edit-2"></i> Edit`;
+    editButton.addEventListener("click", () => {
+      this.navigateTo(`/edit-server/${server.id}`);
+    });
 
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
     deleteButton.innerHTML = `<i data-feather="trash-2"></i>`;
+    deleteButton.addEventListener("click", async () => {
+      await this.#onDeleteServerClick(server.id);
+      this.#loadAndRender();
+    });
 
     content.insertAdjacentElement("beforeend", link);
     content.insertAdjacentElement("beforeend", description);

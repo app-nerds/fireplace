@@ -39,6 +39,62 @@ func (r *mutationResolver) CreateServer(ctx context.Context, input model.CreateS
 	return newServer, nil
 }
 
+// DeleteServer is the resolver for the deleteServer field.
+func (r *mutationResolver) DeleteServer(ctx context.Context, id int) (*model1.Server, error) {
+	var (
+		queryResult *gorm.DB
+	)
+
+	existingServer := &model1.Server{}
+	existingServer.ID = uint(id)
+
+	queryResult = r.DB.Find(&existingServer)
+
+	if queryResult.Error != nil {
+		return existingServer, queryResult.Error
+	}
+
+	queryResult = r.DB.Delete(&existingServer)
+	return existingServer, queryResult.Error
+}
+
+// UpdateServer is the resolver for the updateServer field.
+func (r *mutationResolver) UpdateServer(ctx context.Context, input model.UpdateServer) (*model1.Server, error) {
+	var (
+		queryResult *gorm.DB
+	)
+
+	existingServer := &model1.Server{}
+	existingServer.ID = uint(input.ID)
+
+	queryResult = r.DB.Find(&existingServer)
+
+	if queryResult.Error != nil {
+		return existingServer, queryResult.Error
+	}
+
+	existingServer.Description = input.Description
+	existingServer.Password = input.Password
+	existingServer.ServerName = input.ServerName
+	existingServer.URL = input.URL
+
+	queryResult = r.DB.Save(&existingServer)
+	return existingServer, queryResult.Error
+}
+
+// GetServer is the resolver for the getServer field.
+func (r *queryResolver) GetServer(ctx context.Context, id int) (*model1.Server, error) {
+	var (
+		queryResult *gorm.DB
+	)
+
+	result := &model1.Server{}
+	result.ID = uint(id)
+
+	queryResult = r.DB.Find(&result)
+	return result, queryResult.Error
+}
+
 // GetServers is the resolver for the getServers field.
 func (r *queryResolver) GetServers(ctx context.Context) ([]*model1.Server, error) {
 	var (

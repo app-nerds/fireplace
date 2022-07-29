@@ -1,5 +1,5 @@
 import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
-import { fadeAndScrollInElements } from "../js/services/UIService.js";
+// import { fadeAndScrollInElements } from "../js/services/UIService.js";
 
 export default class Home extends BaseView {
   constructor(params) {
