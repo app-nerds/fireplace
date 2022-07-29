@@ -4,6 +4,7 @@
 :root {
   /* Colors */
   --primary-color: #3A50FD;
+  --secondary-color: #3C53F4;
   --link-color-1: #000e;
   --link-color-2: #71FFFF;
   --text-color: rgba(0, 0, 0, 0.8);
@@ -242,6 +243,62 @@ footer section a {
   color: var(--link-color-2);
 }
 
+.container h2 {
+  font-size: 40pt;
+  margin: 3rem 5rem 1rem 5rem;
+}
+
+.container .action-button {
+  padding: 0.5rem;
+  border: 1px solid var(--primary-color);
+  background-color: var(--secondary-color);
+  margin-left: 5rem;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+.container .action-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.container section.filters {
+  background-color: #eee;
+  padding: 2rem 5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.88rem 2rem;
+  flex-wrap: wrap;
+}
+
+.container section.filters div {
+  display: flex;
+  flex-direction: column;
+}
+
+.container section.filters div select,
+.container section.filters div input {
+  width: 12rem;
+  padding: 0.4rem;
+}
+
+.container section.filters button {
+  width: 9rem;
+  padding: 0.4rem;
+  background-color: #fff;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  cursor: pointer;
+}
+
+.container section.filters button svg {
+  width: 18px;
+  height: 18px;
+}
+
 /*
  * Utility
  */
@@ -269,4 +326,9 @@ footer section a {
 .fade-in.is-visible {
   opacity: 1;
   visibility: visible;
+}
+
+.break {
+  flex-basis: 100%;
+  height: 0;
 }
