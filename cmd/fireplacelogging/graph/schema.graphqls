@@ -2,11 +2,37 @@
 #
 # https://gqlgen.com/getting-started/
 
+type Member {
+  id: Int!
+  firstName: String!
+  lastName: String!
+  email: String!
+}
+
+type Server {
+  id: Int!
+  description: String!
+  password: String!
+  serverName: String!
+  url: String!
+}
+
 type Version {
   version: String!
 }
 
 type Query {
+  getServers: [Server!]!
   getVersion: Version!
 }
 
+input CreateServer {
+  description: String!
+  password: String!
+  serverName: String!
+  url: String!
+}
+
+type Mutation {
+    createServer(input: CreateServer!): Server!
+}

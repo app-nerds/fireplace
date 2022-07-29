@@ -17,6 +17,7 @@ import (
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/graph/generated"
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/configuration"
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/handlers"
+	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/model"
 	"github.com/app-nerds/nerdweb/v2"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -77,6 +78,8 @@ func main() {
 		DB:     db,
 		Config: config,
 	}}))
+
+	_ = db.AutoMigrate(&model.Server{}, &model.Member{})
 
 	spaConfig.Endpoints = nerdweb.Endpoints{
 		{Path: "/version", Methods: []string{http.MethodGet}, HandlerFunc: handlers.VersionHandler(config, logger)},

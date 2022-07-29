@@ -2,6 +2,13 @@
 
 package model
 
+type CreateServer struct {
+	Description string `json:"description"`
+	Password    string `json:"password"`
+	ServerName  string `json:"serverName"`
+	URL         string `json:"url"`
+}
+
 type Version struct {
 	Version string `json:"version"`
 }
