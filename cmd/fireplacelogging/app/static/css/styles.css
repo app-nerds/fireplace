@@ -8,6 +8,7 @@
   --link-color-1: #000e;
   --link-color-2: #71FFFF;
   --text-color: rgba(0, 0, 0, 0.8);
+  --border-color: #eee;
   --section-gradient: radial-gradient(circle at 47.74248758951823% 27.788899739583332%, #3C53F4 0%, 38.76%, rgba(60,83,244,0) 68%), radial-gradient(circle at 94.35384114583333% 89.61588541666666%, #3C53F4 0%, 13.200000000000001%, rgba(60,83,244,0) 40%), radial-gradient(circle at 6.503906249999999% 88.037109375%, rgba(60,83,244,0.99) 0%, 25%, rgba(60,83,244,0) 50%), radial-gradient(circle at 6.165364583333333% 12.617187499999998%, #8CCFDD 0%, 42%, rgba(140,207,221,0) 70%), radial-gradient(circle at 93.90768686930339% 11.448923746744793%, #3C53F4 0%, 42%, rgba(60,83,244,0) 70%), radial-gradient(circle at 48.9013671875% 49.521484375%, #FFFFFF 0%, 100%, rgba(255,255,255,0) 100%);
 
   /*
@@ -295,6 +296,84 @@ footer section a {
 }
 
 .container section.filters button svg {
+  width: 18px;
+  height: 18px;
+}
+
+#servers {
+  margin: 2rem 5rem;
+  display: flex;
+  flex-direction: row;
+}
+
+/*
+ * Card
+ */
+div.card {
+  display: inline-flex;
+  flex-direction: column;
+  width: 30rem;
+  margin-bottom: 1rem;
+  -webkit-column-break-inside: avoid;
+  margin-right: 2rem;
+}
+
+div.card h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  color: #008;
+  font-size: 20px;
+  letter-spacing: 1.2px;
+  padding: 0 0.2rem 0.1rem 0.5rem;
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+}
+
+div.card div.content {
+  background-color: #f0f0f0;
+  width: 100%;
+  padding: 0.5rem;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+div.card div.content p {
+  margin-bottom: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+div.card .action-button {
+  padding: 0.5rem;
+  border: 1px solid var(--primary-color);
+  background-color: var(--secondary-color);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+div.card .action-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+div.card .delete-button {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  background-color: #fff;
+  color: #000;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  margin-left: 0.6rem;
+}
+
+div.card .delete-button svg {
   width: 18px;
   height: 18px;
 }
