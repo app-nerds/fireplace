@@ -1,4 +1,5 @@
 import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
+import ServerSelector from "../js/components/ServerSelector.js";
 
 export default class ViewLogs extends BaseView {
   constructor(params) {
@@ -15,7 +16,7 @@ export default class ViewLogs extends BaseView {
         <section class="filters">
           <div>
             <label for="server">Server</label>
-            <select id="server" placeholder="Select a server to view logs"></select>
+            <server-selector id="serverID" server-id="0"></server-selector>
           </div>
 
           <div>
@@ -51,9 +52,26 @@ export default class ViewLogs extends BaseView {
   }
 
   async afterRender() {
+    this.params.nerdspinner.show();
+    const serverIDEl = document.getElementById("serverID");
+
+    serverIDEl.graphql = this.params.graphql;
+    serverIDEl.addEventListener("server-selected", this.#onServerSelected.bind(this));
+
     feather.replace();
+    this.params.nerdspinner.hide();
   }
 
+  #onServerSelected(e) {
+    const serverID = e.detail;
+    console.log(serverID);
+
+    this.params.nerdspinner.show();
+
+    setTimeout(() => {
+      this.params.nerdspinner.hide();
+    }, 2000);
+  }
 }
 
 customElements.define("view-logs-page", ViewLogs);

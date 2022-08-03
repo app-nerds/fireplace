@@ -26,6 +26,7 @@ app.injectParams(() => {
     nerdalert: nerdadmin.nerdalert(),
     nerdconfirm: nerdadmin.nerdconfirm(),
     nerdshim: nerdadmin.nerdshim(),
+    nerdspinner: nerdadmin.nerdspinner(),
   };
 });
 
