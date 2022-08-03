@@ -667,3 +667,9 @@ form input:focus, form textarea:focus, form select:focus {
 	z-index: 99;
 }
 
+/*
+ * suneditor
+ */
+.sun-editor {
+  margin-bottom: 0.5rem;
+}

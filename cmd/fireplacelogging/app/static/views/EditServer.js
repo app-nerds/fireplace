@@ -44,6 +44,8 @@ export default class EditServer extends BaseView {
       document.getElementById("description").value = server.description;
     }
 
+    SUNEDITOR.create("description");
+
     document.getElementById("btnCancel").addEventListener("click", this.#onCancelButtonClick.bind(this));
     document.getElementById("btnSave").addEventListener("click", this.#onSaveButtonClick.bind(this));
     document.getElementById("serverName").focus();
