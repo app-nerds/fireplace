@@ -55,15 +55,19 @@ export default class ManageServers extends BaseView {
 
   async #onDeleteServerClick(id) {
     try {
-      let query = `deleteServer(id: ${id}) {
-        id
-      }`;
+      const deleteConfirmation = await this.params.nerdconfirm.yesNo(`Are you sure you wish to delete this server?`);
 
-      await this.params.graphql.mutation(query);
-      this.params.nerdalert.success("Server deleted");
+      if (deleteConfirmation) {
+        let query = `deleteServer(id: ${id}) {
+          id
+        }`;
+
+        await this.params.graphql.mutation(query);
+        this.params.nerdalert.success("Server deleted");
+      }
     } catch (e) {
       console.log(e);
-      this.nerdalert.error(e.message);
+      this.params.nerdalert.error(e.message);
     }
   }
 
