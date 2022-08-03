@@ -5,6 +5,7 @@
   /* Colors */
   --primary-color: #3A50FD;
   --secondary-color: #3C53F4;
+  --third-color: #F9FAFC;
   --link-color-1: #000e;
   --link-color-2: #71FFFF;
   --text-color: rgba(0, 0, 0, 0.8);
@@ -615,6 +616,42 @@ form input:focus, form textarea:focus, form select:focus {
 
 .nerdconfirm-container .button-container button {
   height: 2.6rem;
+}
+
+.nerdconfirm-container .action-button {
+  color: #fff;
+  background-color: var(--primary-color);
+  font-size: 1rem;
+  padding: 0.7rem 0.8rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  align-items: center;
+  display: inline-flex;
+  height: 3rem;
+}
+
+.nerdconfirm-container .action-button svg {
+  margin-right: 0.3rem;
+}
+
+.nerdconfirm-container .cancel-button {
+  color: var(--text-color);
+  background-color: var(--third-color);
+  font-size: 1rem;
+  padding: 0.7rem 0.8rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  align-items: center;
+  display: inline-flex;
+  height: 3rem;
+}
+
+.nerdconfirm-container .cancel-button svg {
+  margin-right: 0.3rem;
 }
 
 /*
