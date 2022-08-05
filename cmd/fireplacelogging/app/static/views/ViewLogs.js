@@ -1,7 +1,11 @@
 import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
 import ServerSelector from "../js/components/ServerSelector.js";
+import ApplicationSelector from "../js/components/ApplicationSelector.js";
 
 export default class ViewLogs extends BaseView {
+  #serverIDEl;
+  #applicationEl;
+
   constructor(params) {
     super(params);
   }
@@ -21,7 +25,7 @@ export default class ViewLogs extends BaseView {
 
           <div>
             <label for="application">Application</label>
-            <select id="application" disabled></select>
+            <application-selector id="application" disabled></application-selector>
           </div>
 
           <div>
@@ -53,24 +57,28 @@ export default class ViewLogs extends BaseView {
 
   async afterRender() {
     this.params.nerdspinner.show();
-    const serverIDEl = document.getElementById("serverID");
+    this.#serverIDEl = document.getElementById("serverID");
+    this.#applicationEl = document.getElementById("application");
 
-    serverIDEl.graphql = this.params.graphql;
-    serverIDEl.addEventListener("server-selected", this.#onServerSelected.bind(this));
+    this.#serverIDEl.graphql = this.params.graphql;
+    this.#serverIDEl.addEventListener("server-selected", this.#onServerSelected.bind(this));
+
+    this.#applicationEl.graphql = this.params.graphql;
+    this.#applicationEl.addEventListener("finished-loading", this.#onApplicationSelectorFinishedLoading.bind(this));
 
     feather.replace();
     this.params.nerdspinner.hide();
   }
 
   #onServerSelected(e) {
-    const serverID = e.detail;
-    console.log(serverID);
-
     this.params.nerdspinner.show();
+    const serverID = e.detail;
+    this.#applicationEl.serverID = serverID;
+  }
 
-    setTimeout(() => {
-      this.params.nerdspinner.hide();
-    }, 2000);
+  #onApplicationSelectorFinishedLoading(e) {
+    console.log(e.detail);
+    this.params.nerdspinner.hide();
   }
 }
 

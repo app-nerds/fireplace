@@ -55,31 +55,28 @@ export default class ApplicationSelector extends HTMLElement {
   }
 
   async #getApplications() {
-    // TODO: add server side code to get applications for a server
-    let query = `getServers() {
-      id
-      serverName
-    }`;
+    let query = `getApplicationNames(serverID: ${this._serverID})`;
 
     const response = await this._graphql.query(query);
-    return response.data.getServers;
+    return response.data.getApplicationNames;
   }
 
   async #loadAndRender() {
-    const servers = await this.#getServers();
-    this.#render(servers);
+    const applications = await this.#getApplications();
+    this.#render(applications);
+
+    this.dispatchEvent(new CustomEvent("finished-loading", { detail: applications }));
   }
 
-  #render(servers) {
+  #render(applications) {
     this._selectEl.options.length = 0;
-    this._selectEl.options.add(new Option("Select a server...", "0", 0 === parseInt(this._selectedServerID), 0 === parseInt(this._selectedServerID)));
+    this._selectEl.options.add(new Option("Select an application...", "0", "" === parseInt(this._application), "" === parseInt(this._application)));
 
-    servers.forEach(s => {
-      let selected = s.id === parseInt(this._selectedServerID);
-      this._selectEl.options.add(new Option(s.serverName, s.id, selected, selected));
+    applications.forEach(a => {
+      let selected = a === this._application;
+      this._selectEl.options.add(new Option(a, a, selected, selected));
     });
   }
 }
 
-customElements.define("server-selector", ServerSelector);
-
+customElements.define("application-selector", ApplicationSelector);
