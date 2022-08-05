@@ -8,6 +8,8 @@ import (
 
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/graph/generated"
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/graph/model"
+	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/applications"
+	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/fireplaceclient"
 	model1 "github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/model"
 	"gorm.io/gorm"
 )
@@ -80,6 +82,18 @@ func (r *mutationResolver) UpdateServer(ctx context.Context, input model.UpdateS
 
 	queryResult = r.DB.Save(&existingServer)
 	return existingServer, queryResult.Error
+}
+
+// GetApplicationNames is the resolver for the getApplicationNames field.
+func (r *queryResolver) GetApplicationNames(ctx context.Context, serverID int) ([]string, error) {
+	restClient, err := fireplaceclient.GetClient(r.DB, serverID, r.Logger)
+
+	if err != nil {
+		return []string{}, err
+	}
+
+	result, err := applications.GetApplicationNames(restClient)
+	return result, err
 }
 
 // GetServer is the resolver for the getServer field.

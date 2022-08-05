@@ -22,6 +22,7 @@ type Version {
 }
 
 type Query {
+  getApplicationNames(serverID: Int!): [String!]!
   getServer(id: Int!): Server!
   getServers: [Server!]!
   getVersion: Version!
