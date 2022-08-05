@@ -77,6 +77,7 @@ func main() {
 	graphQLServer := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
 		DB:     db,
 		Config: config,
+		Logger: logger,
 	}}))
 
 	_ = db.AutoMigrate(&model.Server{}, &model.Member{})

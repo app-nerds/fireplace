@@ -2,6 +2,7 @@ package graph
 
 import (
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/configuration"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -12,4 +13,5 @@ import (
 type Resolver struct {
 	DB     *gorm.DB
 	Config *configuration.Config
+	Logger  *logrus.Entry
 }
