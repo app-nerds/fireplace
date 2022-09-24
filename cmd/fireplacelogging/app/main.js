@@ -21,12 +21,14 @@ app.onRenderComplete(() => {
 });
 
 app.injectParams(() => {
+  const nerdspinner = nerdadmin.nerdspinner();
+
   return {
-    graphql: new GraphQL("http://localhost:8080/query", fetch),
+    graphql: new GraphQL("http://localhost:8080/query", { spinner: nerdspinner }),
     nerdalert: nerdadmin.nerdalert(),
     nerdconfirm: nerdadmin.nerdconfirm(),
     nerdshim: nerdadmin.nerdshim(),
-    nerdspinner: nerdadmin.nerdspinner(),
+    nerdspinner: nerdspinner,
   };
 });
 

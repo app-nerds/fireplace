@@ -1,10 +1,13 @@
 import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
 import ServerSelector from "../js/components/ServerSelector.js";
 import ApplicationSelector from "../js/components/ApplicationSelector.js";
+import LogLevelSelector from "../js/components/LogLevelSelector.js";
 
 export default class ViewLogs extends BaseView {
   #serverIDEl;
   #applicationEl;
+  #logLevelEl;
+  #searchEl;
 
   constructor(params) {
     super(params);
@@ -25,18 +28,12 @@ export default class ViewLogs extends BaseView {
 
           <div>
             <label for="application">Application</label>
-            <application-selector id="application" disabled></application-selector>
+            <application-selector id="application" disabled="true"></application-selector>
           </div>
 
           <div>
             <label for="logLevel">Log Level</label>
-            <select id="logLevel" disabled>
-              <option value="">All</option>
-              <option value="debug">Debug</option>
-              <option value="info">Info</option>
-              <option value="error">Error</option>
-              <option value="fatal">Fatal</option>
-            </select>
+            <log-level-selector id="logLevel" disabled="true"></log-level-selector>
           </div>
 
           <div>
@@ -59,26 +56,39 @@ export default class ViewLogs extends BaseView {
     this.params.nerdspinner.show();
     this.#serverIDEl = document.getElementById("serverID");
     this.#applicationEl = document.getElementById("application");
+    this.#logLevelEl = document.getElementById("logLevel");
+    this.#searchEl = document.getElementById("search");
 
     this.#serverIDEl.graphql = this.params.graphql;
     this.#serverIDEl.addEventListener("server-selected", this.#onServerSelected.bind(this));
 
     this.#applicationEl.graphql = this.params.graphql;
     this.#applicationEl.addEventListener("finished-loading", this.#onApplicationSelectorFinishedLoading.bind(this));
+    this.#applicationEl.addEventListener("application-selected", this.#onApplicationSelected.bind(this));
+
+    document.getElementById("btnClear").addEventListener("click", this.#onClearClick.bind(this));
 
     feather.replace();
     this.params.nerdspinner.hide();
   }
 
   #onServerSelected(e) {
-    this.params.nerdspinner.show();
     const serverID = e.detail;
     this.#applicationEl.serverID = serverID;
   }
 
   #onApplicationSelectorFinishedLoading(e) {
-    console.log(e.detail);
-    this.params.nerdspinner.hide();
+    this.#applicationEl.setAttribute("disabled", "false");
+  }
+
+  #onApplicationSelected(e) {
+    this.#logLevelEl.removeAttribute("disabled");
+    this.#searchEl.removeAttribute("disabled");
+  }
+
+  #onClearClick() {
+    this.#logLevelEl.reset();
+    this.#searchEl.value = "";
   }
 }
 

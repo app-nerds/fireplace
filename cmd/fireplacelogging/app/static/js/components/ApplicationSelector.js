@@ -4,12 +4,18 @@ export default class ApplicationSelector extends HTMLElement {
 
     this._selectEl = null;
     this._graphql;
+    this._disabled = this.getAttribute("disabled") || "false";
     this._serverID = this.getAttribute("server-id") || "0";
     this._application = this.getAttribute("application-name") || "";
   }
 
   async connectedCallback() {
     this._selectEl = document.createElement("select");
+
+    if (this._disabled === "true") {
+      this._selectEl.setAttribute("disabled", true);
+    }
+
     this._selectEl.setAttribute("placeholder", "Select an application...");
     this._selectEl.addEventListener("change", (e) => {
       e.preventDefault();
@@ -52,6 +58,26 @@ export default class ApplicationSelector extends HTMLElement {
   set serverID(newServerID) {
     this._serverID = newServerID;
     this.#loadAndRender();
+  }
+
+  get disabled() {
+    return this._disabled;
+  }
+
+  static get observedAttributes() {
+    return ["disabled"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "disabled" && this._selectEl) {
+      if (newValue === "true") {
+        this._selectEl.setAttribute("disabled", true);
+      } else {
+        if (this._selectEl.hasAttribute("disabled")) {
+          this._selectEl.removeAttribute("disabled");
+        }
+      }
+    }
   }
 
   async #getApplications() {
