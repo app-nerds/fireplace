@@ -15,6 +15,7 @@ import (
 	"github.com/app-nerds/fireplace/v2/cmd/fireplace-server/internal"
 	"github.com/app-nerds/kit/v6/database"
 	"github.com/app-nerds/kit/v6/datetime"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
@@ -89,11 +90,16 @@ func main() {
 
 	router.Use(auth.Middleware)
 
-	router.HandleFunc("/logentry", logEntryController.CreateLogEntry).Methods(http.MethodPost)
-	router.HandleFunc("/logentry", logEntryController.GetLogEntries).Methods(http.MethodGet)
-	router.HandleFunc("/logentry/{id}", logEntryController.GetLogEntry).Methods(http.MethodGet)
-	router.HandleFunc("/logentry", logEntryController.DeleteLogEntries).Methods(http.MethodDelete)
-	router.HandleFunc("/applicationname", logEntryController.GetApplicationNames).Methods(http.MethodGet)
+	// CORS
+	headersOK := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "Host"})
+	originsOK := handlers.AllowedOrigins([]string{"*"})
+	methodsOK := handlers.AllowedMethods([]string{"OPTIONS", "POST", "GET", "DELETE"})
+
+	router.HandleFunc("/logentry", logEntryController.CreateLogEntry).Methods(http.MethodPost, http.MethodOptions)
+	router.HandleFunc("/logentry", logEntryController.GetLogEntries).Methods(http.MethodGet, http.MethodOptions)
+	router.HandleFunc("/logentry/{id}", logEntryController.GetLogEntry).Methods(http.MethodGet, http.MethodOptions)
+	router.HandleFunc("/logentry", logEntryController.DeleteLogEntries).Methods(http.MethodDelete, http.MethodOptions)
+	router.HandleFunc("/applicationname", logEntryController.GetApplicationNames).Methods(http.MethodGet, http.MethodOptions)
 
 	/*
 	 * Run the server
@@ -104,7 +110,7 @@ func main() {
 		logger.Info("Starting Fireplace Server...")
 
 		httpServer = &http.Server{
-			Handler:      router,
+			Handler:      handlers.CORS(headersOK, originsOK, methodsOK)(router),
 			Addr:         config.Host,
 			WriteTimeout: 30 * time.Second,
 			ReadTimeout:  30 * time.Second,
