@@ -306,6 +306,21 @@ footer section a {
   height: 18px;
 }
 
+.container section.navigation-buttons {
+  padding: 2rem 5rem;
+}
+
+.container section.navigation-buttons button {
+  padding: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: 1px solid var(--border-color);
+}
+
+.container section.navigation-buttons button:disabled {
+  opacity: 0.5;
+}
+
 #servers {
   margin: 2rem 5rem;
   display: flex;
@@ -468,6 +483,7 @@ section.results {
   gap: 1rem;
   background-color: var(--log-entry-background-color);
   padding: 1.5rem;
+  margin: 0.3rem 0 0.3rem 0;
 }
 
 .log-entry > img {
@@ -767,4 +783,46 @@ section.results {
   }
 }
 
+/* 
+ * Infinite loader animation 
+ */
+.loading{
+    width: 150px;
+    height: 70px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.ball{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: black;
+    margin: 0 10px;
+}
+
+.first{
+    animation: slide 2s  ease-in-out infinite ;
+    animation-delay: .1s;
+}
+
+.second{
+    animation: slide 2s ease-in-out infinite;
+    animation-delay: .5s;
+}
+
+.third{
+    animation: slide 2s ease-in-out infinite;
+    animation-delay: 1s;
+}
+
+@keyframes slide{
+    from{
+        transform: translateY(-30px);
+    }
+    to{
+        transform: translateY(0);
+    }
+}

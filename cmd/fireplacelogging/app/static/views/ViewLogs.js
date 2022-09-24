@@ -9,17 +9,23 @@ export default class ViewLogs extends BaseView {
   #applicationEl;
   #logLevelEl;
   #searchEl;
+  #prevButton;
+  #nextButton;
 
   #server;
   #application;
   #logLevel;
   #search;
+  #page;
+  #hasMorePages;
 
   constructor(params) {
     super(params);
 
     this.#logLevel = "";
     this.#search = "";
+    this.#page = 1;
+    this.#hasMorePages = false;
   }
 
   async render() {
@@ -57,6 +63,11 @@ export default class ViewLogs extends BaseView {
 
         <section class="results" id="results">
         </section>
+
+        <section class="navigation-buttons">
+          <button id="prev" disabled>Previous Page</button>
+          <button id="next" disabled>Next Page</button>
+        </section>
       </div>
     `;
   }
@@ -67,6 +78,8 @@ export default class ViewLogs extends BaseView {
     this.#applicationEl = document.getElementById("application");
     this.#logLevelEl = document.getElementById("logLevel");
     this.#searchEl = document.getElementById("search");
+    this.#prevButton = document.getElementById("prev");
+    this.#nextButton = document.getElementById("next");
 
     this.#serverIDEl.graphql = this.params.graphql;
     this.#serverIDEl.addEventListener("server-selected", this.#onServerSelected.bind(this));
@@ -79,6 +92,9 @@ export default class ViewLogs extends BaseView {
     this.#searchEl.addEventListener("keypress", debounce(this.#onSearchKeypress.bind(this)));
 
     document.getElementById("btnClear").addEventListener("click", this.#onClearClick.bind(this));
+
+    this.#prevButton.addEventListener("click", this.#onPreviousClick.bind(this));
+    this.#nextButton.addEventListener("click", this.#onNextClick.bind(this));
 
     feather.replace();
     this.params.nerdspinner.hide();
@@ -107,17 +123,17 @@ export default class ViewLogs extends BaseView {
     this.#logLevel = "";
     this.#search = "";
 
-    this.#getLogsAndRender(1);
+    this.#getLogsAndRender(1, true);
   }
 
   #onLogLevelSelected(e) {
     this.#logLevel = e.detail;
-    this.#getLogsAndRender(1);
+    this.#getLogsAndRender(1, true);
   }
 
   #onSearchKeypress() {
     this.#search = this.#searchEl.value;
-    this.#getLogsAndRender(1);
+    this.#getLogsAndRender(1, true);
   }
 
   #onClearClick() {
@@ -127,7 +143,25 @@ export default class ViewLogs extends BaseView {
     this.#logLevel = "";
     this.#search = "";
 
-    this.#getLogsAndRender(1);
+    this.#getLogsAndRender(1, true);
+  }
+
+  async #onPreviousClick() {
+    if (this.#page > 1) {
+      this.#page--;
+      await this.#getLogsAndRender(this.#page, true);
+
+      this.#scrollToTop();
+    }
+  }
+
+  async #onNextClick() {
+    if (this.#hasMorePages) {
+      this.#page++;
+      await this.#getLogsAndRender(this.#page, true);
+
+      this.#scrollToTop();
+    }
   }
 
   async #getServer(serverID) {
@@ -142,11 +176,13 @@ export default class ViewLogs extends BaseView {
     return response.data.getServer;
   }
 
-  async #getLogsAndRender(page) {
+  async #getLogsAndRender(page, clear) {
     const response = await this.#getLogs(page);
     const resultsEl = document.getElementById("results");
 
-    resultsEl.innerHTML = "";
+    if (clear) {
+      resultsEl.innerHTML = "";
+    }
 
     response.logEntries.forEach(logEntry => {
       const el = document.createElement("log-entry");
@@ -158,8 +194,23 @@ export default class ViewLogs extends BaseView {
       el.setAttribute("message", logEntry.message);
       el.setAttribute("time", logEntry.time);
       el.setAttribute("details", JSON.stringify(logEntry.details));
-
     });
+
+    if (this.#hasMorePages) {
+      if (this.#nextButton.hasAttribute("disabled")) {
+        this.#nextButton.removeAttribute("disabled");
+      }
+    } else {
+      this.#nextButton.setAttribute("disabled", "");
+    }
+
+    if (page > 1) {
+      if (this.#prevButton.hasAttribute("disabled")) {
+        this.#prevButton.removeAttribute("disabled");
+      }
+    } else {
+      this.#prevButton.setAttribute("disabled", "");
+    }
   }
 
   async #getLogs(page) {
@@ -176,7 +227,21 @@ export default class ViewLogs extends BaseView {
     const response = await fetcher(`${this.#server.url}/logentry?${params}`, options, this.params.nerdspinner);
     const result = await response.json();
 
+    this.#hasMorePages = (result.pageSize * this.#page) < result.totalCount;
     return result;
+  }
+
+  #scrollToTop() {
+    console.log(`setting scrool in timeout`);
+    setTimeout(() => {
+      console.log(`scrolling!`);
+      // window.scrollTo({
+      //   top: 0,
+      //   left: 0,
+      //   behavior: "smooth",
+      // });
+      window.scrollTo(0, 0);
+    }, 800);
   }
 }
 
