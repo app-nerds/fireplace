@@ -89,12 +89,14 @@ func main() {
 		httpClient = &http.Client{}
 	}
 
-	fireplaceClient = restclient.NewJSONClient(
-		config.FireplaceServerURL,
-		&restclient.HTTPClient{
-			Client: httpClient,
-		},
-	).WithAuthorization("Bearer " + config.FireplaceServerPassword)
+	fireplaceClientConfig := restclient.JSONClientConfig{
+		BaseURL:    config.FireplaceServerURL,
+		DebugMode:  false,
+		HTTPClient: httpClient,
+		Logger:     logger,
+	}
+
+	fireplaceClient = restclient.NewJSONClient(fireplaceClientConfig).WithAuthorization("Bearer " + config.FireplaceServerPassword)
 
 	/*
 	 * Setup JWT Service
