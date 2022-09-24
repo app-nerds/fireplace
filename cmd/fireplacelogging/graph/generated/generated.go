@@ -331,6 +331,10 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
+###################################################
+# Types and queries
+###################################################
+
 type Member {
   id: Int!
   firstName: String!
@@ -356,6 +360,10 @@ type Query {
   getServers: [Server!]!
   getVersion: Version!
 }
+
+###################################################
+# Inputs and mutations 
+###################################################
 
 input CreateServer {
   description: String!
