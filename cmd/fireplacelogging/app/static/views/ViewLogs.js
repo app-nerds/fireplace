@@ -1,7 +1,8 @@
-import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
+import { BaseView, fetcher, debounce } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
 import ServerSelector from "../js/components/ServerSelector.js";
 import ApplicationSelector from "../js/components/ApplicationSelector.js";
 import LogLevelSelector from "../js/components/LogLevelSelector.js";
+import LogEntry from "../js/components/LogEntry.js";
 
 export default class ViewLogs extends BaseView {
   #serverIDEl;
@@ -9,8 +10,16 @@ export default class ViewLogs extends BaseView {
   #logLevelEl;
   #searchEl;
 
+  #server;
+  #application;
+  #logLevel;
+  #search;
+
   constructor(params) {
     super(params);
+
+    this.#logLevel = "";
+    this.#search = "";
   }
 
   async render() {
@@ -46,7 +55,7 @@ export default class ViewLogs extends BaseView {
           <button id="btnClear"><i data-feather="refresh-cw"></i> Clear</button>
         </section>
 
-        <section class="results">
+        <section class="results" id="results">
         </section>
       </div>
     `;
@@ -66,29 +75,108 @@ export default class ViewLogs extends BaseView {
     this.#applicationEl.addEventListener("finished-loading", this.#onApplicationSelectorFinishedLoading.bind(this));
     this.#applicationEl.addEventListener("application-selected", this.#onApplicationSelected.bind(this));
 
+    this.#logLevelEl.addEventListener("log-level-selected", this.#onLogLevelSelected.bind(this));
+    this.#searchEl.addEventListener("keypress", debounce(this.#onSearchKeypress.bind(this)));
+
     document.getElementById("btnClear").addEventListener("click", this.#onClearClick.bind(this));
 
     feather.replace();
     this.params.nerdspinner.hide();
   }
 
-  #onServerSelected(e) {
+  async #onServerSelected(e) {
     const serverID = e.detail;
+    this.#server = await this.#getServer(serverID);
+
     this.#applicationEl.serverID = serverID;
   }
 
-  #onApplicationSelectorFinishedLoading(e) {
+  #onApplicationSelectorFinishedLoading() {
     this.#applicationEl.setAttribute("disabled", "false");
   }
 
   #onApplicationSelected(e) {
+    this.#application = e.detail;
+
     this.#logLevelEl.removeAttribute("disabled");
     this.#searchEl.removeAttribute("disabled");
+
+    this.#logLevelEl.reset();
+    this.#searchEl.value = "";
+
+    this.#logLevel = "";
+    this.#search = "";
+
+    this.#getLogsAndRender(1);
+  }
+
+  #onLogLevelSelected(e) {
+    this.#logLevel = e.detail;
+    this.#getLogsAndRender(1);
+  }
+
+  #onSearchKeypress() {
+    this.#search = this.#searchEl.value;
+    this.#getLogsAndRender(1);
   }
 
   #onClearClick() {
     this.#logLevelEl.reset();
     this.#searchEl.value = "";
+
+    this.#logLevel = "";
+    this.#search = "";
+
+    this.#getLogsAndRender(1);
+  }
+
+  async #getServer(serverID) {
+    const query = `getServer(id: ${serverID}) {
+      id
+      url
+      password
+    }`;
+
+    const response = await this.params.graphql.query(query);
+
+    return response.data.getServer;
+  }
+
+  async #getLogsAndRender(page) {
+    const response = await this.#getLogs(page);
+    const resultsEl = document.getElementById("results");
+
+    resultsEl.innerHTML = "";
+
+    response.logEntries.forEach(logEntry => {
+      const el = document.createElement("log-entry");
+      resultsEl.insertAdjacentElement("beforeend", el);
+
+      el.setAttribute("logid", logEntry.id);
+      el.setAttribute("loglevel", logEntry.level);
+      el.setAttribute("application", logEntry.application);
+      el.setAttribute("message", logEntry.message);
+      el.setAttribute("time", logEntry.time);
+      el.setAttribute("details", JSON.stringify(logEntry.details));
+
+    });
+  }
+
+  async #getLogs(page) {
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.#server.password}`,
+      },
+    };
+
+    const params = `page=${page}&application=${encodeURIComponent(this.#application)}&search=${encodeURIComponent(this.#search)}&level=${this.#logLevel}`;
+
+    const response = await fetcher(`${this.#server.url}/logentry?${params}`, options, this.params.nerdspinner);
+    const result = await response.json();
+
+    return result;
   }
 }
 

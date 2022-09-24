@@ -11,6 +11,7 @@
   --text-color: rgba(0, 0, 0, 0.8);
   --border-color: #eee;
   --section-gradient: radial-gradient(circle at 47.74248758951823% 27.788899739583332%, #3C53F4 0%, 38.76%, rgba(60,83,244,0) 68%), radial-gradient(circle at 94.35384114583333% 89.61588541666666%, #3C53F4 0%, 13.200000000000001%, rgba(60,83,244,0) 40%), radial-gradient(circle at 6.503906249999999% 88.037109375%, rgba(60,83,244,0.99) 0%, 25%, rgba(60,83,244,0) 50%), radial-gradient(circle at 6.165364583333333% 12.617187499999998%, #8CCFDD 0%, 42%, rgba(140,207,221,0) 70%), radial-gradient(circle at 93.90768686930339% 11.448923746744793%, #3C53F4 0%, 42%, rgba(60,83,244,0) 70%), radial-gradient(circle at 48.9013671875% 49.521484375%, #FFFFFF 0%, 100%, rgba(255,255,255,0) 100%);
+  --log-entry-background-color: #eee;
 
   /*
    * Header
@@ -452,6 +453,35 @@ form input:focus, form textarea:focus, form select:focus {
 .container form .secondary-button svg {
   width: 18px;
   height: 18px;
+}
+
+/*
+ * Log Entry styles 
+ */
+section.results {
+  padding: 2rem 0 1rem 0;
+}
+
+.log-entry {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  background-color: var(--log-entry-background-color);
+  padding: 1.5rem;
+}
+
+.log-entry > img {
+  width: 64px;
+  height: 64px;
+}
+
+.log-entry > div > p {
+  padding: 0.2rem;
+}
+
+.log-entry > div > p > div.kvp {
+  margin-left: 1rem;
+  margin-top: 0.2rem;
 }
 
 /*
