@@ -1,6 +1,8 @@
 import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
 
 export default class EditServer extends BaseView {
+  #descriptionEl;
+
   constructor(params) {
     super(params);
   }
@@ -25,7 +27,7 @@ export default class EditServer extends BaseView {
           <input type="password" id="password" />
 
           <label for="description">Description</label>
-          <textarea id="description"></textarea>
+          <div id="description"></div>
 
           <button type="button" id="btnCancel" class="secondary-button">Cancel</button>
           <button type="button" id="btnSave" class="action-button">Save</button>
@@ -35,16 +37,18 @@ export default class EditServer extends BaseView {
   }
 
   async afterRender() {
+    this.#descriptionEl = new Quill("#description", {
+      theme: "snow",
+    });
+
     if (!this.#isNew()) {
       const server = await this.#getServer(this.params.id);
 
       document.getElementById("serverName").value = server.serverName;
       document.getElementById("url").value = server.url;
       document.getElementById("password").value = server.password;
-      document.getElementById("description").value = server.description;
+      this.#descriptionEl.root.innerHTML = server.description;
     }
-
-    SUNEDITOR.create("description");
 
     document.getElementById("btnCancel").addEventListener("click", this.#onCancelButtonClick.bind(this));
     document.getElementById("btnSave").addEventListener("click", this.#onSaveButtonClick.bind(this));
@@ -79,7 +83,7 @@ export default class EditServer extends BaseView {
 
   async #onSaveButtonClick() {
     let server = {
-      description: document.getElementById("description").value,
+      description: this.#descriptionEl.root.innerHTML,
       password: document.getElementById("password").value,
       serverName: document.getElementById("serverName").value,
       url: document.getElementById("url").value,
