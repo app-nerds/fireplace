@@ -9,8 +9,10 @@ export default class ViewLogs extends BaseView {
   #applicationEl;
   #logLevelEl;
   #searchEl;
+  #firstButton;
   #prevButton;
   #nextButton;
+  #lastButton;
 
   #server;
   #application;
@@ -18,6 +20,7 @@ export default class ViewLogs extends BaseView {
   #search;
   #page;
   #hasMorePages;
+  #lastPage;
 
   constructor(params) {
     super(params);
@@ -26,6 +29,7 @@ export default class ViewLogs extends BaseView {
     this.#search = "";
     this.#page = 1;
     this.#hasMorePages = false;
+    this.#lastPage = 0;
   }
 
   async render() {
@@ -61,57 +65,70 @@ export default class ViewLogs extends BaseView {
           <button id="btnClear"><i data-feather="refresh-cw"></i> Clear</button>
         </section>
 
-        <section class="results" id="results">
+        <section class="navigation-buttons">
+          <button id="first" disabled><i data-feather="skip-back"></i> First Page</button>
+          <button id="prev" disabled><i data-feather="arrow-left"></i> Previous Page</button>
+          <span id="page">Page 0</span>
+          <button id="next" disabled>Next Page <i data-feather="arrow-right"></i></button>
+          <button id="last" disabled><i data-feather="skip-forward"></i> Last Page</button>
         </section>
 
-        <section class="navigation-buttons">
-          <button id="prev" disabled>Previous Page</button>
-          <button id="next" disabled>Next Page</button>
+        <section class="results" id="results">
         </section>
       </div>
     `;
   }
 
   async afterRender() {
-    this.params.nerdspinner.show();
+    // Get element references
     this.#serverIDEl = document.getElementById("serverID");
     this.#applicationEl = document.getElementById("application");
     this.#logLevelEl = document.getElementById("logLevel");
     this.#searchEl = document.getElementById("search");
+    this.#firstButton = document.getElementById("first");
     this.#prevButton = document.getElementById("prev");
     this.#nextButton = document.getElementById("next");
+    this.#lastButton = document.getElementById("last");
 
+    // Setup server selector
     this.#serverIDEl.graphql = this.params.graphql;
-    this.#serverIDEl.addEventListener("server-selected", this.#onServerSelected.bind(this));
+    this.#serverIDEl.addEventListener("server-selected", this.onServerSelected.bind(this));
 
+    // Setup application selector
     this.#applicationEl.graphql = this.params.graphql;
-    this.#applicationEl.addEventListener("finished-loading", this.#onApplicationSelectorFinishedLoading.bind(this));
-    this.#applicationEl.addEventListener("application-selected", this.#onApplicationSelected.bind(this));
+    this.#applicationEl.addEventListener("finished-loading", this.onApplicationSelectorFinishedLoading.bind(this));
+    this.#applicationEl.addEventListener("application-selected", this.onApplicationSelected.bind(this));
 
-    this.#logLevelEl.addEventListener("log-level-selected", this.#onLogLevelSelected.bind(this));
-    this.#searchEl.addEventListener("keypress", debounce(this.#onSearchKeypress.bind(this)));
+    // Setup log level selector
+    this.#logLevelEl.addEventListener("log-level-selected", this.onLogLevelSelected.bind(this));
+    this.#searchEl.addEventListener("keypress", debounce(this.onSearchKeypress.bind(this)));
 
-    document.getElementById("btnClear").addEventListener("click", this.#onClearClick.bind(this));
-
-    this.#prevButton.addEventListener("click", this.#onPreviousClick.bind(this));
-    this.#nextButton.addEventListener("click", this.#onNextClick.bind(this));
+    // Button events
+    document.getElementById("btnClear").addEventListener("click", this.onClearClick.bind(this));
+    this.#firstButton.addEventListener("click", this.onFirstClick.bind(this));
+    this.#prevButton.addEventListener("click", this.onPreviousClick.bind(this));
+    this.#nextButton.addEventListener("click", this.onNextClick.bind(this));
+    this.#lastButton.addEventListener("click", this.onLastClick.bind(this));
 
     feather.replace();
-    this.params.nerdspinner.hide();
   }
 
-  async #onServerSelected(e) {
+  /*******************************************************************************
+   * Event handlers
+   ******************************************************************************/
+
+  async onServerSelected(e) {
     const serverID = e.detail;
     this.#server = await this.#getServer(serverID);
 
     this.#applicationEl.serverID = serverID;
   }
 
-  #onApplicationSelectorFinishedLoading() {
+  onApplicationSelectorFinishedLoading() {
     this.#applicationEl.setAttribute("disabled", "false");
   }
 
-  #onApplicationSelected(e) {
+  onApplicationSelected(e) {
     this.#application = e.detail;
 
     this.#logLevelEl.removeAttribute("disabled");
@@ -123,46 +140,64 @@ export default class ViewLogs extends BaseView {
     this.#logLevel = "";
     this.#search = "";
 
-    this.#getLogsAndRender(1, true);
+    this.#setPage(1);
+    this.#getLogsAndRender();
   }
 
-  #onLogLevelSelected(e) {
+  onLogLevelSelected(e) {
     this.#logLevel = e.detail;
-    this.#getLogsAndRender(1, true);
+    this.#setPage(1);
+    this.#getLogsAndRender();
   }
 
-  #onSearchKeypress() {
+  onSearchKeypress() {
     this.#search = this.#searchEl.value;
-    this.#getLogsAndRender(1, true);
+    this.#setPage(1);
+    this.#getLogsAndRender();
   }
 
-  #onClearClick() {
+  onClearClick() {
     this.#logLevelEl.reset();
     this.#searchEl.value = "";
 
     this.#logLevel = "";
     this.#search = "";
 
-    this.#getLogsAndRender(1, true);
+    this.#setPage(1);
+    this.#getLogsAndRender();
   }
 
-  async #onPreviousClick() {
+  async onFirstClick() {
     if (this.#page > 1) {
-      this.#page--;
-      await this.#getLogsAndRender(this.#page, true);
-
-      this.#scrollToTop();
+      this.#setPage(1);
+      await this.#getLogsAndRender();
     }
   }
 
-  async #onNextClick() {
+  async onPreviousClick() {
+    if (this.#page > 1) {
+      this.#decrementPage();
+      await this.#getLogsAndRender();
+    }
+  }
+
+  async onNextClick() {
     if (this.#hasMorePages) {
-      this.#page++;
-      await this.#getLogsAndRender(this.#page, true);
-
-      this.#scrollToTop();
+      this.#incrementPage();
+      await this.#getLogsAndRender();
     }
   }
+
+  async onLastClick() {
+    if (this.#hasMorePages) {
+      this.#setPage(this.#lastPage);
+      await this.#getLogsAndRender();
+    }
+  }
+
+  /*******************************************************************************
+   * Private methods
+   ******************************************************************************/
 
   async #getServer(serverID) {
     const query = `getServer(id: ${serverID}) {
@@ -176,13 +211,11 @@ export default class ViewLogs extends BaseView {
     return response.data.getServer;
   }
 
-  async #getLogsAndRender(page, clear) {
-    const response = await this.#getLogs(page);
+  async #getLogsAndRender() {
+    const response = await this.#getLogs(this.#page);
     const resultsEl = document.getElementById("results");
 
-    if (clear) {
-      resultsEl.innerHTML = "";
-    }
+    resultsEl.innerHTML = "";
 
     response.logEntries.forEach(logEntry => {
       const el = document.createElement("log-entry");
@@ -204,12 +237,25 @@ export default class ViewLogs extends BaseView {
       this.#nextButton.setAttribute("disabled", "");
     }
 
-    if (page > 1) {
+    if (this.#page < this.#lastPage) {
+      if (this.#lastButton.hasAttribute("disabled")) {
+        this.#lastButton.removeAttribute("disabled");
+      }
+    } else {
+      this.#lastButton.setAttribute("disabled", "");
+    }
+
+    if (this.#page > 1) {
       if (this.#prevButton.hasAttribute("disabled")) {
         this.#prevButton.removeAttribute("disabled");
       }
+
+      if (this.#firstButton.hasAttribute("disabled")) {
+        this.#firstButton.removeAttribute("disabled");
+      }
     } else {
       this.#prevButton.setAttribute("disabled", "");
+      this.#firstButton.setAttribute("disabled", "");
     }
   }
 
@@ -227,21 +273,32 @@ export default class ViewLogs extends BaseView {
     const response = await fetcher(`${this.#server.url}/logentry?${params}`, options, this.params.nerdspinner);
     const result = await response.json();
 
+    this.#lastPage = Math.ceil(result.totalCount / result.pageSize);
     this.#hasMorePages = (result.pageSize * this.#page) < result.totalCount;
     return result;
   }
 
   #scrollToTop() {
-    console.log(`setting scrool in timeout`);
-    setTimeout(() => {
-      console.log(`scrolling!`);
-      // window.scrollTo({
-      //   top: 0,
-      //   left: 0,
-      //   behavior: "smooth",
-      // });
-      window.scrollTo(0, 0);
-    }, 800);
+    window.scroll(0, 0);
+  }
+
+  #setPage(page) {
+    this.#page = page;
+    this.#updatePageEl();
+  }
+
+  #incrementPage() {
+    this.#page++;
+    this.#updatePageEl();
+  }
+
+  #decrementPage() {
+    this.#page--;
+    this.#updatePageEl();
+  }
+
+  #updatePageEl() {
+    document.getElementById("page").innerText = `Page ${this.#page}`;
   }
 }
 
