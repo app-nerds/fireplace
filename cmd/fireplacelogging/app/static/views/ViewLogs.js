@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+
 import { BaseView, fetcher, debounce } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
 import ServerSelector from "../js/components/ServerSelector.js";
 import ApplicationSelector from "../js/components/ApplicationSelector.js";

@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+
 import { longDateTime } from "../services/DateService.js";
 
 export default class LogEntry extends HTMLElement {

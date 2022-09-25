@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+
 import Home from "./static/views/Home.js";
 import ViewLogs from "./static/views/ViewLogs.js";
 import ManageServers from "./static/views/ManageServers.js";

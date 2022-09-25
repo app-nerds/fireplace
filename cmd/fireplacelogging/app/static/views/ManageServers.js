@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+
 import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
 
 export default class ManageServers extends BaseView {

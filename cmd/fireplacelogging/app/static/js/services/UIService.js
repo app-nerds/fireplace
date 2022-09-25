@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+
 export function fadeAndScrollInElements(elements) {
   for (let el of elements) {
     if (isInViewport(el)) {

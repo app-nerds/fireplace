@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+
 export default class LogLevelSelector extends HTMLElement {
   constructor() {
     super();
