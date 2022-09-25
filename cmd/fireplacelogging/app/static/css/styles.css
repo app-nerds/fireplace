@@ -308,6 +308,10 @@ footer section a {
 
 .container section.navigation-buttons {
   padding: 2rem 5rem;
+  display: inline-flex;
+  align-items: center;
+  align-content: center;
+  gap: 1.2rem;
 }
 
 .container section.navigation-buttons button {
@@ -315,6 +319,11 @@ footer section a {
   background-color: var(--primary-color);
   color: white;
   border: 1px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  width: 10rem;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .container section.navigation-buttons button:disabled {
