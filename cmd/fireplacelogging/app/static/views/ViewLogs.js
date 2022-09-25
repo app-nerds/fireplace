@@ -30,7 +30,7 @@ export default class ViewLogs extends BaseView {
 
   async render() {
     this.innerHTML = `
-      <title>View Logs</title>
+      <title>View Logs | Fireplace</title>
 
       <div class="container">
         <h2>View Logs</h2>

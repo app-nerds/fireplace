@@ -7,7 +7,7 @@ export default class ManageServers extends BaseView {
 
   async render() {
     this.innerHTML = `
-      <title>Manage Servers</title>
+      <title>Manage Servers | Fireplace</title>
 
       <div class="container">
         <h2>Manage Servers</h2>

@@ -11,7 +11,7 @@ export default class EditServer extends BaseView {
     const title = (this.#isNew()) ? "Add New Server" : "Edit Server";
 
     this.innerHTML = `
-      <title>${title}</title>
+      <title>${title} | Fireplace</title>
 
       <div class="container">
         <h2>${title}</h2>

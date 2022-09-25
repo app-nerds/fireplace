@@ -8,7 +8,7 @@ export default class Home extends BaseView {
 
   async render() {
     this.innerHTML = `
-      <title>Home</title>
+      <title>Home | Fireplace</title>
 
       <section class="hero-banner">
         <div class="description">
