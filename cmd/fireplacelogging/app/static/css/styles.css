@@ -55,9 +55,68 @@ html, body {
   padding: 0;
   box-sizing: border-box;
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16pt;
   height: 100vh;
   width: 100vw;
   overflow-x: hidden;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0Ljk1IDEwIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2ZmZjt9LmNscy0ye2ZpbGw6IzQ0NDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPmFycm93czwvdGl0bGU+PHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iNC45NSIgaGVpZ2h0PSIxMCIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMiIgcG9pbnRzPSIxLjQxIDQuNjcgMi40OCAzLjE4IDMuNTQgNC42NyAxLjQxIDQuNjciLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMy41NCA1LjMzIDIuNDggNi44MiAxLjQxIDUuMzMgMy41NCA1LjMzIi8+PC9zdmc+) no-repeat 100% 50%;
+  font-size: 14pt;
+  line-height: 24px;
+  background-color: white;
+}
+
+select:disabled, input:disabled {
+  background-color: white;
+}
+
+button {
+  font-size: 16pt;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+button svg {
+  width: 18px;
+  height: 18px;
+}
+
+label {
+	display: block;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+input, textarea, select {
+	margin-bottom: 0.5rem;
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	font-size: 1rem;
+	border: 1px solid var(--border-color);
+	border-radius: 0.25rem;
+}
+
+input[type="checkbox"] {
+	width: auto;
+}
+
+input:focus, form textarea:focus, form select:focus {
+	border-color: var(--primary-color);
+	outline: 0;
+	box-shadow: 0 0 0 .20rem var(--primary-color);
 }
 
 #app {
@@ -65,6 +124,12 @@ html, body {
   transition: opacity 1.0s;
   width: 100%;
   padding: 0;
+  margin-top: 60px;
+}
+
+view-logs-page, manage-servers-page, edit-server-page {
+  display: block;
+  margin-top: 120px;
 }
 
 header {
@@ -73,6 +138,8 @@ header {
   display: flex;
   flex-direction: row;
   align-items: center;
+  position: fixed;
+  width: 100%;
 }
 
 header div.header-left {
@@ -138,7 +205,6 @@ header div.header-right nav ul li a {
 }
 
 .hero-banner div.description p {
-  font-size: 12pt;
   line-height: 2rem;
 }
 
@@ -215,8 +281,6 @@ header div.header-right nav ul li a {
   background: transparent;
   border-radius: 60px;
   color: #fff;
-  font-size: 12pt;
-  cursor: pointer;
   transition: 0.3s;
 }
 
@@ -256,20 +320,10 @@ footer section a {
 }
 
 .container .action-button {
-  padding: 0.5rem;
   border: 1px solid var(--primary-color);
   background-color: var(--secondary-color);
   margin-left: 5rem;
   color: #fff;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  cursor: pointer;
-}
-
-.container .action-button svg {
-  width: 18px;
-  height: 18px;
 }
 
 .container section.filters {
@@ -294,16 +348,9 @@ footer section a {
 
 .container section.filters button {
   width: 9rem;
-  padding: 0.4rem;
   background-color: #fff;
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
-  cursor: pointer;
-}
-
-.container section.filters button svg {
-  width: 18px;
-  height: 18px;
 }
 
 .container section.navigation-buttons {
@@ -315,19 +362,10 @@ footer section a {
 }
 
 .container section.navigation-buttons button {
-  padding: 0.5rem;
   background-color: var(--primary-color);
   color: white;
   border: 1px solid var(--border-color);
-  display: inline-flex;
-  align-items: center;
   width: 10rem;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.container section.navigation-buttons button:disabled {
-  opacity: 0.5;
 }
 
 #servers {
@@ -354,7 +392,7 @@ div.card h3 {
   justify-content: space-between;
   height: 50px;
   color: #008;
-  font-size: 20px;
+  font-size: 18pt;
   letter-spacing: 1.2px;
   padding: 0 0.2rem 0.1rem 0.5rem;
   width: 100%;
@@ -368,6 +406,8 @@ div.card div.content {
   width: 100%;
   padding: 0.5rem;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  min-height: 225px;
+  position: relative;
 }
 
 div.card div.content p {
@@ -375,37 +415,22 @@ div.card div.content p {
   margin-top: 0.6rem;
 }
 
-div.card .action-button {
-  padding: 0.5rem;
+div.card div.button-row {
+  position: absolute;
+  bottom: 10px;
+}
+
+div.card div.button-row .action-button {
   border: 1px solid var(--primary-color);
   background-color: var(--secondary-color);
   color: #fff;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  cursor: pointer;
 }
 
-div.card .action-button svg {
-  width: 18px;
-  height: 18px;
-}
-
-div.card .delete-button {
-  padding: 0.5rem;
+div.card div.button-row .delete-button {
   border: 1px solid var(--border-color);
   background-color: #fff;
   color: #000;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  cursor: pointer;
   margin-left: 0.6rem;
-}
-
-div.card .delete-button svg {
-  width: 18px;
-  height: 18px;
 }
 
 /*
@@ -416,67 +441,23 @@ div.card .delete-button svg {
   margin: 2rem 5rem;
 }
 
-form label {
-	display: block;
-	margin-top: 0.5rem;
-	margin-bottom: 0.5rem;
-}
-
-form input, form textarea, form select {
-	margin-bottom: 0.5rem;
-	width: 100%;
-	padding: 0.5rem 0.75rem;
-	font-size: 1rem;
-	border: 1px solid var(--border-color);
-	border-radius: 0.25rem;
-}
-
-form input[type="checkbox"] {
-	width: auto;
-}
-
-form input:focus, form textarea:focus, form select:focus {
-	border-color: var(--primary-color);
-	outline: 0;
-	box-shadow: 0 0 0 .20rem var(--primary-color);
-}
-
 .container form .action-button {
-  padding: 0.6rem;
   border: 1px solid var(--primary-color);
   background-color: var(--secondary-color);
   color: #fff;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  cursor: pointer;
-  font-size: 1.1rem;
   margin-left: 0px;
   margin-right: 0.2rem;
-}
-
-.container form .action-button svg {
-  width: 18px;
-  height: 18px;
+  width: 5rem;
 }
 
 .container form .secondary-button {
-  padding: 0.6rem;
   border: 1px solid var(--border-color);
   background-color: #fff;
   color: #000;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  cursor: pointer;
-  font-size: 1.1rem;
   margin-left: 0;
   margin-right: 0.2rem;
-}
-
-.container form .secondary-button svg {
-  width: 18px;
-  height: 18px;
+  margin-top: 1.5rem;
+  width: 5rem;
 }
 
 /*
@@ -487,24 +468,28 @@ section.results {
 }
 
 .log-entry {
+  display: block;
+  margin: 0.3rem 0 0.3rem 0;
+}
+
+.log-entry > div {
   display: flex;
   flex-direction: row;
   gap: 1rem;
   background-color: var(--log-entry-background-color);
   padding: 1.5rem;
-  margin: 0.3rem 0 0.3rem 0;
 }
 
-.log-entry > img {
+.log-entry > div > img {
   width: 64px;
   height: 64px;
 }
 
-.log-entry > div > p {
+.log-entry > div > div > p {
   padding: 0.2rem;
 }
 
-.log-entry > div > p > div.kvp {
+.log-entry > div > div > p > div.kvp {
   margin-left: 1rem;
   margin-top: 0.2rem;
 }
@@ -676,37 +661,19 @@ section.results {
 .nerdconfirm-container .action-button {
   color: #fff;
   background-color: var(--primary-color);
-  font-size: 1rem;
-  padding: 0.7rem 0.8rem;
   border: none;
   border-radius: 0.25rem;
-  cursor: pointer;
   margin: 0.5rem 0.5rem 0.5rem 0;
-  align-items: center;
-  display: inline-flex;
   height: 3rem;
-}
-
-.nerdconfirm-container .action-button svg {
-  margin-right: 0.3rem;
 }
 
 .nerdconfirm-container .cancel-button {
   color: var(--text-color);
   background-color: var(--third-color);
-  font-size: 1rem;
-  padding: 0.7rem 0.8rem;
   border: none;
   border-radius: 0.25rem;
-  cursor: pointer;
   margin: 0.5rem 0.5rem 0.5rem 0;
-  align-items: center;
-  display: inline-flex;
   height: 3rem;
-}
-
-.nerdconfirm-container .cancel-button svg {
-  margin-right: 0.3rem;
 }
 
 /*
@@ -792,46 +759,9 @@ section.results {
   }
 }
 
-/* 
- * Infinite loader animation 
- */
-.loading{
-    width: 150px;
-    height: 70px;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.ball{
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: black;
-    margin: 0 10px;
-}
-
-.first{
-    animation: slide 2s  ease-in-out infinite ;
-    animation-delay: .1s;
-}
-
-.second{
-    animation: slide 2s ease-in-out infinite;
-    animation-delay: .5s;
-}
-
-.third{
-    animation: slide 2s ease-in-out infinite;
-    animation-delay: 1s;
-}
-
-@keyframes slide{
-    from{
-        transform: translateY(-30px);
-    }
-    to{
-        transform: translateY(0);
-    }
+/*
+Quill customizations
+*/
+.ql-container p {
+  font-size: 16pt;
 }

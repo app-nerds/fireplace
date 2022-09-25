@@ -96,6 +96,9 @@ export default class ManageServers extends BaseView {
     const description = document.createElement("p");
     description.innerHTML = server.description;
 
+    const buttonRow = document.createElement("div");
+    buttonRow.classList.add("button-row");
+
     const editButton = document.createElement("button");
     editButton.classList.add("action-button");
     editButton.innerHTML = `<i data-feather="edit-2"></i> Edit`;
@@ -105,16 +108,18 @@ export default class ManageServers extends BaseView {
 
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
-    deleteButton.innerHTML = `<i data-feather="trash-2"></i>`;
+    deleteButton.innerHTML = `<i data-feather="trash-2"></i> Delete`;
     deleteButton.addEventListener("click", async () => {
       await this.#onDeleteServerClick(server.id);
       this.#loadAndRender();
     });
 
+    buttonRow.insertAdjacentElement("beforeend", editButton);
+    buttonRow.insertAdjacentElement("beforeend", deleteButton);
+
     content.insertAdjacentElement("beforeend", link);
     content.insertAdjacentElement("beforeend", description);
-    content.insertAdjacentElement("beforeend", editButton);
-    content.insertAdjacentElement("beforeend", deleteButton);
+    content.insertAdjacentElement("beforeend", buttonRow);
 
     cardDiv.insertAdjacentElement("beforeend", title);
     cardDiv.insertAdjacentElement("beforeend", content);

@@ -60,6 +60,8 @@ export default class LogEntry extends HTMLElement {
   connectedCallback() {
     this.classList.add("log-entry");
 
+    const inner = document.createElement("div");
+
     /*
      * Create all the elements 
      */
@@ -78,8 +80,10 @@ export default class LogEntry extends HTMLElement {
     detailContainer.insertAdjacentElement("beforeend", this.#timeEl);
     detailContainer.insertAdjacentElement("beforeend", this.#detailsEl);
 
-    this.insertAdjacentElement("beforeend", this.#logLevelEl);
-    this.insertAdjacentElement("beforeend", detailContainer);
+    inner.insertAdjacentElement("beforeend", this.#logLevelEl);
+    inner.insertAdjacentElement("beforeend", detailContainer);
+
+    this.insertAdjacentElement("beforeend", inner);
   }
 
   #updateValues() {
