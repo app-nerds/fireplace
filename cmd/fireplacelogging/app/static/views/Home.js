@@ -2,10 +2,9 @@
  * Copyright © 2022 App Nerds LLC
  */
 
-import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
-// import { fadeAndScrollInElements } from "../js/services/UIService.js";
+import nerdjslibrary from "../js/libraries/nerd-js-library/nerdjslibrary.min.js";
 
-export default class Home extends BaseView {
+export default class Home extends nerdjslibrary.BaseView {
   constructor(params) {
     super(params);
   }

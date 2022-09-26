@@ -2,9 +2,9 @@
  * Copyright © 2022 App Nerds LLC
  */
 
-import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
+import nerdjslibrary from "../js/libraries/nerd-js-library/nerdjslibrary.min.js";
 
-export default class EditServer extends BaseView {
+export default class EditServer extends nerdjslibrary.BaseView {
   #descriptionEl;
 
   constructor(params) {
@@ -33,7 +33,7 @@ export default class EditServer extends BaseView {
           <label for="description">Description</label>
           <div id="description"></div>
 
-          <button type="button" id="btnCancel" class="secondary-button">Cancel</button>
+          <button type="button" id="btnCancel">Cancel</button>
           <button type="button" id="btnSave" class="action-button">Save</button>
         </form>
       </div>
@@ -72,7 +72,7 @@ export default class EditServer extends BaseView {
       return response.data.getServer;
     } catch (e) {
       console.log(e);
-      this.params.nerdalert.error(e.message);
+      this.params.alert.error(e.message);
     }
 
   }
@@ -100,7 +100,7 @@ export default class EditServer extends BaseView {
         await this.#update(server);
       } catch (e) {
         console.log(e);
-        this.params.nerdalert.error(e.message);
+        this.params.alert.error(e.message);
       }
 
       this.navigateTo("/manage-servers");
@@ -111,7 +111,7 @@ export default class EditServer extends BaseView {
       await this.#create(server);
     } catch (e) {
       console.log(e);
-      this.params.nerdalert.error(e.message);
+      this.params.alert.error(e.message);
     }
 
     this.navigateTo("/manage-servers");

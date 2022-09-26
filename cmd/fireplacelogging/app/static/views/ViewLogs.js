@@ -2,13 +2,13 @@
  * Copyright © 2022 App Nerds LLC
  */
 
-import { BaseView, fetcher, debounce } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
+import nerdjslibrary from "../js/libraries/nerd-js-library/nerdjslibrary.min.js";
 import ServerSelector from "../js/components/ServerSelector.js";
 import ApplicationSelector from "../js/components/ApplicationSelector.js";
 import LogLevelSelector from "../js/components/LogLevelSelector.js";
 import LogEntry from "../js/components/LogEntry.js";
 
-export default class ViewLogs extends BaseView {
+export default class ViewLogs extends nerdjslibrary.BaseView {
   #serverIDEl;
   #applicationEl;
   #logLevelEl;
@@ -105,7 +105,7 @@ export default class ViewLogs extends BaseView {
 
     // Setup log level selector
     this.#logLevelEl.addEventListener("log-level-selected", this.onLogLevelSelected.bind(this));
-    this.#searchEl.addEventListener("keypress", debounce(this.onSearchKeypress.bind(this)));
+    this.#searchEl.addEventListener("keypress", nerdjslibrary.debounce(this.onSearchKeypress.bind(this)));
 
     // Button events
     document.getElementById("btnClear").addEventListener("click", this.onClearClick.bind(this));
@@ -113,8 +113,6 @@ export default class ViewLogs extends BaseView {
     this.#prevButton.addEventListener("click", this.onPreviousClick.bind(this));
     this.#nextButton.addEventListener("click", this.onNextClick.bind(this));
     this.#lastButton.addEventListener("click", this.onLastClick.bind(this));
-
-    feather.replace();
   }
 
   /*******************************************************************************
@@ -274,7 +272,7 @@ export default class ViewLogs extends BaseView {
 
     const params = `page=${page}&application=${encodeURIComponent(this.#application)}&search=${encodeURIComponent(this.#search)}&level=${this.#logLevel}`;
 
-    const response = await fetcher(`${this.#server.url}/logentry?${params}`, options, this.params.nerdspinner);
+    const response = await nerdjslibrary.fetcher(`${this.#server.url}/logentry?${params}`, options, this.params.nerdspinner);
     const result = await response.json();
 
     this.#lastPage = Math.ceil(result.totalCount / result.pageSize);

@@ -2,9 +2,9 @@
  * Copyright © 2022 App Nerds LLC
  */
 
-import { BaseView } from "../js/libraries/nerdwebjs/nerdwebjs.min.js";
+import nerdjslibrary from "../js/libraries/nerd-js-library/nerdjslibrary.min.js";
 
-export default class ManageServers extends BaseView {
+export default class ManageServers extends nerdjslibrary.BaseView {
   constructor(params) {
     super(params);
   }
@@ -16,15 +16,15 @@ export default class ManageServers extends BaseView {
       <div class="container">
         <h2>Manage Servers</h2>
         <button id="btnAddNewServer" class="action-button"><i data-feather="plus"></i> Add New Server</button>
+
+        <section id="servers"></section>
       </div>
 
-      <section id="servers"></section>
     `;
   }
 
   async afterRender() {
     await this.#loadAndRender();
-
     document.getElementById("btnAddNewServer").addEventListener("click", this.#onAddNewServerClick.bind(this));
   }
 
@@ -41,7 +41,7 @@ export default class ManageServers extends BaseView {
       return response.data.getServers;
     } catch (e) {
       console.log(e);
-      this.params.nerdalert.error(e.message);
+      this.params.alert.error(e.message);
     }
   }
 
@@ -49,8 +49,6 @@ export default class ManageServers extends BaseView {
     const servers = await this.#getServers();
     document.getElementById("servers").innerHTML = "";
     this.#renderServerCards(servers);
-
-    feather.replace();
   }
 
   #onAddNewServerClick() {
@@ -59,7 +57,7 @@ export default class ManageServers extends BaseView {
 
   async #onDeleteServerClick(id) {
     try {
-      const deleteConfirmation = await this.params.nerdconfirm.yesNo(`Are you sure you wish to delete this server?`);
+      const deleteConfirmation = await this.params.confirm.yesNo(`Are you sure you wish to delete this server?`);
 
       if (deleteConfirmation) {
         let query = `deleteServer(id: ${id}) {
@@ -67,11 +65,11 @@ export default class ManageServers extends BaseView {
         }`;
 
         await this.params.graphql.mutation(query);
-        this.params.nerdalert.success("Server deleted");
+        this.params.alert.success("Server deleted");
       }
     } catch (e) {
       console.log(e);
-      this.params.nerdalert.error(e.message);
+      this.params.alert.error(e.message);
     }
   }
 
@@ -111,7 +109,6 @@ export default class ManageServers extends BaseView {
     });
 
     const deleteButton = document.createElement("button");
-    deleteButton.classList.add("delete-button");
     deleteButton.innerHTML = `<i data-feather="trash-2"></i> Delete`;
     deleteButton.addEventListener("click", async () => {
       await this.#onDeleteServerClick(server.id);

@@ -5,11 +5,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fireplace</title>
+  <link rel="stylesheet" href="/static/js/libraries/nerd-js-library/base.min.css" />
+  <link rel="stylesheet" href="/static/js/libraries/nerd-js-library/components.min.css" />
   <link rel="stylesheet" href="/static/css/styles.css" />
   <link rel="stylesheet" href="/static/js/libraries/quill/quill.snow.css" />
+  <link rel="stylesheet" href="/static/js/components/MemberLoginBar.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script type="module" src="/static/js/components/MemberLoginBar.js"></script>
 </head>
 
 <body>
@@ -29,6 +33,8 @@
           <li><a href="/manage-servers">Manage Servers</a></li>
         </ul>
       </nav>
+
+      <member-login-bar></member-login-bar>
     </div>
   </header>
 
