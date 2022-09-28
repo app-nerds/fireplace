@@ -3,6 +3,7 @@
  */
 
 import Home from "./static/views/Home.js";
+import Unauthorized from "./static/views/Unauthorized.js";
 import ViewLogs from "./static/views/ViewLogs.js";
 import ManageServers from "./static/views/ManageServers.js";
 import EditServer from "./static/views/EditServer.js";
@@ -11,6 +12,7 @@ import nerdjslibrary from "./static/js/libraries/nerd-js-library/nerdjslibrary.j
 
 const routes = [
   { path: "/", view: Home },
+  { path: "/unauthorized", view: Unauthorized },
   { path: "/view-logs", view: ViewLogs },
   { path: "/manage-servers", view: ManageServers },
   { path: "/edit-server/:id", view: EditServer },

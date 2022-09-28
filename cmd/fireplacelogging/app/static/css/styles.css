@@ -25,11 +25,12 @@
 /*
  * App
  */
-#app {
+main {
   opacity: 0;
   transition: opacity 1.0s;
   width: 100%;
   padding: 0;
+  margin-top: 120px;
 }
 
 header {
@@ -124,7 +125,7 @@ footer section a {
 /*
  * All pages 
  */ 
-home-page, view-logs-page, manage-servers-page, edit-server-page {
+home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-page {
   display: block;
   padding-top: 120px;
 }
@@ -169,7 +170,7 @@ home-page, view-logs-page, manage-servers-page, edit-server-page {
 .about {
   background-color: #fff;
   color: var(--text-color);
-  padding: 5rem 10rem;
+  padding: 5rem 5rem;
   display: flex;
   flex-direction: row;
   gap: 2rem 20rem;

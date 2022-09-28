@@ -2,6 +2,8 @@
  * Copyright © 2022 App Nerds LLC
  */
 
+import nerdjslibrary from "/static/js/libraries/nerd-js-library/nerdjslibrary.js";
+
 export default class ApplicationSelector extends HTMLElement {
   constructor() {
     super();
@@ -85,10 +87,31 @@ export default class ApplicationSelector extends HTMLElement {
   }
 
   async #getApplications() {
-    let query = `getApplicationNames(serverID: ${this._serverID})`;
+    const server = await this.#getServer();
 
-    const response = await this._graphql.query(query);
-    return response.data.getApplicationNames;
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${server.password}`,
+      },
+    };
+
+    const response = await nerdjslibrary.fetcher(`${server.url}/applicationname`, options, window.nerdspinner);
+    const result = await response.json();
+    return result;
+  }
+
+  async #getServer() {
+    const response = await nerdjslibrary.fetcher(`/api/server/${this._serverID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    return data;
   }
 
   async #loadAndRender() {

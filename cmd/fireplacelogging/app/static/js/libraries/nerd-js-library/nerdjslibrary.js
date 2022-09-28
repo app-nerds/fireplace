@@ -614,12 +614,14 @@ class GraphQL {
     tokenGetterFunction: null,
     expiredTokenCallback: null,
     spinner: null,
+    navigateTo: null,
   }) {
     options = {
       http: fetcher,
       tokenGetterFunction: null,
       expiredTokenCallback: null,
       spinner: null,
+      navigateTo: null,
       ...options,
     };
 
@@ -628,6 +630,7 @@ class GraphQL {
     this.tokenGetterFunction = options.tokenGetterFunction;
     this.expiredTokenCallback = options.expiredTokenCallback;
     this.spinner = options.spinner;
+    this.navigateTo = options.navigateTo;
   }
 
   /**
@@ -635,7 +638,7 @@ class GraphQL {
    * @param query string A graphql query. Omit the "query {}" portion.
    */
   async query(query) {
-    if (this.expiredTokenCallback && !this.expiredTokenCallback()) {
+    if (this.expiredTokenCallback && !this.expiredTokenCallback(null, "/", this.navigateTo)) {
       return;
     }
 
@@ -661,7 +664,7 @@ class GraphQL {
 
     if (response.status === 400 || response.status === 401) {
       if (this.expiredTokenCallback) {
-        this.expiredTokenCallback(response);
+        this.expiredTokenCallback(response, "/", this.navigateTo);
       }
       return;
     }
@@ -680,7 +683,7 @@ class GraphQL {
    * @param query string A graphql mutation. Omit the "mutation {}" portion
    */
   async mutation(query) {
-    if (this.expiredTokenCallback && !this.expiredTokenCallback()) {
+    if (this.expiredTokenCallback && !this.expiredTokenCallback(null, "/", this.navigateTo)) {
       return;
     }
 
@@ -706,7 +709,7 @@ class GraphQL {
 
     if (response.status === 400 || response.status === 401) {
       if (this.expiredTokenCallback) {
-        this.expiredTokenCallback();
+        this.expiredTokenCallback(response, "/", this.navigateTo);
       }
 
       return;
@@ -765,12 +768,24 @@ const objectToMap = (o = {}) => {
 const ErrTokenExpired = "token expired";
 
 class SessionService {
+  static clearMember() {
+    window.sessionStorage.removeItem("member");
+  }
+
   static clearToken() {
     window.sessionStorage.removeItem("token");
   }
 
+  static getMember() {
+    return JSON.parse(window.sessionStorage.getItem("member"));
+  }
+
   static getToken() {
-    return window.sessionStorage.getItem("token");
+    return JSON.parse(window.sessionStorage.getItem("token"));
+  }
+
+  static hasMember() {
+    return window.sessionStorage.getItem("member") !== null;
   }
 
   static hasToken() {
@@ -784,19 +799,23 @@ class SessionService {
     }
   }
 
-  static setToken(token) {
-    window.sessionStorage.setItem("token", token);
+  static setMember(member) {
+    window.sessionStorage.setItem("member", JSON.stringify(member));
   }
 
-  static tokenExpireFunc(httpResponse, path) {
+  static setToken(token) {
+    window.sessionStorage.setItem("token", JSON.stringify(token));
+  }
+
+  static tokenExpireFunc(httpResponse, path, navigateTo) {
     if (httpResponse && httpResponse.status === 401) {
       SessionService.clearToken();
-      SessionService.navigateOnTokenExpired({ message: ErrTokenExpired }, path);
+      SessionService.navigateOnTokenExpired({ message: ErrTokenExpired }, path, navigateTo);
       return false;
     }
 
     if (!SessionService.hasToken()) {
-      SessionService.navigateOnTokenExpired({ message: ErrTokenExpired }, path);
+      SessionService.navigateOnTokenExpired({ message: ErrTokenExpired }, path, navigateTo);
       return false;
     }
 
@@ -1086,6 +1105,218 @@ const application = (
 };
 
 /*
+ * MemberLoginBar is a component used to display a member dropdown in the header of websites. 
+ * It displays either a user-uploaded image or the letter of the first initial of the user's name. 
+ * When logged in the menu provides links to the user's account and log off. If the user is not logged 
+ * in then a log in link is displayed.
+ *
+ * To work with member data this component requires service component that provides the following.
+ *   - getMember - Must return an object with fields memberID, firstName, lastName, profilePictureURL
+ *
+ * This component uses Feather Icons. https://feathericons.com/
+ * 
+ * Copyright © 2022 App Nerds LLC
+*/
+
+class MemberLoginBar extends HTMLElement {
+  memberService;
+
+  loginPath;
+
+  constructor() {
+    super();
+
+    this.loginPath = this.getAttribute("login-path") || "";
+  }
+
+  static get observedAttributes() {
+    return ["login-path"];
+  }
+
+  set memberService(service) {
+    this.memberService = service;
+  }
+
+  attributedChangedCallback(name, oldValue, newValue) {
+    if (name === "login-path") {
+      this.loginPath = newValue;
+    }
+  }
+
+  connectedCallback() {
+    let member = null;
+
+    if (SessionService.hasMember()) {
+      member = SessionService.getMember();
+    }
+
+    const containerEl = this.createContainerEl();
+    this.createAvatarEl(containerEl, member);
+    this.createTextEl(containerEl, member);
+    this.createPopupMenu(containerEl, member);
+
+    this.insertAdjacentElement("beforeend", containerEl);
+  }
+
+  /*******************************************************************************
+   * Event methods
+   ******************************************************************************/
+
+  /*******************************************************************************
+   * UI elements
+   ******************************************************************************/
+
+  createContainerEl() {
+    const el = document.createElement("div");
+    return el;
+  }
+
+  createAvatarEl(container, member) {
+    let el;
+
+    if (member && member.profilePictureURL) {
+      el = document.createElement("img");
+      el.classList.add("avatar");
+      el.src = member.profilePictureURL;
+    } else {
+      el = document.createElement("div");
+      el.classList.add("avatar");
+      el.innerHTML = `<i data-feather="user"></i>`;
+    }
+
+    container.insertAdjacentElement("beforeend", el);
+  }
+
+  createTextEl(container, member) {
+    let markup;
+
+    const el = document.createElement("a");
+    el.id = "member-link";
+
+    if (!member) {
+      el.href = this.loginPath;
+      markup = "Log In";
+    } else {
+      el.href = "#";
+      markup = `${member.firstName} ${member.lastName} <i data-feather="chevron-down"></i>`;
+    }
+
+    el.innerHTML = markup;
+
+    container.insertAdjacentElement("beforeend", el);
+  }
+
+  createPopupMenu(container, member) {
+    if (member) {
+      const el = document.createElement("popup-menu");
+      el.setAttribute("trigger", "#member-link");
+
+      const menuItems = [
+        { id: "member-my-account-link", text: "My Account", icon: "home", handler: this.onMyAccountClick.bind(this) },
+        { id: "member-log-out-link", text: "Log Out", icon: "log-out", handler: this.onLogOutClick.bind(this) },
+      ];
+
+      menuItems.forEach(data => {
+        const menuItem = document.createElement("popup-menu-item");
+        menuItem.setAttribute("id", data.id);
+        menuItem.setAttribute("text", data.text);
+        menuItem.setAttribute("icon", data.icon);
+        menuItem.addEventListener("click", data.handler);
+
+        el.insertAdjacentElement("beforeend", menuItem);
+      });
+
+      container.insertAdjacentElement("beforeend", el);
+    }
+  }
+
+  /*******************************************************************************
+   * Private methods
+   ******************************************************************************/
+
+  onMyAccountClick() {
+    console.log("My Account");
+  }
+
+  onLogOutClick() {
+    SessionService.clearToken();
+  }
+}
+
+if (!customElements.get("member-login-bar")) {
+  customElements.define("member-login-bar", MemberLoginBar);
+}
+
+class MemberService {
+  #baseURL;
+  #graphql;
+
+  constructor(baseURL, navigateTo) {
+    this.#baseURL = baseURL;
+    this.#graphql = new GraphQL(this.#baseURL, {
+      tokenGetterFunction: SessionService.getToken,
+      expiredTokenCallback: SessionService.tokenExpireFunc,
+      navigateTo: navigateTo,
+    });
+  }
+
+  async getMember(id) {
+    let query = `getMember(id: ${id}) {
+      id
+      firstName
+      lastName
+      profilePictureURL
+    }`;
+
+    const response = await this.#graphql.query(query);
+    return response.data.getMember;
+  }
+}
+
+/*
+ * Copyright © 2022 App Nerds LLC
+ */
+
+class GoogleLoginForm extends HTMLElement {
+  loginPath;
+  createAccountPath;
+  signInButtonURL;
+
+  constructor() {
+    super();
+
+    this.loginPath = this.getAttribute("login-path") || "/auth/google";
+    this.createAccountPath = this.getAttribute("create-account-path") || "/create-account";
+    this.signInButtonURL = this.getAttribute("sign-in-button-url") || "/static/images/sign-in-with-google.jpg";
+  }
+
+  connectedCallback() {
+    const sectionEl = document.createElement("section");
+    sectionEl.classList.add("google-login-form");
+
+    const footerEl = document.createElement("div");
+    footerEl.classList.add("sign-up-footer");
+
+    sectionEl.innerHTML = `
+      <a href="${this.loginPath}"><img src="${this.signInButtonURL}" alt="Sign in with Google" style="width:100%;" /></a>
+    `;
+
+    footerEl.innerHTML = `
+      <p>
+        Don't have an account? Click <a href="${this.createAccountPath}">here</a> to create one.
+      </p>
+    `;
+
+    sectionEl.insertAdjacentElement("beforeend", footerEl);
+    this.insertAdjacentElement("beforeend", sectionEl);
+  }
+}
+
+if (!customElements.get("google-login-form")) {
+  customElements.define("google-login-form", GoogleLoginForm);
+}
+
+/*
  * Copyright © 2022 App Nerds LLC
  */
 
@@ -1107,6 +1338,9 @@ var nerdjslibrary = {
   ErrTokenExpired,
   application,
   BaseView,
+  MemberLoginBar,
+  MemberService,
+  GoogleLoginForm,
 };
 
 export { nerdjslibrary as default };

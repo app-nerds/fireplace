@@ -2,6 +2,8 @@
  * Copyright © 2022 App Nerds LLC
  */
 
+import nerdjslibrary from "/static/js/libraries/nerd-js-library/nerdjslibrary.js";
+
 export default class ServerSelector extends HTMLElement {
   constructor() {
     super();
@@ -34,13 +36,15 @@ export default class ServerSelector extends HTMLElement {
   }
 
   async #getServers() {
-    let query = `getServers() {
-      id
-      serverName
-    }`;
+    const response = await nerdjslibrary.fetcher(`/api/server`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    const response = await this._graphql.query(query);
-    return response.data.getServers;
+    const data = await response.json();
+    return data;
   }
 
   async #loadAndRender() {
@@ -54,7 +58,7 @@ export default class ServerSelector extends HTMLElement {
 
     servers.forEach(s => {
       let selected = s.id === parseInt(this._selectedServerID);
-      this._selectEl.options.add(new Option(s.serverName, s.id, selected, selected));
+      this._selectEl.options.add(new Option(s.serverName, s.ID, selected, selected));
     });
   }
 }

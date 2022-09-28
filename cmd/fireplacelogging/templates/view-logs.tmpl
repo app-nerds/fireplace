@@ -1,0 +1,43 @@
+{{template "layout" .}}
+{{define "content"}}
+  <div class="container">
+    <h2>View Logs</h2>
+
+    <section class="filters">
+      <div>
+        <label for="server">Server</label>
+        <server-selector id="serverID" server-id="0"></server-selector>
+      </div>
+
+      <div>
+        <label for="application">Application</label>
+        <application-selector id="application" disabled="true"></application-selector>
+      </div>
+
+      <div>
+        <label for="logLevel">Log Level</label>
+        <log-level-selector id="logLevel" disabled="true"></log-level-selector>
+      </div>
+
+      <div>
+        <label for="search">Search</label>
+        <input type="text" id="search" disabled />
+      </div>
+
+      <div class="break"></div>
+
+      <button id="btnClear"><i data-feather="refresh-cw"></i> Clear</button>
+    </section>
+
+    <section class="navigation-buttons">
+      <button id="first" disabled><i data-feather="skip-back"></i> First Page</button>
+      <button id="prev" disabled><i data-feather="arrow-left"></i> Previous Page</button>
+      <span id="page">Page 0</span>
+      <button id="next" disabled>Next Page <i data-feather="arrow-right"></i></button>
+      <button id="last" disabled><i data-feather="skip-forward"></i> Last Page</button>
+    </section>
+
+    <section class="results" id="results">
+    </section>
+  </div>
+{{end}}

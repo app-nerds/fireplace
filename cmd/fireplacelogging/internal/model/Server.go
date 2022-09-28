@@ -7,6 +7,6 @@ type Server struct {
 
 	Description string `json:"description"`
 	Password    string `json:"password"`
-	ServerName  string `json:"server_name"`
+	ServerName  string `json:"serverName"`
 	URL         string `json:"url"`
 }
