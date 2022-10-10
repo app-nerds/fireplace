@@ -36,21 +36,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function onDeleteServerClick(id) {
-    // try {
-    //   const deleteConfirmation = await window.confirm.yesNo(`Are you sure you wish to delete this server?`);
+    try {
+      const deleteConfirmation = await window.confirm.yesNo("Are you sure you wish to delete this server?");
 
-    //   if (deleteConfirmation) {
-    //     let query = `deleteServer(id: ${id}) {
-    //       id
-    //     }`;
+      if (deleteConfirmation) {
+        const options = {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
 
-    //     await this.params.graphql.mutation(query);
-    //     this.params.alert.success("Server deleted");
-    //   }
-    // } catch (e) {
-    //   console.log(e);
-    //   this.params.alert.error(e.message);
-    // }
+        await frame.fetcher(`/api/server/${id}`, options, window.spinner);
+        window.alert.success("Server deleted");
+      }
+    } catch (e) {
+      console.log(e);
+      window.alert.error(e.message);
+    }
   }
 
   function renderServerCards(servers) {
@@ -85,13 +88,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     editButton.classList.add("action-button");
     editButton.innerHTML = `<i data-feather="edit-2"></i> Edit`;
     editButton.addEventListener("click", () => {
-      this.navigateTo(`/edit-server/${server.id}`);
+      window.location = `/edit-server/${server.ID}`;
     });
 
     const deleteButton = document.createElement("button");
     deleteButton.innerHTML = `<i data-feather="trash-2"></i> Delete`;
     deleteButton.addEventListener("click", async () => {
-      await onDeleteServerClick(server.id);
+      await onDeleteServerClick(server.ID);
       loadAndRender();
     });
 

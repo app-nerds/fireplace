@@ -76,7 +76,7 @@ func main() {
 		frame.Endpoint{Path: "/manage-servers", Methods: []string{http.MethodGet}, HandlerFunc: handlers.ManageServersHandler(app)},
 		frame.Endpoint{Path: "/version", Methods: []string{http.MethodGet}, HandlerFunc: handlers.VersionHandler(app)},
 		frame.Endpoint{Path: "/api/server", Methods: []string{http.MethodGet}, HandlerFunc: handlers.GetServersHandler(app)},
-		frame.Endpoint{Path: "/api/server/{id}", Methods: []string{http.MethodGet}, HandlerFunc: handlers.GetServerHandler(app)},
+		frame.Endpoint{Path: "/api/server/{id}", Methods: []string{http.MethodGet, http.MethodDelete}, HandlerFunc: handlers.GetDeleteServerHandler(app)},
 	})
 
 	<-app.Start()
