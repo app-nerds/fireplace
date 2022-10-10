@@ -1,4 +1,4 @@
-/* Copyright © 2022 App Nerds LLC v1.0.0 */
+/* Copyright © 2022 App Nerds LLC  */
 /*
  * alert is a simple toast library inspired by vanilla-toast (https://github.com/mehmetemineker/vanilla-toast)
  * It is self contained and only relies on styles provided by alert.css.
@@ -24,7 +24,6 @@ const svgs = {
   warn: '<svg viewBox="0 0 310.285 310.285" width=18 height=18> <path d="M264.845 45.441C235.542 16.139 196.583 0 155.142 0 113.702 0 74.743 16.139 45.44 45.441 16.138 74.743 0 113.703 0 155.144c0 41.439 16.138 80.399 45.44 109.701 29.303 29.303 68.262 45.44 109.702 45.44s80.399-16.138 109.702-45.44c29.303-29.302 45.44-68.262 45.44-109.701.001-41.441-16.137-80.401-45.439-109.703zm-132.673 3.895a12.587 12.587 0 0 1 9.119-3.873h28.04c3.482 0 6.72 1.403 9.114 3.888 2.395 2.485 3.643 5.804 3.514 9.284l-4.634 104.895c-.263 7.102-6.26 12.933-13.368 12.933H146.33c-7.112 0-13.099-5.839-13.345-12.945L128.64 58.594c-.121-3.48 1.133-6.773 3.532-9.258zm23.306 219.444c-16.266 0-28.532-12.844-28.532-29.876 0-17.223 12.122-30.211 28.196-30.211 16.602 0 28.196 12.423 28.196 30.211.001 17.591-11.456 29.876-27.86 29.876z" fill="#FFDA44" /> </svg>',
   info: '<svg viewBox="0 0 23.625 23.625" width=18 height=18> <path d="M11.812 0C5.289 0 0 5.289 0 11.812s5.289 11.813 11.812 11.813 11.813-5.29 11.813-11.813S18.335 0 11.812 0zm2.459 18.307c-.608.24-1.092.422-1.455.548a3.838 3.838 0 0 1-1.262.189c-.736 0-1.309-.18-1.717-.539s-.611-.814-.611-1.367c0-.215.015-.435.045-.659a8.23 8.23 0 0 1 .147-.759l.761-2.688c.067-.258.125-.503.171-.731.046-.23.068-.441.068-.633 0-.342-.071-.582-.212-.717-.143-.135-.412-.201-.813-.201-.196 0-.398.029-.605.09-.205.063-.383.12-.529.176l.201-.828c.498-.203.975-.377 1.43-.521a4.225 4.225 0 0 1 1.29-.218c.731 0 1.295.178 1.692.53.395.353.594.812.594 1.376 0 .117-.014.323-.041.617a4.129 4.129 0 0 1-.152.811l-.757 2.68a7.582 7.582 0 0 0-.167.736 3.892 3.892 0 0 0-.073.626c0 .356.079.599.239.728.158.129.435.194.827.194.185 0 .392-.033.626-.097.232-.064.4-.121.506-.17l-.203.827zm-.134-10.878a1.807 1.807 0 0 1-1.275.492c-.496 0-.924-.164-1.28-.492a1.57 1.57 0 0 1-.533-1.193c0-.465.18-.865.533-1.196a1.812 1.812 0 0 1 1.28-.497c.497 0 .923.165 1.275.497.353.331.53.731.53 1.196 0 .467-.177.865-.53 1.193z" fill="#006DF0" /> </svg>',
   error: '<svg viewBox="0 0 51.976 51.976" width=18 height=18> <path d="M44.373 7.603c-10.137-10.137-26.632-10.138-36.77 0-10.138 10.138-10.137 26.632 0 36.77s26.632 10.138 36.77 0c10.137-10.138 10.137-26.633 0-36.77zm-8.132 28.638a2 2 0 0 1-2.828 0l-7.425-7.425-7.778 7.778a2 2 0 1 1-2.828-2.828l7.778-7.778-7.425-7.425a2 2 0 1 1 2.828-2.828l7.425 7.425 7.071-7.071a2 2 0 1 1 2.828 2.828l-7.071 7.071 7.425 7.425a2 2 0 0 1 0 2.828z" fill="#D80027" /> </svg>'
-
 };
 
 function setup() {
@@ -125,6 +124,7 @@ function alert(baseOptions = {
     card.addEventListener("mouseover", () => {
       card.options.isFocus = card.options.focusable;
     });
+
     card.addEventListener("mouseout", () => {
       card.options.isFocus = false;
       autoDestroy(card, card.options.duration);
@@ -1104,6 +1104,27 @@ const application = (
   };
 };
 
+class MemberService {
+  spinnerEl;
+
+  constructor(spinnerEl) {
+    this.spinnerEl = spinnerEl;
+  }
+
+  async getCurrentMember() {
+    let options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    let response = await fetcher(`/api/member/current`, options, this.spinnerEl);
+    let result = await response.json();
+    return result;
+  }
+}
+
 /*
  * MemberLoginBar is a component used to display a member dropdown in the header of websites. 
  * It displays either a user-uploaded image or the letter of the first initial of the user's name. 
@@ -1111,7 +1132,7 @@ const application = (
  * in then a log in link is displayed.
  *
  * To work with member data this component requires service component that provides the following.
- *   - getMember - Must return an object with fields memberID, firstName, lastName, profilePictureURL
+ *   - getCurrentMember - Must return an object with fields memberID, firstName, lastName, profilePictureURL
  *
  * This component uses Feather Icons. https://feathericons.com/
  * 
@@ -1120,35 +1141,40 @@ const application = (
 
 class MemberLoginBar extends HTMLElement {
   memberService;
-
   loginPath;
 
   constructor() {
     super();
 
-    this.loginPath = this.getAttribute("login-path") || "";
+    this.loginPath = this.getAttribute("login-path") || "/member/login";
+    const spinner = this.getAttribute("spinner") || null;
+    let spinnerEl = null;
+
+    if (spinner) {
+      spinnerEl = document.querySelector(spinner);
+    }
+
+    this.memberService = new MemberService(spinnerEl);
   }
 
   static get observedAttributes() {
     return ["login-path"];
   }
 
-  set memberService(service) {
+  set memberService(/** @type {any} */ service) {
     this.memberService = service;
   }
 
-  attributedChangedCallback(name, oldValue, newValue) {
+  attributedChangedCallback(name, _, newValue) {
     if (name === "login-path") {
       this.loginPath = newValue;
     }
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     let member = null;
 
-    if (SessionService.hasMember()) {
-      member = SessionService.getMember();
-    }
+    member = await this.memberService.getCurrentMember();
 
     const containerEl = this.createContainerEl();
     this.createAvatarEl(containerEl, member);
@@ -1156,6 +1182,7 @@ class MemberLoginBar extends HTMLElement {
     this.createPopupMenu(containerEl, member);
 
     this.insertAdjacentElement("beforeend", containerEl);
+    feather.replace();
   }
 
   /*******************************************************************************
@@ -1174,10 +1201,10 @@ class MemberLoginBar extends HTMLElement {
   createAvatarEl(container, member) {
     let el;
 
-    if (member && member.profilePictureURL) {
+    if (member && member.avatarURL) {
       el = document.createElement("img");
       el.classList.add("avatar");
-      el.src = member.profilePictureURL;
+      el.src = member.avatarURL;
     } else {
       el = document.createElement("div");
       el.classList.add("avatar");
@@ -1193,21 +1220,35 @@ class MemberLoginBar extends HTMLElement {
     const el = document.createElement("a");
     el.id = "member-link";
 
-    if (!member) {
+    if (member && member.email) {
+      let name = "";
+
+      el.href = "#";
+
+      if (member.firstName) {
+        name += member.firstName;
+      }
+
+      if (member.lastName) {
+        name += ` ${member.lastName}`;
+      }
+
+      if (name === "") {
+        name = "User";
+      }
+
+      markup = `${name} <i data-feather="chevron-down"></i>`;
+    } else {
       el.href = this.loginPath;
       markup = "Log In";
-    } else {
-      el.href = "#";
-      markup = `${member.firstName} ${member.lastName} <i data-feather="chevron-down"></i>`;
     }
 
     el.innerHTML = markup;
-
     container.insertAdjacentElement("beforeend", el);
   }
 
   createPopupMenu(container, member) {
-    if (member) {
+    if (member && member.email) {
       const el = document.createElement("popup-menu");
       el.setAttribute("trigger", "#member-link");
 
@@ -1239,38 +1280,12 @@ class MemberLoginBar extends HTMLElement {
   }
 
   onLogOutClick() {
-    SessionService.clearToken();
+    window.location = "/api/member/logout";
   }
 }
 
 if (!customElements.get("member-login-bar")) {
   customElements.define("member-login-bar", MemberLoginBar);
-}
-
-class MemberService {
-  #baseURL;
-  #graphql;
-
-  constructor(baseURL, navigateTo) {
-    this.#baseURL = baseURL;
-    this.#graphql = new GraphQL(this.#baseURL, {
-      tokenGetterFunction: SessionService.getToken,
-      expiredTokenCallback: SessionService.tokenExpireFunc,
-      navigateTo: navigateTo,
-    });
-  }
-
-  async getMember(id) {
-    let query = `getMember(id: ${id}) {
-      id
-      firstName
-      lastName
-      profilePictureURL
-    }`;
-
-    const response = await this.#graphql.query(query);
-    return response.data.getMember;
-  }
 }
 
 /*
@@ -1317,10 +1332,87 @@ if (!customElements.get("google-login-form")) {
 }
 
 /*
+ * MessageBar is a component used to display a message on the screen. It is typically used to display 
+ * the results of submitting a form. It can also be used to provide informational breakout.
+ *
+ * Copyright © 2022 App Nerds LLC
+*/
+
+class MessageBar extends HTMLElement {
+  constructor() {
+    super();
+
+    this.messageType = this.getAttribute("message-type") || "info";
+    this.message = this.getAttribute("message") || "";
+
+    this.containerEl = null;
+  }
+
+  connectedCallback() {
+    this.containerEl = this.createContainerEl();
+    const closeButtonEl = this.createCloseButtonEl();
+    const textEl = this.createTextEl();
+
+    this.containerEl.insertAdjacentElement("beforeend", closeButtonEl);
+    this.containerEl.insertAdjacentElement("beforeend", textEl);
+
+    this.insertAdjacentElement("beforeend", this.containerEl);
+  }
+
+  createContainerEl() {
+    const el = document.createElement("div");
+    el.classList.add("message-bar");
+
+    switch (this.messageType) {
+      case "error":
+        el.classList.add("message-bar-error");
+        break;
+
+      case "warn":
+        el.classList.add("message-bar-warn");
+        break;
+
+      case "info":
+        el.classList.add("message-bar-info");
+        break;
+
+      case "success":
+        el.classList.add("message-bar-success");
+        break;
+    }
+
+    return el;
+  }
+
+  createCloseButtonEl() {
+    const el = document.createElement("span");
+    el.innerHTML = "&times;";
+
+    el.addEventListener("click", () => {
+      if (this.containerEl) {
+        this.containerEl.remove();
+      }
+    });
+
+    return el;
+  }
+
+  createTextEl() {
+    const el = document.createElement("p");
+    el.setAttribute("role", "alert");
+    el.innerHTML = this.message;
+
+    return el;
+  }
+}
+
+customElements.define("message-bar", MessageBar);
+
+/*
  * Copyright © 2022 App Nerds LLC
  */
 
-var nerdjslibrary = {
+var frame = {
   alertPosition,
   alert,
   confirm,
@@ -1341,6 +1433,7 @@ var nerdjslibrary = {
   MemberLoginBar,
   MemberService,
   GoogleLoginForm,
+  MessageBar,
 };
 
-export { nerdjslibrary as default };
+export { frame as default };

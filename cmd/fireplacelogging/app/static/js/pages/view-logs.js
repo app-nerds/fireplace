@@ -1,4 +1,4 @@
-import nerdjslibrary from "/static/js/libraries/nerd-js-library/nerdjslibrary.min.js";
+import frame from "../lib/frame/frame.min.js";
 import ServerSelector from "/static/js/components/ServerSelector.js";
 import ApplicationSelector from "/static/js/components/ApplicationSelector.js";
 import LogLevelSelector from "/static/js/components/LogLevelSelector.js";
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Setup log level selector
   logLevelEl.addEventListener("log-level-selected", onLogLevelSelected);
-  searchEl.addEventListener("keypress", nerdjslibrary.debounce(onSearchKeypress.bind(this)));
+  searchEl.addEventListener("keypress", frame.debounce(onSearchKeypress.bind(this)));
 
   // Button events
   document.getElementById("btnClear").addEventListener("click", onClearClick);
@@ -129,12 +129,12 @@ document.addEventListener("DOMContentLoaded", () => {
    ******************************************************************************/
 
   async function getServer(serverID) {
-    const response = await nerdjslibrary.fetcher(`/api/server/${serverID}`, {
+    const response = await frame.fetcher(`/api/server/${serverID}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    }, window.spinner);
 
     const data = await response.json();
     return data;
@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const params = `page=${page}&application=${encodeURIComponent(application)}&search=${encodeURIComponent(search)}&level=${logLevel}`;
 
-    const response = await nerdjslibrary.fetcher(`${server.url}/logentry?${params}`, options, window.nerdspinner);
+    const response = await frame.fetcher(`${server.url}/logentry?${params}`, options, window.spinner);
     const result = await response.json();
 
     lastPage = Math.ceil(result.totalCount / result.pageSize);

@@ -9,10 +9,11 @@ import (
 func ViewLogsHandler(f *frame.FrameApplication) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := map[string]interface{}{
-			"Title":          "View Logs",
-			"RegularScripts": []string{},
-			"ModuleScripts": []string{
-				"/static/js/pages/view-logs.js",
+			"scripts": []map[string]interface{}{
+				{
+					"type": "module",
+					"src":  "/pages/view-logs.js",
+				},
 			},
 		}
 

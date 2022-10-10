@@ -11,6 +11,9 @@ import (
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/handlers"
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/model"
 	"github.com/app-nerds/frame"
+	"github.com/app-nerds/frame/pkg/framesessions"
+	siteauth "github.com/app-nerds/frame/pkg/site-auth"
+	webapp "github.com/app-nerds/frame/pkg/web-app"
 )
 
 /*
@@ -18,7 +21,7 @@ import (
  * logging setup.
  */
 const (
-	AppName string = "fireplacelogging"
+	AppName string = "Fireplace Logging"
 )
 
 var (
@@ -32,35 +35,42 @@ var (
 )
 
 func main() {
-	app := frame.NewFrameApplication(AppName, Version).
-		Templates(templateFS, "templates", frame.TemplateCollection{
-			frame.Template{Name: "layout.tmpl", IsLayout: true, UseLayout: ""},
-			frame.Template{Name: "home.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
-			frame.Template{Name: "error.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
-			frame.Template{Name: "unauthorized.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
-			frame.Template{Name: "login.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
-			frame.Template{Name: "account-pending.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
-			frame.Template{Name: "view-logs.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
+	var (
+		app *frame.FrameApplication
+	)
+
+	pathsExcludedFromAuth := []string{
+		"/", "/version",
+	}
+
+	pathsThatShouldRedirectToLogin := []string{
+		"/view-logs",
+	}
+
+	app = frame.NewFrameApplication(AppName, Version).
+		Database(&model.Server{}).
+		AddWebApp(&webapp.WebAppConfig{
+			AppFolder:         "app",
+			AppFS:             appFS,
+			PrimaryLayoutName: "layout",
+			TemplateFS:        templateFS,
+			SessionType:       framesessions.CookieSessionType,
+			TemplateManifest: webapp.TemplateCollection{
+				webapp.Template{Name: "layout.tmpl", IsLayout: true, UseLayout: ""},
+				webapp.Template{Name: "home.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
+				webapp.Template{Name: "view-logs.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
+			},
+		}).
+		AddSiteAuth(siteauth.SiteAuthConfig{
+			BaseData:              map[string]interface{}{},
+			ContentTemplateName:   "content",
+			HtmlPaths:             pathsThatShouldRedirectToLogin,
+			LayoutName:            "layout",
+			PathsExcludedFromAuth: pathsExcludedFromAuth,
 		})
 
-	app = app.Database(&model.Server{}).
-		CookieSessions("fireplacelogging", 86400*2).
-		AccountAwaitingApprovalPath("/account-pending").
-		UnauthorizedPath("/unauthorized").
-		UnexpectedErrorPath("/error").
-		WithGoogleAuth("email", "profile").
-		SetupExternalAuth(
-			[]string{"/", "/login", "/unauthorized", "/account-pending", "/static", "/auth", "/version"},
-			[]string{"/view-logs", "/manage-servers", "/edit-server"},
-		).
-		WebAppFolder("app")
-
-	app = app.SetupEndpoints(appFS, frame.Endpoints{
+	app = app.SetupEndpoints(frame.Endpoints{
 		frame.Endpoint{Path: "/", Methods: []string{http.MethodGet}, HandlerFunc: handlers.HomeHandler(app)},
-		frame.Endpoint{Path: "/login", Methods: []string{http.MethodGet}, HandlerFunc: handlers.LoginHandler(app)},
-		frame.Endpoint{Path: "/account-pending", Methods: []string{http.MethodGet}, HandlerFunc: handlers.AccountPendingHandler(app)},
-		frame.Endpoint{Path: "/error", Methods: []string{http.MethodGet}, HandlerFunc: handlers.ErrorHandler(app)},
-		frame.Endpoint{Path: "/unauthorized", Methods: []string{http.MethodGet}, HandlerFunc: handlers.UnauthorizedHandler(app)},
 		frame.Endpoint{Path: "/view-logs", Methods: []string{http.MethodGet}, HandlerFunc: handlers.ViewLogsHandler(app)},
 		frame.Endpoint{Path: "/version", Methods: []string{http.MethodGet}, HandlerFunc: handlers.VersionHandler(app)},
 		frame.Endpoint{Path: "/api/server", Methods: []string{http.MethodGet}, HandlerFunc: handlers.GetServersHandler(app)},

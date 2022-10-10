@@ -1,4 +1,4 @@
-import nerdjslibrary from "/static/js/libraries/nerd-js-library/nerdjslibrary.js";
+import frame from "../lib/frame/frame.min.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   /*
@@ -15,10 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
   /*
    * Setup some global stuff
    */
-  window.spinner = nerdjslibrary.spinner();
-  window.graphql = new nerdjslibrary.GraphQL("http://localhost:8080/query", { spinner: window.spinner });
-  window.alert = nerdjslibrary.alert();
-  window.confirm = nerdjslibrary.confirm();
-  window.shim = nerdjslibrary.shim();
+  window.spinner = frame.spinner();
+  // window.graphql = new nerdjslibrary.GraphQL("http://localhost:8080/query", { spinner: window.spinner });
+  window.alert = frame.alert();
+  window.confirm = frame.confirm();
+  window.shim = frame.shim();
 });
 

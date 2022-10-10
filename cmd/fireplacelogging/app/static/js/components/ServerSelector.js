@@ -2,7 +2,7 @@
  * Copyright © 2022 App Nerds LLC
  */
 
-import nerdjslibrary from "/static/js/libraries/nerd-js-library/nerdjslibrary.js";
+import frame from "../lib/frame/frame.min.js";
 
 export default class ServerSelector extends HTMLElement {
   constructor() {
@@ -36,12 +36,12 @@ export default class ServerSelector extends HTMLElement {
   }
 
   async #getServers() {
-    const response = await nerdjslibrary.fetcher(`/api/server`, {
+    const response = await frame.fetcher(`/api/server`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    }, window.spinner);
 
     const data = await response.json();
     return data;

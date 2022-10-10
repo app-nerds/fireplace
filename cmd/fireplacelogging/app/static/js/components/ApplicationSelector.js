@@ -2,7 +2,7 @@
  * Copyright © 2022 App Nerds LLC
  */
 
-import nerdjslibrary from "/static/js/libraries/nerd-js-library/nerdjslibrary.js";
+import frame from "../lib/frame/frame.min.js";
 
 export default class ApplicationSelector extends HTMLElement {
   constructor() {
@@ -97,18 +97,18 @@ export default class ApplicationSelector extends HTMLElement {
       },
     };
 
-    const response = await nerdjslibrary.fetcher(`${server.url}/applicationname`, options, window.nerdspinner);
+    const response = await frame.fetcher(`${server.url}/applicationname`, options, window.spinner);
     const result = await response.json();
     return result;
   }
 
   async #getServer() {
-    const response = await nerdjslibrary.fetcher(`/api/server/${this._serverID}`, {
+    const response = await frame.fetcher(`/api/server/${this._serverID}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    }, window.spinner);
 
     const data = await response.json();
     return data;
