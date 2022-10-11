@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/99designs/gqlgen v0.17.13
 	github.com/app-nerds/configinator v1.0.1
-	github.com/app-nerds/frame v0.0.0-20221010165704-ea3ed9080b27
+	github.com/app-nerds/frame v0.0.0-20221011032858-6894e937f48f
 	github.com/app-nerds/kit/v6 v6.4.0
 	github.com/app-nerds/nerdweb/v2 v2.3.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
@@ -56,7 +56,7 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20221004154528-8021a29435af // indirect
 	golang.org/x/oauth2 v0.0.0-20221006150949-b44042a4b9c1 // indirect
-	golang.org/x/sys v0.0.0-20221010160319-abe0a0adba9c // indirect
+	golang.org/x/sys v0.0.0-20221010170243-090e33056c14 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.11 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -65,3 +65,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/postgres v1.4.4 // indirect
 )
+
+replace github.com/app-nerds/frame => /Users/adampresley/code/frame

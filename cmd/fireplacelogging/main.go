@@ -44,7 +44,7 @@ func main() {
 	}
 
 	pathsThatShouldRedirectToLogin := []string{
-		"/view-logs",
+		"/view-logs", "/manage-servers", "/edit-server",
 	}
 
 	app = frame.NewFrameApplication(AppName, Version).
@@ -60,6 +60,7 @@ func main() {
 				webapp.Template{Name: "home.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
 				webapp.Template{Name: "view-logs.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
 				webapp.Template{Name: "manage-servers.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
+				webapp.Template{Name: "edit-server.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
 			},
 		}).
 		AddSiteAuth(siteauth.SiteAuthConfig{
@@ -74,6 +75,7 @@ func main() {
 		frame.Endpoint{Path: "/", Methods: []string{http.MethodGet}, HandlerFunc: handlers.HomeHandler(app)},
 		frame.Endpoint{Path: "/view-logs", Methods: []string{http.MethodGet}, HandlerFunc: handlers.ViewLogsHandler(app)},
 		frame.Endpoint{Path: "/manage-servers", Methods: []string{http.MethodGet}, HandlerFunc: handlers.ManageServersHandler(app)},
+		frame.Endpoint{Path: "/edit-server/{id}", Methods: []string{http.MethodGet, http.MethodPost}, HandlerFunc: handlers.EditServerHandler(app)},
 		frame.Endpoint{Path: "/version", Methods: []string{http.MethodGet}, HandlerFunc: handlers.VersionHandler(app)},
 		frame.Endpoint{Path: "/api/server", Methods: []string{http.MethodGet}, HandlerFunc: handlers.GetServersHandler(app)},
 		frame.Endpoint{Path: "/api/server/{id}", Methods: []string{http.MethodGet, http.MethodDelete}, HandlerFunc: handlers.GetDeleteServerHandler(app)},

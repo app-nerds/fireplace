@@ -1,0 +1,33 @@
+{{template "layout" .}}
+{{define "title"}}{{if gt .ID 0}}Edit{{else}}Add New{{end}} Server{{end}}
+
+{{define "content"}}
+<div class="container">
+  <h2>{{if gt .ID 0}}Edit{{else}}Add New{{end}} Server</h2>
+
+  {{if .Message}}
+    <message-bar message-type="info" message="{{.Message}}"></message-bar>
+  {{end}}
+
+  <form method="POST">
+    <label for="serverName">Name <sub>*</sub></label>
+    <input type="text" id="serverName" name="serverName" maxlength="100" value="{{.Server.ServerName}}" autofocus required />
+
+    <label for="url">URL <sub>*</sub></label>
+    <input type="text" id="url" name="url" value="{{.Server.URL}}" required />
+
+    <label for="password">Password <sub>*</sub></label>
+    <input type="password" id="password" name="password" value="{{.Server.Password}}" />
+
+    <label for="description">Description</label>
+    <div id="descriptionEl"></div>
+
+    <nav>
+      <input type="hidden" id="description" name="description" value="{{.Server.Description}}" />
+
+      <button type="button" id="btnCancel">Cancel</button>
+      <button id="btnSave" class="action-button">Save</button>
+    </nav>
+  </form>
+</div>
+{{end}}

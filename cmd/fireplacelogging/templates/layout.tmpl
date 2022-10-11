@@ -58,9 +58,9 @@
   </footer>
 
   <script type="module" src="/static/js/pages/layout.js"></script>
-  {{if .scripts}} 
-    {{range .scripts}}
-      <script type="{{.type}}" src="/static/js{{.src}}"></script>
+  {{if .JavascriptIncludes}} 
+    {{range .JavascriptIncludes}}
+      <script type="{{.Type}}" src="/static/js{{.Src}}"></script>
     {{end}}
   {{end}}
 </body>
