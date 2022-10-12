@@ -18,9 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let application;
   let logLevel;
   let search;
-  let page;
+  let page = 0;
   let hasMorePages;
-  let lastPage;
+  let lastPage = 0;
 
   // Setup server selector
   serverIDEl.graphql = window.graphql;
@@ -33,7 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Setup log level selector
   logLevelEl.addEventListener("log-level-selected", onLogLevelSelected);
-  searchEl.addEventListener("keypress", frame.debounce(onSearchKeypress.bind(this)));
+
+  // Setup search box
+  searchEl.addEventListener("keypress", frame.debounce(onSearchKeypress));
+  searchEl.addEventListener("change", frame.debounce(onSearchKeypress))
 
   // Button events
   document.getElementById("btnClear").addEventListener("click", onClearClick);
@@ -57,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     applicationEl.setAttribute("disabled", "false");
   }
 
-  function onApplicationSelected(e) {
+  async function onApplicationSelected(e) {
     application = e.detail;
 
     logLevelEl.removeAttribute("disabled");
@@ -69,31 +72,31 @@ document.addEventListener("DOMContentLoaded", () => {
     logLevel = "";
     search = "";
 
+    await getLogsAndRender();
     setPage(1);
-    getLogsAndRender();
   }
 
-  function onLogLevelSelected(e) {
+  async function onLogLevelSelected(e) {
     logLevel = e.detail;
+    await getLogsAndRender();
     setPage(1);
-    getLogsAndRender();
   }
 
-  function onSearchKeypress() {
+  async function onSearchKeypress() {
     search = searchEl.value;
+    await getLogsAndRender();
     setPage(1);
-    getLogsAndRender();
   }
 
-  function onClearClick() {
+  async function onClearClick() {
     logLevelEl.reset();
     searchEl.value = "";
 
     logLevel = "";
     search = "";
 
+    await getLogsAndRender();
     setPage(1);
-    getLogsAndRender();
   }
 
   async function onFirstClick() {
@@ -227,6 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updatePageEl() {
-    document.getElementById("page").innerText = `Page ${page}`;
+    document.getElementById("page").innerText = `Page ${page} of ${lastPage}`;
   }
 });

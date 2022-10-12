@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
    * Setup some global stuff
    */
   window.spinner = frame.spinner();
-  // window.graphql = new nerdjslibrary.GraphQL("http://localhost:8080/query", { spinner: window.spinner });
   window.alert = frame.alert();
   window.confirm = frame.confirm();
   window.shim = frame.shim();
