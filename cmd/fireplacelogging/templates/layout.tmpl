@@ -64,7 +64,7 @@
   </footer>
 
   <script type="module" src="/static/js/pages/layout.js"></script>
-  {{if .JavascriptIncludes}} 
+  {{if (IsSet "JavascriptIncludes" .)}} 
     {{range .JavascriptIncludes}}
       <script type="{{.Type}}" src="/static/js{{.Src}}"></script>
     {{end}}

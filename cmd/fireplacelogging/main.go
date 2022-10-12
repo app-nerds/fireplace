@@ -64,7 +64,6 @@ func main() {
 			},
 		}).
 		AddSiteAuth(siteauth.SiteAuthConfig{
-			BaseData:              map[string]interface{}{},
 			ContentTemplateName:   "content",
 			HtmlPaths:             pathsThatShouldRedirectToLogin,
 			LayoutName:            "layout",

@@ -5,7 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
    * Fade our content in nicely
    */
   document.querySelector("main").style.opacity = "1";
-  document.querySelector("footer").style.opacity = "1";
+
+  const footers = document.querySelectorAll("footer");
+  footers.forEach(f => {
+    f.style.opacity = "1";
+  });
 
   /*
    * Load Feather icons
