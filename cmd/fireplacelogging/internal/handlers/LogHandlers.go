@@ -12,7 +12,7 @@ func ViewLogsHandler(f *frame.FrameApplication) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := &model.ViewLogsData{
 			JavascriptIncludes: []webapp.JavascriptInclude{
-				{Type: "module", Src: "/pages/view-logs.js"},
+				{Type: "module", Src: "/static/js/pages/view-logs.js"},
 			},
 		}
 
@@ -24,7 +24,7 @@ func ManageServersHandler(f *frame.FrameApplication) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := &model.ManageServersData{
 			JavascriptIncludes: []webapp.JavascriptInclude{
-				{Type: "module", Src: "/pages/manage-servers.js"},
+				{Type: "module", Src: "/static/js/pages/manage-servers.js"},
 			},
 		}
 

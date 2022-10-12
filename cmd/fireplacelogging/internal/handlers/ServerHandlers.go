@@ -36,8 +36,8 @@ func EditServerHandler(f *frame.FrameApplication) http.HandlerFunc {
 		 */
 		data := &model.EditServerData{
 			JavascriptIncludes: []webapp.JavascriptInclude{
-				{Type: "application/javascript", Src: "/lib/quill/quill.min.js"},
-				{Type: "module", Src: "/pages/edit-server.js"},
+				{Type: "application/javascript", Src: "/static/js/lib/quill/quill.min.js"},
+				{Type: "module", Src: "/static/js/pages/edit-server.js"},
 			},
 			ID:     id,
 			Server: &model.Server{},

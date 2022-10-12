@@ -585,13 +585,13 @@ function spinner() {
  * Copyright © 2022 App Nerds LLC
  */
 
-async function fetcher(url, options, spinner) {
+async function fetcher(url, options, spinner, msBeforeShowSpinner = 1000) {
   let timerID;
 
   if (spinner) {
     timerID = setTimeout(() => {
       spinner.show();
-    }, 1000);
+    }, msBeforeShowSpinner);
   }
 
   const response = await fetch(url, options);
