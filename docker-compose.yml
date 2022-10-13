@@ -6,9 +6,11 @@ services:
     restart: unless-stopped
     build:
       context: .
-      dockerfile: ./cmd/fireplace-server/Dockerfile
+      dockerfile: ./Dockerfile
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
+        APP_NAME: "fireplace-server"
+        APP_PATH: "./cmd/fireplace-server"
     ports:
       - "0.0.0.0:8999:8999"
     depends_on:
@@ -32,6 +34,8 @@ services:
       dockerfile: ./cmd/fireplace-viewer/Dockerfile
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
+        APP_NAME: "fireplace-viewer"
+        APP_PATH: "./cmd/fireplace-viewer"
     ports:
       - "0.0.0.0:8090:8090"
     depends_on:
@@ -44,9 +48,11 @@ services:
     restart: unless-stopped
     build:
       context: .
-      dockerfile: ./cmd/fireplacelogging/Dockerfile
+      dockerfile: ./Dockerfile
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
+        APP_NAME: "fireplacelogging"
+        APP_PATH: "./cmd/fireplacelogging"
     ports:
       - "8080:8080"
     depends_on:
