@@ -51,7 +51,7 @@ run-docker: ## Starts all containers in Docker
 build-docker: ## Builds the application into a docker image
 	docker compose --build
 
-docker-tag: ## Builds a docker image and tags a release. It is then pushed up to Docker. GITHUB_TOKEN must be defined as an environment variable. Usage: make USERNAME="username" APP_NAME="appname" APP_PATH="./cmd/appname" docker-tag
+docker-tag: ## Builds a docker image and tags a release. It is then pushed up to Docker. GITHUB_TOKEN must be defined as an environment variable. Usage: make USERNAME="username" docker-tag
 	docker login -u ${USERNAME} && docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplace-server APP_PATH=./cmd/fireplace-server --tag appnerds/fireplace:linux-amd64-${VERSION} . && docker push appnerds/fireplace:linux-amd64-${VERSION}
 	docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplace-viewer --APP_PATH=./cmd/fireplace-viewer --tag appnerds/fireplace-viewer:linux-amd64-${VERSION} . && docker push appnerds/fireplace-viewer:linux-amd64-${VERSION}
 	docker build --platform linux/arm64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplace-server --build-arg APP_PATH=./cmd/fireplace-server --tag appnerds/fireplace:linux-arm64-${VERSION} . && docker push appnerds/fireplace:linux-arm64-${VERSION}
