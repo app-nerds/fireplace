@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let application;
   let logLevel;
   let search;
-  let page = 0;
+  let page = 1;
   let hasMorePages;
   let lastPage = 0;
 
