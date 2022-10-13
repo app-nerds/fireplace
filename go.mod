@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/99designs/gqlgen v0.17.13
 	github.com/app-nerds/configinator v1.0.1
-	github.com/app-nerds/frame v0.0.0-20221011032858-6894e937f48f
+	github.com/app-nerds/frame v0.0.0-20221013014637-4ef0e1be163c
 	github.com/app-nerds/kit/v6 v6.4.0
 	github.com/app-nerds/nerdweb/v2 v2.3.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
@@ -47,7 +47,7 @@ require (
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/laher/mergefs v0.1.1 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
-	github.com/markbates/goth v1.73.1 // indirect
+	github.com/markbates/goth v1.74.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.21 // indirect
@@ -79,5 +79,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/postgres v1.4.4 // indirect
 )
-
-replace github.com/app-nerds/frame => /Users/adampresley/code/frame
