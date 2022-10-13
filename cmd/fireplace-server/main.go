@@ -154,7 +154,7 @@ func main() {
 	defer cancel()
 
 	if err = httpServer.Shutdown(ctx); err != nil {
-		logger.Error("There was an error shutting down the server - %s", err.Error())
+		logger.Errorf("There was an error shutting down the server - %s", err.Error())
 	}
 
 	logger.Info("Server stopped")
