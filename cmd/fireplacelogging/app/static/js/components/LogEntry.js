@@ -11,7 +11,6 @@ export default class LogEntry extends HTMLElement {
   #messageEl;
   #detailsEl;
 
-  #id;
   #logLevel;
   #time;
   #application;
@@ -21,7 +20,6 @@ export default class LogEntry extends HTMLElement {
   constructor() {
     super();
 
-    this.#id = this.getAttribute("logid") || "";
     this.#logLevel = this.getAttribute("loglevel") || "";
     this.#time = this.getAttribute("time") || "";
     this.#application = this.getAttribute("application") || "";
@@ -34,10 +32,6 @@ export default class LogEntry extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "logid") {
-      this.#id = newValue;
-    }
-
     if (name === "loglevel") {
       this.#logLevel = newValue;
     }
@@ -115,7 +109,7 @@ export default class LogEntry extends HTMLElement {
   }
 
   #setMessageAttributes() {
-    this.#messageEl.innerHTML = `<strong>Message:</strong> ${this.#message}`;
+    this.#messageEl.innerHTML = `<strong>Message:</strong> <span>${this.#message}</span>`;
   }
 
   #createTimeEl() {
@@ -124,7 +118,7 @@ export default class LogEntry extends HTMLElement {
   }
 
   #setTimeAttributes() {
-    this.#timeEl.innerHTML = `<strong>Time:</strong> ${longDateTime(this.#time)}`;
+    this.#timeEl.innerHTML = `<strong>Time:</strong> <span>${longDateTime(this.#time)}</span>`;
   }
 
   #createApplicationEl() {
@@ -133,7 +127,7 @@ export default class LogEntry extends HTMLElement {
   }
 
   #setApplicationAttributes() {
-    this.#applicationEl.innerHTML = `<strong>Application:</strong> ${this.#application}`;
+    this.#applicationEl.innerHTML = `<strong>Application:</strong> <span>${this.#application}</span>`;
   }
 
   #createDetailsEl() {

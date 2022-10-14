@@ -480,5 +480,25 @@ Quill customizations
     width: auto;
     margin-right: 0;
   }
+
+  .container section.filters {
+    padding: 1rem;
+    gap: 0 2rem;
+  }
+
+  .container section.navigation-buttons {
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .log-entry > div {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .log-entry > div > div > p > span {
+    display: block;
+  }
 }
 
