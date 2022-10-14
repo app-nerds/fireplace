@@ -468,6 +468,9 @@ Quill customizations
   .container {
     padding: 0 1rem;
   }
+  .container form {
+    margin: 2rem 0;
+  }
 
   #servers {
     flex-direction: column;
