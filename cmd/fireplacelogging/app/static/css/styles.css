@@ -500,5 +500,12 @@ Quill customizations
   .log-entry > div > div > p > span {
     display: block;
   }
+
+  .member-profile-page nav {
+    padding: 1rem;
+    height: auto !important;
+    flex-direction: column;
+  }
 }
+
 
