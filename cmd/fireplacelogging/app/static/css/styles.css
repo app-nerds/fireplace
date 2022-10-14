@@ -30,7 +30,7 @@ main {
   transition: opacity 1.0s;
   width: 100%;
   padding: 0;
-  margin-top: 120px;
+  margin-top: var(--header-height);
 }
 
 header {
@@ -49,7 +49,6 @@ header {
 header div.header-left {
   align-items: center;
   display: flex;
-  height: var(--header-height);
   margin-left: 1rem;
 }
 
@@ -66,7 +65,6 @@ header div.header-left img {
 header div.header-right {
   margin-left: auto;
   align-items: center;
-  height: var(--header-height);
   margin-right: 1.5rem;
   display: flex;
   justify-content: center;
@@ -75,7 +73,6 @@ header div.header-right {
 header div.header-right nav {
   display: inline-flex;
   align-items: center;
-  height: var(--header-height);
 }
 
 header div.header-right nav ul {
@@ -93,7 +90,6 @@ header div.header-right nav ul li a {
 
 header div.header-right member-login-bar {
   margin-left: 1rem;
-  height: var(--header-height);
   display: inline-flex;
 }
 
@@ -104,7 +100,6 @@ footer {
   flex-direction: row;
   align-items: center;
   padding: 2rem 5rem;
-  /* margin-top: 5rem; */
   color: #fffe;
   opacity: 0.9;
   line-height: 1.5rem;
@@ -393,3 +388,81 @@ Quill customizations
 .ql-container p {
   font-size: 16pt;
 }
+
+/* Change the flow to flex column at 1000px */
+@media only screen and (max-width: 1000px) {
+  :root {
+    --header-height: 7rem;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  header div.header-right {
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1rem;
+  }
+
+  header div.header-right nav {
+    display: block;
+    width: 100%;
+  }
+
+  header div.header-right nav ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    gap: 0.15rem;
+  }
+
+  header div.header-right member-login-bar {
+    margin: 0;
+    width: 100%;
+    margin-top: 1rem;
+    margin-left: 1rem;
+  }
+
+  .hero-banner div.description {
+    flex-direction: column;
+    padding: 5rem 1rem 2rem 1rem;
+  }
+
+  .hero-banner div.description h2 {
+    width: 100%;
+    font-size: 1.9rem;
+  }
+  .hero-banner img {
+    margin: 0 1rem 1.5rem 1rem;
+  }
+
+  .about {
+    flex-direction: column;
+    padding: 1rem 1rem;
+  }
+
+  .call-to-action {
+    padding: 1rem 0;
+  }
+
+  .call-to-action h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  .call-to-action p {
+    padding: 0 1rem;
+  }
+
+  footer {
+    padding: 2rem 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
