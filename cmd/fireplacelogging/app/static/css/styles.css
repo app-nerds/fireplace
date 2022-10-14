@@ -464,5 +464,18 @@ Quill customizations
     gap: 1rem;
     align-items: flex-start;
   }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  #servers {
+    flex-direction: column;
+  }
+
+  div.card {
+    width: auto;
+    margin-right: 0;
+  }
 }
 
