@@ -50,9 +50,9 @@ import (
 func main() {
     logger := logrus.New()
     logger.AddHook(fireplacehook.NewFireplaceHook(&fireplacehook.FireplaceHookConfig{
-        Application: "Sample Application",
-        FireplaceURL: "http://localhost:8999"
-			Password: "password",
+      Application: "Sample Application",
+      FireplaceURL: "http://localhost:8999"
+      Password: "http://localhost:8999"
     }))
 
     logger.WithField("someKey", "someValue").Infof("This is a log entry!")
@@ -114,6 +114,8 @@ Upon successful capture a *200* status code and the new log entry **ID** will be
 #### Query Parameters
 * **page** - Page number of records to retrieve. 1-based. *Required*
 * **application** - Filter results by application name. *Optional*
+* **dateFrom** - Only include entries whos time is on or after this date. Format is *2006-01-02T15:04:05Z*
+* **dateTo** - Only include entries whos time is before this date. Format is *2006-01-02T15:04:05Z*
 * **level** - Filter results by level of severity. Must be one of the following: *debug*, *warning*, *info*, *error*, *fatal*, *panic*. *Optional*
 * **search** - Filter results by a search term. This will apply against the log message. *Optional*
 
@@ -199,7 +201,7 @@ Upon return the payload will return a structure which contains the specified log
 #### DELETE: /logentry
 
 #### Query Parameters
-* **fromDate** - Date in the format of *MM/DD/YYYY*. All log entries from this date back will be deleted
+* **fromDate** - Date in the format of *MM/DD/YYYY* or *YYYY-MM-DD*. All log entries from this date back will be deleted
 
 #### Response
 A message detailing how many log entries were deleted. For example ```10 entries deleted```
@@ -222,7 +224,7 @@ An array of application names.
 ## License
 MIT License
 
-Copyright (c) 2021 App Nerds LLC
+Copyright (c) 2022 App Nerds LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -57,7 +57,7 @@ Then open your browser to `http://localhost:8090`.
 
 MIT License
 
-Copyright (c) 2021 App Nerds LLC
+Copyright (c) 2022 App Nerds LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
