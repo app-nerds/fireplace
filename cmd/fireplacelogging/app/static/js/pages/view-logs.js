@@ -254,10 +254,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return result;
   }
 
-  function scrollToTop() {
-    window.scroll(0, 0);
-  }
-
   function setPage(newPage) {
     page = newPage;
     updatePageEl();

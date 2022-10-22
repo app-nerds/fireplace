@@ -146,7 +146,7 @@ func (s LogEntryService) GetLogEntries(filter pkg.LogEntryFilter) (pkg.LogEntryC
 
 	c := s.db.Collection(DatabaseCollection)
 	query := s.buildQueryFromFilters(filter)
-	opts := options.Find().SetSort(bson.D{{"time", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "time", Value: -1}})
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -199,7 +199,7 @@ func (s LogEntryService) GetLogEntry(id string) (pkg.LogEntry, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	response := c.FindOne(ctx, bson.D{{"_id", bsonID}})
+	response := c.FindOne(ctx, bson.D{{Key: "_id", Value: bsonID}})
 
 	if response.Err() != nil && errors.Is(response.Err(), mongo.ErrNoDocuments) {
 		return result, mongo.ErrNoDocuments
@@ -229,9 +229,9 @@ func (s LogEntryService) buildQueryFromFilters(filter pkg.LogEntryFilter) bson.D
 
 	if filter.Search != "" {
 		or := bson.A{
-			bson.D{{"message", bson.M{"$regex": filter.Search, "$options": "im"}}},
-			bson.D{{"details.value", bson.M{"$regex": filter.Search, "$options": "im"}}},
-			bson.D{{"details.key", bson.M{"$regex": filter.Search, "$options": "im"}}},
+			bson.D{{Key: "message", Value: bson.M{"$regex": filter.Search, "$options": "im"}}},
+			bson.D{{Key: "details.value", Value: bson.M{"$regex": filter.Search, "$options": "im"}}},
+			bson.D{{Key: "details.key", Value: bson.M{"$regex": filter.Search, "$options": "im"}}},
 		}
 
 		query = append(query, bson.E{Key: "$or", Value: or})
@@ -272,7 +272,7 @@ func (s LogEntryService) Delete(fromDate time.Time) (int, error) {
 		result *mongo.DeleteResult
 	)
 
-	query := bson.D{{"time", bson.D{{"$lt", fromDate}}}}
+	query := bson.D{{Key: "time", Value: bson.D{{Key: "$lt", Value: fromDate}}}}
 
 	c := s.db.Collection(DatabaseCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)

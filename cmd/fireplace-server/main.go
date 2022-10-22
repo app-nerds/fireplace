@@ -208,10 +208,10 @@ func createIndexes(db *mongo.Database) error {
 
 	c := db.Collection(internal.DatabaseCollection)
 
-	applicationIndex := mongo.IndexModel{Keys: bson.D{{"application", 1}}}
-	levelIndex := mongo.IndexModel{Keys: bson.D{{"level", 1}}}
-	timeIndex := mongo.IndexModel{Keys: bson.D{{"time", 1}}}
-	applicationLevelIndex := mongo.IndexModel{Keys: bson.D{{"application", 1}, {"level", 1}}}
+	applicationIndex := mongo.IndexModel{Keys: bson.D{{Key: "application", Value: 1}}}
+	levelIndex := mongo.IndexModel{Keys: bson.D{{Key: "level", Value: 1}}}
+	timeIndex := mongo.IndexModel{Keys: bson.D{{Key: "time", Value: 1}}}
+	applicationLevelIndex := mongo.IndexModel{Keys: bson.D{{Key: "application", Value: 1}, {Key: "level", Value: 1}}}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
 	defer cancel()
