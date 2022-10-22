@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const applicationEl = document.getElementById("application");
   const logLevelEl = document.getElementById("logLevel");
   const searchEl = document.getElementById("search");
+  const dateFromEl = document.getElementById("dateFrom")
+  const dateToEl = document.getElementById("dateTo")
   const firstButton = document.getElementById("first");
   const prevButton = document.getElementById("prev");
   const nextButton = document.getElementById("next");
@@ -18,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let application;
   let logLevel;
   let search;
+  let dateFrom = "";
+  let dateTo = "";
   let page = 1;
   let hasMorePages;
   let lastPage = 0;
@@ -37,6 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Setup search box
   searchEl.addEventListener("keypress", frame.debounce(onSearchKeypress));
   searchEl.addEventListener("change", frame.debounce(onSearchKeypress))
+
+  // Setup the date boxes 
+  dateFromEl.addEventListener("keypress", frame.debounce(onDateFromKeyPress, 500));
+  dateFromEl.addEventListener("change", frame.debounce(onDateFromKeyPress, 500));
+  dateToEl.addEventListener("keypress", frame.debounce(onDateToKeyPress, 500));
+  dateToEl.addEventListener("change", frame.debounce(onDateToKeyPress, 500));
 
   // Button events
   document.getElementById("btnClear").addEventListener("click", onClearClick);
@@ -65,6 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     logLevelEl.removeAttribute("disabled");
     searchEl.removeAttribute("disabled");
+    dateFromEl.removeAttribute("disabled");
+    dateToEl.removeAttribute("disabled");
 
     logLevelEl.reset();
     searchEl.value = "";
@@ -88,12 +100,36 @@ document.addEventListener("DOMContentLoaded", () => {
     setPage(1);
   }
 
+  async function onDateFromKeyPress(e) {
+    if (isValidDate(e.target.value)) {
+      dateFrom = `${e.target.value}Z`;
+      await getLogsAndRender();
+      setPage(1);
+    } else {
+      dateFrom = "";
+    }
+  }
+
+  async function onDateToKeyPress(e) {
+    if (isValidDate(e.target.value)) {
+      dateTo = `${e.target.value}Z`;
+      await getLogsAndRender();
+      setPage(1);
+    } else {
+      dateTo = "";
+    }
+  }
+
   async function onClearClick() {
     logLevelEl.reset();
     searchEl.value = "";
+    dateFromEl.value = "";
+    dateToEl.value = "";
 
     logLevel = "";
     search = "";
+    dateFrom = "";
+    dateTo = "";
 
     await getLogsAndRender();
     setPage(1);
@@ -200,7 +236,15 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     };
 
-    const params = `page=${page}&application=${encodeURIComponent(application)}&search=${encodeURIComponent(search)}&level=${logLevel}`;
+    let params = `page=${page}&application=${encodeURIComponent(application)}&search=${encodeURIComponent(search)}&level=${logLevel}`;
+
+    if (dateFrom !== "") {
+      params += `&dateFrom=${dateFrom}`;
+    }
+
+    if (dateTo !== "") {
+      params += `&dateTo=${dateTo}`;
+    }
 
     const response = await frame.fetcher(`${server.url}/logentry?${params}`, options, window.spinner);
     const result = await response.json();
@@ -231,5 +275,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updatePageEl() {
     document.getElementById("page").innerText = `Page ${page} of ${lastPage}`;
+  }
+
+  function isValidDate(d) {
+    const r = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/g;
+    const isValid = d.match(r);
+    return isValid;
   }
 });

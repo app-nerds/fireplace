@@ -260,6 +260,11 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
   flex-direction: column;
 }
 
+.container section.filters div small {
+  font-size: 0.7rem;
+  margin-bottom: 0.4rem;
+}
+
 .container section.filters div select,
 .container section.filters div input {
   width: 12rem;
@@ -490,6 +495,10 @@ Quill customizations
     flex-direction: column;
     justify-content: center;
     width: 100%;
+  }
+
+  #btnClear {
+    margin-top: 0.5rem;
   }
 
   .log-entry > div {
