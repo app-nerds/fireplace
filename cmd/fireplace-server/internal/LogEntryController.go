@@ -114,10 +114,12 @@ func (c LogEntryController) DeleteLogEntries(w http.ResponseWriter, r *http.Requ
 	queryValues := r.URL.Query()
 
 	if initialFromDate, err = time.Parse("1/2/2006", queryValues.Get("fromDate")); err != nil {
-		nerdweb.WriteJSON(c.logger, w, http.StatusBadRequest, pkg.GenericResponse{
-			Message: "Invalid fromDate value",
-		})
-		return
+		if initialFromDate, err = time.Parse("2006-01-02", queryValues.Get("fromDate")); err != nil {
+			nerdweb.WriteJSON(c.logger, w, http.StatusBadRequest, pkg.GenericResponse{
+				Message: "Invalid fromDate value. Valid formats are: '1/2/2006', '2006-01-02'",
+			})
+			return
+		}
 	}
 
 	fromDate = initialFromDate.Add(24 * time.Hour)
@@ -166,8 +168,10 @@ various query parameters.
 */
 func (c LogEntryController) GetLogEntries(w http.ResponseWriter, r *http.Request) {
 	var (
-		err  error
-		page int
+		err      error
+		page     int
+		dateFrom time.Time
+		dateTo   time.Time
 	)
 
 	totalRecords := 0
@@ -176,11 +180,41 @@ func (c LogEntryController) GetLogEntries(w http.ResponseWriter, r *http.Request
 	queryValues := r.URL.Query()
 	application, _ := url.QueryUnescape(queryValues.Get("application"))
 	search, _ := url.QueryUnescape(queryValues.Get("search"))
+	dateFromString, _ := url.QueryUnescape(queryValues.Get("dateFrom"))
+	dateToString, _ := url.QueryUnescape(queryValues.Get("dateTo"))
+
+	if dateFromString != "" {
+		if dateFrom, err = time.Parse("2006-01-02T15:04:05Z", dateFromString); err != nil {
+			c.logger.WithError(err).Error("invalid format in dateFrom")
+			nerdweb.WriteJSON(c.logger, w, http.StatusBadRequest, pkg.GenericResponse{
+				Message: "Invalid value for argument 'dateFrom'. Format is YYYY-MM-DDTHH:mm:ssZ",
+			})
+			return
+		}
+	}
+
+	if dateToString != "" {
+		if dateTo, err = time.Parse("2006-01-02T15:04:05Z", dateToString); err != nil {
+			c.logger.WithError(err).Error("invalid format in dateTo")
+			nerdweb.WriteJSON(c.logger, w, http.StatusBadRequest, pkg.GenericResponse{
+				Message: "Invalid value for argument 'dateTo'. Format is YYYY-MM-DDTHH:mm:ssZ",
+			})
+			return
+		}
+	}
 
 	filter := pkg.LogEntryFilter{
 		Application: application,
 		Level:       queryValues.Get("level"),
 		Search:      search,
+	}
+
+	if dateFromString != "" {
+		filter.DateFrom = dateFrom
+	}
+
+	if dateToString != "" {
+		filter.DateTo = dateTo
 	}
 
 	if page, err = strconv.Atoi(queryValues.Get("page")); err != nil {

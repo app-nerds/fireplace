@@ -7,7 +7,7 @@ package pkg
 import (
 	"time"
 
-	"github.com/globalsign/mgo/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 /*
@@ -16,7 +16,7 @@ LogEntry represents a single log entry in Fireplace.
 type LogEntry struct {
 	Application string                       `json:"application" bson:"application"`
 	Details     LogEntryDetailItemCollection `json:"details" bson:"details"`
-	ID          bson.ObjectId                `json:"id" bson:"_id"`
+	ID          primitive.ObjectID           `json:"id" bson:"_id"`
 	Level       string                       `json:"level" bson:"level"`
 	Message     string                       `json:"message" bson:"message"`
 	Time        time.Time                    `json:"time" bson:"time"`

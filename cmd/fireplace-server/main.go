@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,12 +14,14 @@ import (
 	"time"
 
 	"github.com/app-nerds/fireplace/v2/cmd/fireplace-server/internal"
-	"github.com/app-nerds/kit/v6/database"
 	"github.com/app-nerds/kit/v6/datetime"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -28,11 +31,15 @@ var (
 
 func main() {
 	var (
-		err                error
-		config             internal.Config
-		logger             *logrus.Entry
-		db                 database.Database
-		session            database.Session
+		err      error
+		config   internal.Config
+		logger   *logrus.Entry
+		ctx      context.Context
+		cancel   context.CancelFunc
+		dbClient *mongo.Client
+		db       *mongo.Database
+		// db                 database.Database
+		// session            database.Session
 		dateTimeService    datetime.IDateTimeParser
 		logEntryService    internal.ILogEntryService
 		logEntryController internal.ILogEntryController
@@ -56,12 +63,20 @@ func main() {
 	/*
 	 * Setup database
 	 */
-	if session, err = database.Dial(config.DatabaseURL); err != nil {
-		logger.WithError(err).Fatal("Error opening database connection")
+	ctx, cancel = context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	if dbClient, err = mongo.Connect(ctx, options.Client().ApplyURI(config.DatabaseURL)); err != nil {
+		logger.WithError(err).Fatal("error opening database conenction")
 	}
 
-	db = session.DB("fireplace")
-	defer session.Close()
+	defer dbClient.Disconnect(ctx)
+
+	db = dbClient.Database("fireplace")
+
+	if err = createIndexes(db); err != nil {
+		logger.WithError(err).Fatal("error creating indexes")
+	}
 
 	/*
 	 * Setup services
@@ -150,7 +165,7 @@ func main() {
 
 	deleteLogsCron.Stop()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err = httpServer.Shutdown(ctx); err != nil {
@@ -184,4 +199,33 @@ func deleteLogEntries(cleanLogIntervalDays int, logger *logrus.Entry, logEntrySe
 			"numDeleted": numDeleted,
 		}).Info("Deleted old records")
 	}
+}
+
+func createIndexes(db *mongo.Database) error {
+	var (
+		err error
+	)
+
+	c := db.Collection(internal.DatabaseCollection)
+
+	applicationIndex := mongo.IndexModel{Keys: bson.D{{"application", 1}}}
+	levelIndex := mongo.IndexModel{Keys: bson.D{{"level", 1}}}
+	timeIndex := mongo.IndexModel{Keys: bson.D{{"time", 1}}}
+	applicationLevelIndex := mongo.IndexModel{Keys: bson.D{{"application", 1}, {"level", 1}}}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
+	defer cancel()
+
+	indexes := []mongo.IndexModel{
+		applicationIndex,
+		levelIndex,
+		timeIndex,
+		applicationLevelIndex,
+	}
+
+	if _, err = c.Indexes().CreateMany(ctx, indexes); err != nil {
+		return fmt.Errorf("error creating indexes: %w", err)
+	}
+
+	return nil
 }
