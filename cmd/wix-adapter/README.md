@@ -21,14 +21,14 @@ Please note that the Wix Fireplace Adapter service has no built in security meas
 
 To connect your Wix site to the Adapter visit your Wix dashboard. Go first to *Developer Tools* -> *Logs*.
 
-![cmd/wix-adapter/screenshots/wix-setup-1.png](Developer Tools -> Logs screenshot)
+![Developer Tools -> Logs screenshot](screenshots/wix-setup-1.png)
 
 Now click on the *Open* button under **Connect monitoring tools (advanced)**.
 
-![cmd/wix-adapter/wix-setup-2.png](Connect monitoring tools screenshot)
+![Connect monitoring tools screenshot](screenshots/wix-setup-2.png)
 
 Enter the URL to your adapter installation and point it to the `/log` path. It should look something like this: `https://some.myurl.com/log`.
 
-![cmd/wix-adapter/wix-setup-3.png](Enter adapter URL screenshot)
+![Enter adapter URL screenshot](screenshots/wix-setup-3.png)
 
 Click on the **Set Endpoint** button to save. 
