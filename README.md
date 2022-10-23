@@ -27,6 +27,7 @@ about either the server or viewer, check out their respective READMEs.
 * [Fireplace Viewer README](./cmd/fireplace-viewer/README.md)
 * [Fireplace Logrus Hook](./cmd/fireplace-hook/README.md)
 * [CSharp Library](./cmd/sharpfireplace/README.md)
+* [Wix Fireplace Adapter](./cmd/wix-adapter/README.md)
 
 ### Build and Run from Docker Registry
 
