@@ -51,8 +51,9 @@ run-docker: ## Starts all containers in Docker
 build-docker: ## Builds the application into a docker image
 	docker compose --build
 
-docker-tag: ## Builds a docker image and tags a release. It is then pushed up to Docker. GITHUB_TOKEN must be defined as an environment variable. Usage: make USERNAME="username" docker-tag
-	docker login -u ${USERNAME} && docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplace-server --build-arg APP_PATH=./cmd/fireplace-server --tag appnerds/fireplace:linux-amd64-${VERSION} . && docker push appnerds/fireplace:linux-amd64-${VERSION}
-	docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplace-viewer --build-arg APP_PATH=./cmd/fireplace-viewer --tag appnerds/fireplace-viewer:linux-amd64-${VERSION} . && docker push appnerds/fireplace-viewer:linux-amd64-${VERSION}
-	docker build --platform linux/amd64 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplacelogging --build-arg APP_PATH=./cmd/fireplacelogging --tag appnerds/fireplacelogging:linux-amd64-${VERSION} . && docker push appnerds/fireplacelogging:linux-amd64-${VERSION}
+docker-tag: ## Builds a docker image and tags a release. It is then pushed up to Docker. GITHUB_TOKEN must be defined as an environment variable. 
+	docker login -u appnerds && docker buildx use mybuilder 
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplace-server --build-arg APP_PATH=./cmd/fireplace-server -t appnerds/fireplace:${VERSION} --push . 
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplace-viewer --build-arg APP_PATH=./cmd/fireplace-viewer -t appnerds/fireplace-viewer:${VERSION} --push . 
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7 --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg APP_NAME=fireplacelogging --build-arg APP_PATH=./cmd/fireplacelogging -t appnerds/fireplacelogging:${VERSION} --push . 
 
