@@ -66,14 +66,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderCard(server) {
-    const cardDiv = document.createElement("div");
-    cardDiv.classList.add("card");
+    const cardDiv = document.createElement("article");
 
     const title = document.createElement("h3");
     title.innerText = server.serverName;
-
-    const content = document.createElement("div");
-    content.classList.add("content");
 
     const link = document.createElement("p");
     link.innerHTML = `<a href="${server.url}" target="_blank">${server.url}</a>`;
@@ -81,32 +77,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     const description = document.createElement("p");
     description.innerHTML = server.description;
 
-    const buttonRow = document.createElement("div");
-    buttonRow.classList.add("button-row");
+    const buttonRow = document.createElement("footer");
 
     const editButton = document.createElement("button");
     editButton.classList.add("action-button");
     editButton.innerHTML = `<i data-feather="edit-2"></i> Edit`;
     editButton.addEventListener("click", () => {
-      window.location = `/edit-server/${server.ID}`;
+      window.location = `/edit-server/${server.id}`;
     });
 
     const deleteButton = document.createElement("button");
     deleteButton.innerHTML = `<i data-feather="trash-2"></i> Delete`;
     deleteButton.addEventListener("click", async () => {
-      await onDeleteServerClick(server.ID);
+      await onDeleteServerClick(server.id);
       loadAndRender();
     });
 
     buttonRow.insertAdjacentElement("beforeend", editButton);
     buttonRow.insertAdjacentElement("beforeend", deleteButton);
 
-    content.insertAdjacentElement("beforeend", link);
-    content.insertAdjacentElement("beforeend", description);
-    content.insertAdjacentElement("beforeend", buttonRow);
 
     cardDiv.insertAdjacentElement("beforeend", title);
-    cardDiv.insertAdjacentElement("beforeend", content);
+    cardDiv.insertAdjacentElement("beforeend", link);
+    cardDiv.insertAdjacentElement("beforeend", description);
+    cardDiv.insertAdjacentElement("beforeend", buttonRow);
 
     return cardDiv;
   }

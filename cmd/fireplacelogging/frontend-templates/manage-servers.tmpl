@@ -1,0 +1,11 @@
+{{template "layout" .}}
+{{define "title"}}Manage Servers{{end}}
+
+{{define "content"}}
+  <section class="container">
+    <h2>Manage Servers</h2>
+    <button id="btnAddNewServer" class="action-button"><i data-feather="plus"></i> Add New Server</button>
+
+    <div id="servers" class="cards"></div>
+  </section>
+{{end}}

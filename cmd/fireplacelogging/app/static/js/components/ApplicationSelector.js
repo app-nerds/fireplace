@@ -97,9 +97,15 @@ export default class ApplicationSelector extends HTMLElement {
       },
     };
 
-    const response = await frame.fetcher(`${server.url}/applicationname`, options, window.spinner);
-    const result = await response.json();
-    return result;
+    try {
+      const response = await frame.fetcher(`${server.url}/applicationname`, options, window.spinner);
+      const result = await response.json();
+      return result;
+
+    } catch (e) {
+      console.log(e);
+      frame.alert().error("Unable to retrieve application names for this server. Please review the server configuration");
+    }
   }
 
   async #getServer() {

@@ -34,3 +34,5 @@ fireplacelogging.exe
 .env
 .env.production
 tmp
+
+database-migrations

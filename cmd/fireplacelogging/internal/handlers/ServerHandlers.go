@@ -5,14 +5,25 @@ import (
 	"strconv"
 
 	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/model"
+	"github.com/app-nerds/fireplace/v2/cmd/fireplacelogging/internal/services"
 	"github.com/app-nerds/frame"
-	webapp "github.com/app-nerds/frame/pkg/web-app"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
-func EditServerHandler(f *frame.FrameApplication) http.HandlerFunc {
+func ManageServersHandler(f *frame.FrameApplication) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := &model.ManageServersData{
+			JavascriptIncludes: []frame.JavascriptInclude{
+				{Type: "module", Src: "/static/js/pages/manage-servers.js"},
+			},
+		}
+
+		f.RenderTemplate(w, "manage-servers.tmpl", data)
+	}
+}
+
+func EditServerHandler(f *frame.FrameApplication, serverService *services.ServerService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			err error
@@ -35,12 +46,12 @@ func EditServerHandler(f *frame.FrameApplication) http.HandlerFunc {
 		 * Setup our initial view data
 		 */
 		data := &model.EditServerData{
-			JavascriptIncludes: []webapp.JavascriptInclude{
+			JavascriptIncludes: []frame.JavascriptInclude{
 				{Type: "application/javascript", Src: "/static/js/lib/quill/quill.min.js"},
 				{Type: "module", Src: "/static/js/pages/edit-server.js"},
 			},
 			ID:     id,
-			Server: &model.Server{},
+			Server: model.Server{},
 		}
 
 		/*
@@ -49,24 +60,23 @@ func EditServerHandler(f *frame.FrameApplication) http.HandlerFunc {
 		 * then go to the POST handler.
 		 */
 		if r.Method == http.MethodGet {
-			editServerGet(f, w, r, id, data)
+			editServerGet(f, serverService, w, r, id, data)
 		} else {
-			editServerPost(f, w, r, id, data)
+			editServerPost(f, serverService, w, r, id, data)
 		}
 	}
 }
 
-func editServerGet(f *frame.FrameApplication, w http.ResponseWriter, r *http.Request, id int, data *model.EditServerData) {
+func editServerGet(f *frame.FrameApplication, serverService *services.ServerService, w http.ResponseWriter, r *http.Request, id int, data *model.EditServerData) {
 	var (
-		queryResult *gorm.DB
+		err error
 	)
 
-	if id > 0 {
-		data.Server.ID = uint(id)
-		queryResult = f.DB.Find(&data.Server)
+	memberInfo := f.GetMemberSession(r)
 
-		if queryResult.Error != nil {
-			f.Logger.WithError(queryResult.Error).Error("error getting server information in EditServerHandler")
+	if id > 0 {
+		if data.Server, err = serverService.Get(uint(id), memberInfo.ID); err != nil {
+			f.Logger.WithError(err).Error("error getting server information in EditServerHandler")
 			f.UnexpectedError(w, r)
 			return
 		}
@@ -75,10 +85,11 @@ func editServerGet(f *frame.FrameApplication, w http.ResponseWriter, r *http.Req
 	f.RenderTemplate(w, "edit-server.tmpl", data)
 }
 
-func editServerPost(f *frame.FrameApplication, w http.ResponseWriter, r *http.Request, id int, data *model.EditServerData) {
+func editServerPost(f *frame.FrameApplication, serverService *services.ServerService, w http.ResponseWriter, r *http.Request, id int, data *model.EditServerData) {
 	var (
-		queryResult *gorm.DB
-		server      *model.Server
+		err    error
+		server model.Server
+		newID  int64
 	)
 
 	_ = r.ParseForm()
@@ -88,76 +99,51 @@ func editServerPost(f *frame.FrameApplication, w http.ResponseWriter, r *http.Re
 		"id":   id,
 	}).Info("form posted")
 
-	server = &model.Server{}
+	memberInfo := f.GetMemberSession(r)
 
-	/*
-	 * If we are updated, get the existing data
-	 */
-	if id > 0 {
-		server.ID = uint(id)
-		queryResult = f.DB.Find(&server)
-
-		if queryResult.Error != nil {
-			f.Logger.WithError(queryResult.Error).Error("error getting server information in EditServerHandler")
-			f.UnexpectedError(w, r)
-			return
-		}
+	server = model.Server{
+		ID:          uint(id),
+		Description: r.FormValue("description"),
+		Password:    r.FormValue("password"),
+		ServerName:  r.FormValue("serverName"),
+		URL:         r.FormValue("url"),
 	}
 
-	/*
-	 * Update our fields
-	 */
-	server.Description = r.FormValue("description")
-	server.ServerName = r.FormValue("serverName")
-	server.URL = r.FormValue("url")
-	server.Password = r.FormValue("password")
+	if newID, err = serverService.Save(server, memberInfo.ID); err != nil {
+		f.Logger.WithError(err).Error("error saving server")
+		f.UnexpectedError(w, r)
+		return
+	}
 
-	/*
-	 * Create or update
-	 */
+	data.ID = int(newID)
+	server.ID = uint(newID)
+	data.Message = "Server created!"
+
 	if id > 0 {
-		queryResult = f.DB.Save(&server)
-
-		if queryResult.Error != nil {
-			f.Logger.WithError(queryResult.Error).Error("error updating server")
-			f.UnexpectedError(w, r)
-			return
-		}
-
 		data.Message = "Server updated!"
-	} else {
-		queryResult = f.DB.Create(&server)
-
-		if queryResult.Error != nil {
-			f.Logger.WithError(queryResult.Error).Error("error creating server")
-			f.UnexpectedError(w, r)
-			return
-		}
-
-		data.Message = "Server created!"
 	}
 
 	data.Server = server
 	f.RenderTemplate(w, "edit-server.tmpl", data)
 }
 
-func GetDeleteServerHandler(f *frame.FrameApplication) http.HandlerFunc {
+func GetDeleteServerHandler(f *frame.FrameApplication, serverService *services.ServerService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			getServerHandler(f, w, r)
+			getServerHandler(f, serverService, w, r)
 		}
 
 		if r.Method == http.MethodDelete {
-			deleteServerHandler(f, w, r)
+			deleteServerHandler(f, serverService, w, r)
 		}
 	}
 }
 
-func getServerHandler(f *frame.FrameApplication, w http.ResponseWriter, r *http.Request) {
+func getServerHandler(f *frame.FrameApplication, serverService *services.ServerService, w http.ResponseWriter, r *http.Request) {
 	var (
-		err         error
-		queryResult *gorm.DB
-		id          int
+		err    error
+		server model.Server
+		id     int
 	)
 
 	vars := mux.Vars(r)
@@ -169,25 +155,21 @@ func getServerHandler(f *frame.FrameApplication, w http.ResponseWriter, r *http.
 		return
 	}
 
-	result := &model.Server{}
-	result.ID = uint(id)
+	memberInfo := f.GetMemberSession(r)
 
-	queryResult = f.DB.First(&result)
-
-	if queryResult.Error != nil {
-		f.Logger.WithError(err).Errorf("error querying for server %s", idString)
-		f.WriteJSON(w, http.StatusInternalServerError, f.CreateGenericErrorResponse("error querying for server information", queryResult.Error.Error(), ""))
+	if server, err = serverService.Get(uint(id), memberInfo.ID); err != nil {
+		f.Logger.WithError(err).Error("error getting server information in GetDeleteServerHandler")
+		f.UnexpectedError(w, r)
 		return
 	}
 
-	f.WriteJSON(w, http.StatusOK, result)
+	f.WriteJSON(w, http.StatusOK, server)
 }
 
-func deleteServerHandler(f *frame.FrameApplication, w http.ResponseWriter, r *http.Request) {
+func deleteServerHandler(f *frame.FrameApplication, serverService *services.ServerService, w http.ResponseWriter, r *http.Request) {
 	var (
-		err         error
-		queryResult *gorm.DB
-		id          int
+		err error
+		id  int
 	)
 
 	vars := mux.Vars(r)
@@ -199,32 +181,30 @@ func deleteServerHandler(f *frame.FrameApplication, w http.ResponseWriter, r *ht
 		return
 	}
 
-	result := &model.Server{}
-	result.ID = uint(id)
+	memberInfo := f.GetMemberSession(r)
 
-	queryResult = f.DB.Delete(&result)
-
-	if queryResult.Error != nil {
+	if err = serverService.Delete(uint(id), memberInfo.ID); err != nil {
 		f.Logger.WithError(err).Errorf("error deleting server %s", idString)
-		f.WriteJSON(w, http.StatusInternalServerError, f.CreateGenericErrorResponse("error deleting server", queryResult.Error.Error(), ""))
+		f.UnexpectedError(w, r)
 		return
 	}
 
 	f.WriteJSON(w, http.StatusOK, f.CreateGenericSuccessResponse("deleted successfully"))
 }
 
-func GetServersHandler(f *frame.FrameApplication) http.HandlerFunc {
+func GetServersHandler(f *frame.FrameApplication, serverService *services.ServerService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
-			result      []*model.Server
-			queryResult *gorm.DB
+			err    error
+			result []model.Server
 		)
 
-		queryResult = f.DB.Find(&result)
+		memberInfo := f.GetMemberSession(r)
 
-		if queryResult.Error != nil {
-			f.Logger.WithError(queryResult.Error).Error("error getting server list")
-			f.WriteJSON(w, http.StatusInternalServerError, f.CreateGenericErrorResponse("error getting server list", queryResult.Error.Error(), ""))
+		if result, err = serverService.Search(memberInfo.ID); err != nil {
+			f.Logger.WithError(err).Error("error getting server list")
+			f.WriteJSON(w, http.StatusInternalServerError, f.CreateGenericErrorResponse("error getting server list", err.Error(), ""))
+			return
 		}
 
 		f.WriteJSON(w, http.StatusOK, result)

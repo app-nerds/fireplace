@@ -58,7 +58,7 @@ export default class ServerSelector extends HTMLElement {
 
     servers.forEach(s => {
       let selected = s.id === parseInt(this._selectedServerID);
-      this._selectEl.options.add(new Option(s.serverName, s.ID, selected, selected));
+      this._selectEl.options.add(new Option(s.serverName, s.id, selected, selected));
     });
   }
 }

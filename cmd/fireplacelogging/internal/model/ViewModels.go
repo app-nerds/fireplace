@@ -1,19 +1,19 @@
 package model
 
-import webapp "github.com/app-nerds/frame/pkg/web-app"
+import "github.com/app-nerds/frame"
 
 type ViewLogsData struct {
-	webapp.JavascriptIncludes
+	frame.JavascriptIncludes
 }
 
 type ManageServersData struct {
-	webapp.JavascriptIncludes
+	frame.JavascriptIncludes
 }
 
 type EditServerData struct {
-	webapp.JavascriptIncludes
+	frame.JavascriptIncludes
 
 	ID      int
-	Server  *Server
+	Server  Server
 	Message string
 }

@@ -75,6 +75,8 @@ header div.header-right nav {
   align-items: center;
 }
 
+header div.header-right nav label, #hamburger { display: none; }
+
 header div.header-right nav ul {
   list-style: none;
 }
@@ -117,6 +119,11 @@ footer section a {
   color: var(--link-color-2);
 }
 
+form > footer {
+  background-color: #fff;
+  padding: 0.5rem 0;
+}
+
 /*
  * All pages 
  */ 
@@ -127,6 +134,7 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
 
 .container {
   padding: 0 3rem;
+  margin-bottom: 1rem;
 }
 
 /*
@@ -204,7 +212,7 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
 }
 
 .call-to-action {
-  background: url("/static/images/call-to-action-background.webp"), var(--section-gradient);
+  background: var(--section-gradient);
   display: flex;
   flex-direction: column;
   color: #fff;
@@ -354,6 +362,20 @@ section.results {
 }
 
 /*
+ * Card updates 
+ */
+.cards > article {
+  flex: 1 0 10rem;
+}
+
+.cards > article > footer {
+  opacity: 1;
+  background-color: #fff;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+/*
  * Utility
  */
 .fade-scroll-in {
@@ -395,13 +417,17 @@ Quill customizations
 }
 
 /* Change the flow to flex column at 1000px */
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1300px) {
   :root {
     --header-height: 7rem;
   }
 
+  main {
+    margin-top: 1.5rem;
+  }
+
   header {
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: flex-start;
     position: relative;
   }
@@ -410,27 +436,58 @@ Quill customizations
     flex-direction: column;
     width: 100%;
     margin-left: 0;
-    margin-right: 0;
+    margin-right: 1rem;
     margin-top: 1rem;
+    align-items: flex-end;
   }
 
   header div.header-right nav {
-    display: block;
-    width: 100%;
+    flex-direction: column;
+    align-items: flex-end;
+    display: flex;
+  }
+
+  /* header div.header-right nav { */
+  /*   display: block; */
+  /*   width: 100%; */
+  /* } */
+
+  header div.header-right nav label {
+    display: inline-block; 
+    color: white;
+    background: var(--action-button-background);
+    font-style: normal;
+    font-size: 1.2em;
+    padding: 10px;
+    cursor: pointer;
   }
 
   header div.header-right nav ul {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    gap: 0.15rem;
+    margin: 0.2rem 0 1rem 0;
+  }
+
+  header div.header-right nav ul li {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    border-bottom: none;
+    margin-left: 0.1rem;
+    padding: 0.2rem 0;
+  }
+
+  header div.header-right nav ul { display: none; }
+  header div.header-right nav input:checked ~ ul { 
+    display: block; 
+    padding: 0.3rem; 
+    border: 1px solid var(--border-color); 
+    background-color: white; 
   }
 
   header div.header-right member-login-bar {
     margin: 0;
     width: 100%;
-    margin-top: 1rem;
-    margin-left: 1rem;
+    margin-top: 0.3rem;
+    margin-left: 0.1rem;
   }
 
   .hero-banner div.description {
@@ -463,13 +520,6 @@ Quill customizations
     padding: 0 1rem;
   }
 
-  footer {
-    padding: 2rem 1rem;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-
   .container {
     padding: 0 1rem;
   }
@@ -479,11 +529,6 @@ Quill customizations
 
   #servers {
     flex-direction: column;
-  }
-
-  div.card {
-    width: auto;
-    margin-right: 0;
   }
 
   .container section.filters {
@@ -516,5 +561,4 @@ Quill customizations
     flex-direction: column;
   }
 }
-
 
