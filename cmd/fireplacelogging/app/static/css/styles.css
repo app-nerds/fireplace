@@ -436,7 +436,6 @@ Quill customizations
     flex-direction: column;
     width: 100%;
     margin-left: 0;
-    margin-right: 1rem;
     margin-top: 1rem;
     align-items: flex-end;
   }
@@ -446,11 +445,6 @@ Quill customizations
     align-items: flex-end;
     display: flex;
   }
-
-  /* header div.header-right nav { */
-  /*   display: block; */
-  /*   width: 100%; */
-  /* } */
 
   header div.header-right nav label {
     display: inline-block; 
@@ -488,6 +482,11 @@ Quill customizations
     width: 100%;
     margin-top: 0.3rem;
     margin-left: 0.1rem;
+  }
+
+  footer {
+    flex-direction: column;
+    padding: 2rem 0.5rem;
   }
 
   .hero-banner div.description {
