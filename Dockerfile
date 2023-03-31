@@ -38,6 +38,7 @@ ARG APP_PATH
 ARG APP_NAME 
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /build/database-migrations/* /database-migrations/
 COPY --from=builder /build/cmd/$APP_NAME/$APP_NAME /server
 
 # Run the executable

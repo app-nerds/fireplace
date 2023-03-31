@@ -61,7 +61,7 @@ func main() {
 				frame.Template{Name: "edit-server.tmpl", IsLayout: false, UseLayout: "layout.tmpl"},
 			},
 		}).
-		Database("./database-migrations").
+		Database("database-migrations").
 		AddSiteAuth(frame.SiteAuthConfig{
 			ContentTemplateName:   "content",
 			HtmlPaths:             pathsThatShouldRedirectToLogin,
