@@ -2,11 +2,8 @@ import wixFetch from "wix-fetch";
 import wixSecretsBackend from "wix-secrets-backend";
 
 export async function WriteLog(application, level, message, details = []) {
-    // TODO: move these to secrets
-    // let baseURL = await wixSecretsBackend.getSecret("FIREPLACE_URL");
-    // let serverPassword = await wixSecretsBackend.getSecret("FIREPLACE_SERVER_PASSWORD");
-    let baseURL = "https://fireplace.appnerds.net";
-    let serverPassword = "notanymore";
+    let baseURL = await wixSecretsBackend.getSecret("FIREPLACE_URL");
+    let serverPassword = await wixSecretsBackend.getSecret("FIREPLACE_PASSWORD");
 
     let lowerLevel = level.toLowerCase();
 
