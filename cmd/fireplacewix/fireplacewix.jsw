@@ -6,7 +6,7 @@ export async function WriteLog(application, level, message, details = []) {
     // let baseURL = await wixSecretsBackend.getSecret("FIREPLACE_URL");
     // let serverPassword = await wixSecretsBackend.getSecret("FIREPLACE_SERVER_PASSWORD");
     let baseURL = "https://fireplace.appnerds.net";
-    let serverPassword = "NuQCJ$dmG$?s2@tZRc3u";
+    let serverPassword = "notanymore";
 
     let lowerLevel = level.toLowerCase();
 
