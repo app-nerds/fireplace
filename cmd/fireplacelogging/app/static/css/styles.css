@@ -22,6 +22,8 @@
   --sidebar-width: 240px;
 }
 
+body { display: flex; flex-direction: column; min-height: 100vh; }
+
 /*
  * App
  */
@@ -31,6 +33,7 @@ main {
   width: 100%;
   padding: 0;
   margin-top: var(--header-height);
+  flex: 1;
 }
 
 header {
@@ -107,6 +110,9 @@ footer {
   line-height: 1.5rem;
   opacity: 0;
   transition: opacity 1.0s;
+  height: 7rem;
+  position: fixed;
+  bottom: 0px;
 }
 
 footer section {
@@ -125,8 +131,8 @@ form > footer {
 }
 
 /*
- * All pages 
- */ 
+ * All pages
+ */
 home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-page {
   display: block;
   padding-top: 120px;
@@ -134,11 +140,16 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
 
 .container {
   padding: 0 3rem;
-  margin-bottom: 1rem;
+  margin-bottom: 8rem;
+}
+
+.container .view-logs {
+  display: flex;
+  flex-direction: column;
 }
 
 /*
- * Home page 
+ * Home page
  */
 .hero-banner {
   background: url("/static/images/hero-banner-background.webp"), var(--section-gradient);
@@ -218,6 +229,7 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
   color: #fff;
   padding: 5rem 20rem;
   align-items: center;
+  margin-bottom: 7rem;
 }
 
 .call-to-action h2 {
@@ -247,7 +259,7 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
 }
 
 /*
- * View logs page 
+ * View logs page
  */
 .container h2 {
   font-size: 40pt;
@@ -288,17 +300,19 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
 
 .container section.navigation-buttons {
   padding: 2rem 0;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   align-content: center;
   gap: 1.2rem;
+  justify-content: center;
 }
 
 .container section.navigation-buttons button {
   background-color: var(--primary-color);
   color: white;
   border: 1px solid var(--border-color);
-  width: 10rem;
+  width: 4rem;
+  height: 2.5rem;
 }
 
 #servers {
@@ -316,8 +330,8 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
 }
 
 /*
- * Edit Server page 
- */ 
+ * Edit Server page
+ */
 .container form {
   margin: 2rem 5rem;
 }
@@ -328,10 +342,14 @@ home-page, unauthorized-page, view-logs-page, manage-servers-page, edit-server-p
 
 
 /*
- * Log Entry styles 
+ * Log Entry styles
  */
 section.results {
   padding: 2rem 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 7.5rem;
+  gap: 1rem;
 }
 
 .log-entry {
@@ -362,7 +380,7 @@ section.results {
 }
 
 /*
- * Card updates 
+ * Card updates
  */
 .cards > article {
   flex: 1 0 10rem;
@@ -372,7 +390,9 @@ section.results {
   opacity: 1;
   background-color: #fff;
   gap: 0.5rem;
-  margin-top: 2rem;
+  margin-top: auto;
+  position: relative;
+  height: auto;
 }
 
 /*
@@ -413,8 +433,14 @@ section.results {
 Quill customizations
 */
 .ql-container p {
-  font-size: 16pt;
+  font-size: 16px;
 }
+
+.member-profile-page { margin-bottom: 8rem; }
+.member-profile-page footer { position: relative; }
+
+.member-edit-avatar-page { margin-bottom: 8rem; }
+.member-edit-avatar-page footer { position: relative; }
 
 /* Change the flow to flex column at 1000px */
 @media only screen and (max-width: 1300px) {
@@ -447,7 +473,7 @@ Quill customizations
   }
 
   header div.header-right nav label {
-    display: inline-block; 
+    display: inline-block;
     color: white;
     background: var(--action-button-background);
     font-style: normal;
@@ -470,11 +496,11 @@ Quill customizations
   }
 
   header div.header-right nav ul { display: none; }
-  header div.header-right nav input:checked ~ ul { 
-    display: block; 
-    padding: 0.3rem; 
-    border: 1px solid var(--border-color); 
-    background-color: white; 
+  header div.header-right nav input:checked ~ ul {
+    display: block;
+    padding: 0.3rem;
+    border: 1px solid var(--border-color);
+    background-color: white;
   }
 
   header div.header-right member-login-bar {
@@ -560,4 +586,3 @@ Quill customizations
     flex-direction: column;
   }
 }
-

@@ -1,4 +1,4 @@
-/* Copyright © 2022 App Nerds LLC  */
+/* Copyright © 2022 App Nerds LLC v1.1.0 */
 /*
  * alert is a simple toast library inspired by vanilla-toast (https://github.com/mehmetemineker/vanilla-toast)
  * It is self contained and only relies on styles provided by alert.css.
@@ -182,90 +182,72 @@ function alert(baseOptions = {
  */
 
 function shim(baseOptions = {
-  closeOnClick: false,
+	closeOnClick: false,
 }) {
-  /*
-   * internal constructor function to build a new shim
-   */
-  function newShim(options) {
-    options = { ...baseOptions, ...options };
-    let shim = undefined;
+	/*
+	 * internal constructor function to build a new shim
+	 */
+	function newShim(options) {
+		options = { ...baseOptions, ...options };
+		let shim = undefined;
 
-    function calculateHeight() {
-      const body = document.body;
-      const html = document.documentElement;
+		function show() {
+			if (!shim && !document.getElementsByClassName("shim").length) {
+				shim = document.createElement("div");
+				shim.classList.add("shim");
 
-      const bodyHeight = body.getBoundingClientRect().height;
-      const htmlHeight = html.getBoundingClientRect().height;
+				if (options.closeOnClick) {
+					shim.addEventListener("click", () => {
+						destroy(true);
+					});
+				}
 
-      const height = Math.max(bodyHeight, htmlHeight);
-      return height;
-    }
+				document.body.appendChild(shim);
+			} else if (document.getElementsByClassName("shim").length) {
+				shim = document.getElementsByClassName("shim")[0];
+			}
+		}
 
-    function calculateTop() {
-      const r = document.documentElement.getBoundingClientRect();
-      return r.top;
-    }
+		function destroy(fireCallback = true) {
+			if (shim) {
+				shim.remove();
+				shim = undefined;
 
-    function show() {
-      if (!shim && !document.getElementsByClassName("shim").length) {
-        shim = document.createElement("div");
-        shim.style.top = `${calculateTop()}px`;
-        shim.style.height = `${calculateHeight()}px`;
-        shim.classList.add("shim");
+				if (typeof options.callback === "function" && fireCallback) {
+					options.callback();
+				}
+			}
+		}
 
-        if (options.closeOnClick) {
-          shim.addEventListener("click", (e) => {
-            destroy(true);
-          });
-        }
+		return {
+			hide(fireCallback = true) {
+				destroy(fireCallback);
+			},
 
-        document.body.appendChild(shim);
-      } else if (document.getElementsByClassName("shim").length) {
-        shim = document.getElementsByClassName("shim")[0];
-      }
-    }
+			show() {
+				show();
+			},
+		}
+	}
 
-    function destroy(fireCallback = true) {
-      if (shim) {
-        shim.remove();
-        shim = undefined;
-
-        if (typeof options.callback === "function" && fireCallback) {
-          options.callback();
-        }
-      }
-    }
-
-    return {
-      hide(fireCallback = true) {
-        destroy(fireCallback);
-      },
-
-      show() {
-        show();
-      },
-    }
-  }
-
-  /*
-   * Public functions
-   */
-  return {
-    new(options) {
-      options = { ...{ callback: undefined }, ...options };
-      return newShim(options);
-    }
-  };
+	/*
+	 * Public functions
+	 */
+	return {
+		new(options) {
+			options = { ...{ callback: undefined }, ...options };
+			return newShim(options);
+		}
+	};
 }
 
 /*
- * confirm is a function to display a confirmation dialog. It has two mode: "yesno", "other". 
+ * confirm is a function to display a confirmation dialog. It has two mode: "yesno", "other".
  * "yesno" mode will display two buttons: Yes and No. "other" will only display a Close button.
  * The result of the click will be returned in a promise value.
  *
- * Styling is provided by confirm.css. It relies on variables: 
- *   - --dialog-background-color 
+ * Styling is provided by confirm.css. It relies on variables:
+ *   - --dialog-background-color
  *   - --border-color
  *
  * Example:
@@ -276,118 +258,107 @@ function shim(baseOptions = {
  */
 
 function confirm(baseOptions = {
-  width: "25%",
-  height: "25%",
-  callback: undefined,
+	callback: undefined,
 }) {
-  const shimBuilder = shim({ closeOnClick: true });
-  let _shim;
+	const shimBuilder = shim({ closeOnClick: true });
+	let _shim;
 
-  function calculateTop() {
-    const r = document.body.getBoundingClientRect();
-    return Math.abs(r.top);
-  }
+	function show(type, message, options) {
+		options = { ...baseOptions, ...options };
 
-  function show(type, message, options) {
-    options = { ...baseOptions, ...options };
+		const container = document.createElement("dialog");
+		container.classList.add("confirm-container");
 
-    const container = document.createElement("div");
-    container.classList.add("confirm-container");
-    container.style.setProperty("width", options.width);
-    container.style.setProperty("height", options.height);
-    container.style.setProperty("top", `calc((50% - ${options.height}) + ${calculateTop()}px)`);
-    container.style.setProperty("left", `calc(50% - (${options.width}/2))`);
+		_shim = shimBuilder.new({ callback: () => { close(container, options.callback, false); } });
 
-    _shim = shimBuilder.new({ callback: () => { close(container, options.callback, false); } });
+		setContent(container, message);
+		addButtons(container, type, options.callback);
 
-    setContent(container, message);
-    addButtons(container, type, options.callback);
+		_shim.show();
+		document.body.appendChild(container);
+	}
 
-    _shim.show();
-    document.body.appendChild(container);
-  }
+	function setContent(container, message) {
+		container.innerHTML += `<p>${message}</p>`;
+	}
 
-  function setContent(container, message) {
-    container.innerHTML += `<p>${message}</p>`;
-  }
+	function addButtons(container, type, callback) {
+		let buttons = [];
 
-  function addButtons(container, type, callback) {
-    let buttons = [];
+		switch (type) {
+			case "yesno":
+				const noB = document.createElement("button");
+				noB.innerText = "No";
+				noB.classList.add("cancel-button");
+				noB.addEventListener("click", (e) => {
+					e.preventDefault();
+					e.stopPropagation();
 
-    switch (type) {
-      case "yesno":
-        const noB = document.createElement("button");
-        noB.innerText = "No";
-        noB.classList.add("cancel-button");
-        noB.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+					_shim.hide(false);
+					close(container, callback, false);
+				});
 
-          _shim.hide(false);
-          close(container, callback, false);
-        });
+				const yesB = document.createElement("button");
+				yesB.innerText = "Yes";
+				yesB.classList.add("action-button");
+				yesB.addEventListener("click", (e) => {
+					e.preventDefault();
+					e.stopPropagation();
 
-        const yesB = document.createElement("button");
-        yesB.innerText = "Yes";
-        yesB.classList.add("action-button");
-        yesB.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+					_shim.hide(false);
+					close(container, callback, true);
+				});
 
-          _shim.hide(false);
-          close(container, callback, true);
-        });
+				buttons.push(noB);
+				buttons.push(yesB);
+				break;
 
-        buttons.push(noB);
-        buttons.push(yesB);
-        break;
+			default:
+				const b = document.createElement("button");
+				b.innerText = "Close";
+				b.classList.add("action-button");
+				b.addEventListener("click", (e) => {
+					e.preventDefault();
+					e.stopPropagation();
 
-      default:
-        const b = document.createElement("button");
-        b.innerText = "Close";
-        b.classList.add("action-button");
-        b.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+					_shim.hide(false);
+					close(container, callback);
+				});
 
-          _shim.hide(false);
-          close(container, callback);
-        });
+				buttons.push(b);
+				break;
+		}
 
-        buttons.push(b);
-        break;
-    }
+		const buttonContainer = document.createElement("div");
+		buttonContainer.classList.add("button-row");
 
-    const buttonContainer = document.createElement("div");
-    buttonContainer.classList.add("button-row");
+		buttons.forEach((button) => { buttonContainer.appendChild(button); });
+		container.appendChild(buttonContainer);
+	}
 
-    buttons.forEach((button) => { buttonContainer.appendChild(button); });
-    container.appendChild(buttonContainer);
-  }
+	function close(container, callback, callbackValue) {
+		container.remove();
+		if (typeof callback === "function") {
+			callback(callbackValue);
+		}
+	}
 
-  function close(container, callback, callbackValue) {
-    container.remove();
-    if (typeof callback === "function") {
-      callback(callbackValue);
-    }
-  }
+	return {
+		confirm(message, options) {
+			show("confirm", message, options);
+		},
 
-  return {
-    confirm(message, options) {
-      show("confirm", message, options);
-    },
+		yesNo(message, options) {
+			return new Promise((resolve) => {
+				const cb = (result) => {
+					return resolve(result);
+				};
 
-    yesNo(message, options) {
-      return new Promise((resolve) => {
-        const cb = (result) => {
-          return resolve(result);
-        };
-
-        options = { ...{ callback: cb }, ...options };
-        show("yesno", message, options);
-      });
-    },
-  };
+				options = { ...{ callback: cb }, ...options };
+				show("yesno", message, options);
+			});
+		},
+	};
 }
 
 /*
@@ -530,55 +501,37 @@ if (!customElements.get("popup-menu-item")) {
  * Copyright © 2022 App Nerds LLC
  */
 function spinner() {
-  let spinner = undefined;
+	let spinner = undefined;
 
-  function calculateHeight() {
-    const body = document.body;
-    const html = document.documentElement;
-
-    const bodyHeight = body.getBoundingClientRect().height;
-    const htmlHeight = html.getBoundingClientRect().height;
-
-    const height = Math.max(bodyHeight, htmlHeight);
-    return height;
-  }
-
-  function calculateTop() {
-    const r = document.body.getBoundingClientRect();
-    return Math.abs(r.top);
-  }
-
-  function show() {
-    if (!spinner) {
-      spinner = document.createElement("div");
-      spinner.classList.add("spinner");
-      spinner.style.top = `${calculateTop()}px`;
-      spinner.style.height = `${calculateHeight()}px`;
-      spinner.innerHTML = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+	function show() {
+		if (!spinner) {
+			spinner = document.createElement("div");
+			spinner.classList.add("spinner");
+			spinner.innerHTML = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <circle cx="50" cy="50" r="45" />
         </svg>
       `;
 
-      document.body.appendChild(spinner);
-    }
-  }
+			document.body.appendChild(spinner);
+		}
+	}
 
-  function hide() {
-    if (spinner) {
-      spinner.remove();
-      spinner = undefined;
-    }
-  }
+	function hide() {
+		if (spinner) {
+			spinner.remove();
+			spinner = undefined;
+		}
+	}
 
-  return {
-    hide() {
-      hide();
-    },
+	return {
+		hide() {
+			hide();
+		},
 
-    show() {
-      show();
-    },
-  }
+		show() {
+			show();
+		},
+	}
 }
 
 /*

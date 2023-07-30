@@ -8,6 +8,7 @@
   <title>{{template "title" .}} | Fireplace</title>
   <link rel="stylesheet" href="/static/js/lib/frame/base.min.css" />
   <link rel="stylesheet" href="/static/js/lib/frame/components.min.css" />
+  <link rel="stylesheet" href="/static/js/lib/frame/icons.min.css" />
   <link rel="stylesheet" href="/static/css/styles.css" />
   <link rel="stylesheet" href="/static/js/lib/quill/quill.snow.css" />
 
@@ -66,7 +67,7 @@
   </footer>
 
   <script type="module" src="/static/js/pages/layout.js"></script>
-  {{if (IsSet "JavascriptIncludes" .)}} 
+  {{if (IsSet "JavascriptIncludes" .)}}
     {{range .JavascriptIncludes}}
       <script type="{{.Type}}" src="{{.Src}}"></script>
     {{end}}
