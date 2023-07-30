@@ -2,7 +2,7 @@
 {{define "title"}}View Logs{{end}}
 
 {{define "content"}}
-  <div class="container">
+  <div class="container view-logs">
     <h2>View Logs</h2>
 
     <section class="filters">
@@ -46,15 +46,15 @@
 
       <div class="break"></div>
 
-      <button id="btnClear"><i data-feather="refresh-cw"></i> Clear</button>
+      <button id="btnClear"><i class="icon--mdi icon--mdi--refresh"></i> Clear</button>
     </section>
 
     <section class="navigation-buttons">
-      <button id="first" disabled><i data-feather="skip-back"></i> First Page</button>
-      <button id="prev" disabled><i data-feather="arrow-left"></i> Previous Page</button>
+      <button id="first" alt="Go to first page" title="First Page" disabled><i class="icon--mdi icon--mdi--skip-backward"></i></button>
+      <button id="prev" alt="Go to previous page" title="Previous Page" disabled><i class="icon--mdi icon--mdi--skip-previous"></i></button>
       <span id="page">Page 0 of 0</span>
-      <button id="next" disabled>Next Page <i data-feather="arrow-right"></i></button>
-      <button id="last" disabled><i data-feather="skip-forward"></i> Last Page</button>
+      <button id="next" alt="Go to next page" title="Next Page" disabled><i class="icon--mdi icon--mdi--skip-next"></i></button>
+      <button id="last" alt="Go to last page" title="Last Page" disabled><i class="icon--mdi icon--mdi--skip-forward"></i></button>
     </section>
 
     <section class="results" id="results">
