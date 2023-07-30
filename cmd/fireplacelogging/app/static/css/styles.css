@@ -442,6 +442,9 @@ Quill customizations
 .member-edit-avatar-page { margin-bottom: 8rem; }
 .member-edit-avatar-page footer { position: relative; }
 
+.login-page { margin-bottom: 8rem; }
+.login-page footer { position: relative; }
+
 /* Change the flow to flex column at 1000px */
 @media only screen and (max-width: 1300px) {
   :root {
